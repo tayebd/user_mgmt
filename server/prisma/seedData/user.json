@@ -1,122 +1,202 @@
 [
   {
-    "username": "AliceJones",
-    "teamId": 1,
-    "profilePictureUrl": "p1.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174001"
+    "id": "123e4567-e89b-12d3-a456-426614174001",
+    "email": "alice.jones@example.com",
+    "name": "Alice Jones",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Alice",
+    "phone": "+1 (555) 101-1001",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "BobSmith",
-    "teamId": 2,
-    "profilePictureUrl": "p2.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174002"
+    "id": "123e4567-e89b-12d3-a456-426614174002",
+    "email": "bob.smith@example.com",
+    "name": "Bob Smith",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Bob",
+    "phone": "+1 (555) 101-1002",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "CarolWhite",
-    "teamId": 3,
-    "profilePictureUrl": "p3.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174003"
+    "id": "123e4567-e89b-12d3-a456-426614174003",
+    "email": "carol.white@example.com",
+    "name": "Carol White",
+    "role": "ADMIN",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Carol",
+    "phone": "+1 (555) 101-1003",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "DaveBrown",
-    "teamId": 4,
-    "profilePictureUrl": "p4.jpeg",
-    "cognitoId": "213b7530-1031-70e0-67e9-fe0805e18fb3"
+    "id": "213b7530-1031-70e0-67e9-fe0805e18fb3",
+    "email": "dave.brown@example.com",
+    "name": "Dave Brown",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Dave",
+    "phone": "+1 (555) 101-1004",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "EveClark",
-    "teamId": 5,
-    "profilePictureUrl": "p5.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174005"
+    "id": "123e4567-e89b-12d3-a456-426614174005",
+    "email": "eve.clark@example.com",
+    "name": "Eve Clark",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Eve",
+    "phone": "+1 (555) 101-1005",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "FrankWright",
-    "teamId": 1,
-    "profilePictureUrl": "p6.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174006"
+    "id": "123e4567-e89b-12d3-a456-426614174006",
+    "email": "frank.wright@example.com",
+    "name": "Frank Wright",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Frank",
+    "phone": "+1 (555) 101-1006",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "GraceHall",
-    "teamId": 2,
-    "profilePictureUrl": "p7.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174007"
+    "id": "123e4567-e89b-12d3-a456-426614174007",
+    "email": "grace.hall@example.com",
+    "name": "Grace Hall",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Grace",
+    "phone": "+1 (555) 101-1007",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "HenryAllen",
-    "teamId": 3,
-    "profilePictureUrl": "p8.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174008"
+    "id": "123e4567-e89b-12d3-a456-426614174008",
+    "email": "henry.allen@example.com",
+    "name": "Henry Allen",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Henry",
+    "phone": "+1 (555) 101-1008",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "IdaMartin",
-    "teamId": 4,
-    "profilePictureUrl": "p9.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174009"
+    "id": "123e4567-e89b-12d3-a456-426614174009",
+    "email": "ida.martin@example.com",
+    "name": "Ida Martin",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Ida",
+    "phone": "+1 (555) 101-1009",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "JohnDoe",
-    "teamId": 5,
-    "profilePictureUrl": "p10.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174010"
+    "id": "123e4567-e89b-12d3-a456-426614174010",
+    "email": "john.doe@example.com",
+    "name": "John Doe",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
+    "phone": "+1 (555) 101-1010",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "LauraAdams",
-    "teamId": 1,
-    "profilePictureUrl": "p11.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174011"
+    "id": "123e4567-e89b-12d3-a456-426614174011",
+    "email": "laura.adams@example.com",
+    "name": "Laura Adams",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Laura",
+    "phone": "+1 (555) 101-1011",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "NormanBates",
-    "teamId": 2,
-    "profilePictureUrl": "p12.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174012"
+    "id": "123e4567-e89b-12d3-a456-426614174012",
+    "email": "norman.bates@example.com",
+    "name": "Norman Bates",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Norman",
+    "phone": "+1 (555) 101-1012",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "OliviaPace",
-    "teamId": 3,
-    "profilePictureUrl": "p13.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174013"
+    "id": "123e4567-e89b-12d3-a456-426614174013",
+    "email": "olivia.pace@example.com",
+    "name": "Olivia Pace",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Olivia",
+    "phone": "+1 (555) 101-1013",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "PeterQuill",
-    "teamId": 4,
-    "profilePictureUrl": "p1.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174014"
+    "id": "123e4567-e89b-12d3-a456-426614174014",
+    "email": "peter.quill@example.com",
+    "name": "Peter Quill",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Peter",
+    "phone": "+1 (555) 101-1014",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "QuincyAdams",
-    "teamId": 5,
-    "profilePictureUrl": "p2.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174015"
+    "id": "123e4567-e89b-12d3-a456-426614174015",
+    "email": "quincy.adams@example.com",
+    "name": "Quincy Adams",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Quincy",
+    "phone": "+1 (555) 101-1015",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "RachelGreen",
-    "teamId": 1,
-    "profilePictureUrl": "p3.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174016"
+    "id": "123e4567-e89b-12d3-a456-426614174016",
+    "email": "rachel.green@example.com",
+    "name": "Rachel Green",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Rachel",
+    "phone": "+1 (555) 101-1016",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "SteveJobs",
-    "teamId": 2,
-    "profilePictureUrl": "p4.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174017"
+    "id": "123e4567-e89b-12d3-a456-426614174017",
+    "email": "steve.jobs@example.com",
+    "name": "Steve Jobs",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Steve",
+    "phone": "+1 (555) 101-1017",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "TinaFey",
-    "teamId": 3,
-    "profilePictureUrl": "p5.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174018"
+    "id": "123e4567-e89b-12d3-a456-426614174018",
+    "email": "tina.fey@example.com",
+    "name": "Tina Fey",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Tina",
+    "phone": "+1 (555) 101-1018",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "UrsulaMonroe",
-    "teamId": 4,
-    "profilePictureUrl": "p6.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174019"
+    "id": "123e4567-e89b-12d3-a456-426614174019",
+    "email": "ursula.monroe@example.com",
+    "name": "Ursula Monroe",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Ursula",
+    "phone": "+1 (555) 101-1019",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   },
   {
-    "username": "VictorHugo",
-    "teamId": 5,
-    "profilePictureUrl": "p7.jpeg",
-    "cognitoId": "123e4567-e89b-12d3-a456-426614174020"
+    "id": "123e4567-e89b-12d3-a456-426614174020",
+    "email": "victor.hugo@example.com",
+    "name": "Victor Hugo",
+    "role": "USER",
+    "profilePictureUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=Victor",
+    "phone": "+1 (555) 101-1020",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
   }
 ]

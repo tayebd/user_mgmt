@@ -1,65 +1,6 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
-
-export interface Project {
-  id: number;
-  name: string;
-  description?: string;
-  startDate?: string;
-  endDate?: string;
-}
-
-export enum Priority {
-  Urgent = "Urgent",
-  High = "High",
-  Medium = "Medium",
-  Low = "Low",
-  Backlog = "Backlog",
-}
-
-export enum Status {
-  ToDo = "To Do",
-  WorkInProgress = "Work In Progress",
-  UnderReview = "Under Review",
-  Completed = "Completed",
-}
-
-export interface User {
-  userId?: number;
-  username: string;
-  email: string;
-  profilePictureUrl?: string;
-  cognitoId?: string;
-  teamId?: number;
-}
-
-export interface Attachment {
-  id: number;
-  fileURL: string;
-  fileName: string;
-  taskId: number;
-  uploadedById: number;
-}
-
-export interface Task {
-  id: number;
-  title: string;
-  description?: string;
-  status?: Status;
-  priority?: Priority;
-  tags?: string;
-  startDate?: string;
-  dueDate?: string;
-  points?: number;
-  projectId: number;
-  authorUserId?: number;
-  assignedUserId?: number;
-
-  author?: User;
-  assignee?: User;
-  comments?: Comment[];
-  attachments?: Attachment[];
-}
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { Project, Task, User } from '@/types';
+import { auth } from '@/lib/firebase';
 
 export interface SearchResults {
   tasks?: Task[];
@@ -67,113 +8,161 @@ export interface SearchResults {
   users?: User[];
 }
 
-export interface Team {
-  teamId: number;
-  teamName: string;
-  productOwnerUserId?: number;
-  projectManagerUserId?: number;
-}
+// Helper function to get the current auth token
+const getAuthToken = async () => {
+  try {
+    return await auth.currentUser?.getIdToken(true);
+  } catch (error) {
+    console.error('Error getting auth token:', error);
+    return null;
+  }
+};
 
 export const api = createApi({
+  reducerPath: 'api',
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+    baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
     prepareHeaders: async (headers) => {
-      const session = await fetchAuthSession();
-      const { accessToken } = session.tokens ?? {};
-      if (accessToken) {
-        headers.set("Authorization", `Bearer ${accessToken}`);
+      const token = await getAuthToken();
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`);
       }
       return headers;
     },
+    credentials: 'include',
   }),
-  reducerPath: "api",
-  tagTypes: ["Projects", "Tasks", "Users", "Teams"],
+  tagTypes: ['Projects', 'Tasks', 'Users'],
   endpoints: (build) => ({
-    getAuthUser: build.query({
-      queryFn: async (_, _queryApi, _extraoptions, fetchWithBQ) => {
-        try {
-          const user = await getCurrentUser();
-          const session = await fetchAuthSession();
-          if (!session) throw new Error("No session found");
-          const { userSub } = session;
-          const { accessToken } = session.tokens ?? {};
-
-          const userDetailsResponse = await fetchWithBQ(`users/${userSub}`);
-          const userDetails = userDetailsResponse.data as User;
-
-          return { data: { user, userSub, userDetails } };
-        } catch (error: any) {
-          return { error: error.message || "Could not fetch user data" };
-        }
-      },
-    }),
     getProjects: build.query<Project[], void>({
-      query: () => "projects",
-      providesTags: ["Projects"],
+      query: () => ({
+        url: 'projects',
+        method: 'GET',
+      }),
+      providesTags: ['Projects'],
     }),
+
+    getProject: build.query<Project, string>({
+      query: (projectId) => ({
+        url: `projects/${projectId}`,
+        method: 'GET',
+      }),
+      providesTags: ['Projects'],
+    }),
+
     createProject: build.mutation<Project, Partial<Project>>({
       query: (project) => ({
-        url: "projects",
-        method: "POST",
+        url: 'projects',
+        method: 'POST',
         body: project,
       }),
-      invalidatesTags: ["Projects"],
+      invalidatesTags: ['Projects'],
     }),
-    getTasks: build.query<Task[], { projectId: number }>({
-      query: ({ projectId }) => `tasks?projectId=${projectId}`,
-      providesTags: (result) =>
-        result
-          ? result.map(({ id }) => ({ type: "Tasks" as const, id }))
-          : [{ type: "Tasks" as const }],
+
+    updateProject: build.mutation<Project, { projectId: string; project: Partial<Project> }>({
+      query: ({ projectId, project }) => ({
+        url: `projects/${projectId}`,
+        method: 'PATCH',
+        body: project,
+      }),
+      invalidatesTags: ['Projects'],
     }),
-    getTasksByUser: build.query<Task[], number>({
-      query: (userId) => `tasks/user/${userId}`,
-      providesTags: (result, error, userId) =>
-        result
-          ? result.map(({ id }) => ({ type: "Tasks", id }))
-          : [{ type: "Tasks", id: userId }],
+
+    deleteProject: build.mutation<void, string>({
+      query: (projectId) => ({
+        url: `projects/${projectId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Projects', 'Tasks'],
     }),
+
+    getTasks: build.query<Task[], string>({
+      query: (projectId) => ({
+        url: `tasks/project/${projectId}`,
+        method: 'GET',
+      }),
+      providesTags: ['Tasks'],
+    }),
+
+    getTask: build.query<Task, { taskId: string }>({
+      query: ({ taskId }) => ({
+        url: `tasks/${taskId}`,
+        method: 'GET',
+      }),
+      providesTags: ['Tasks'],
+    }),
+
     createTask: build.mutation<Task, Partial<Task>>({
       query: (task) => ({
-        url: "tasks",
-        method: "POST",
+        url: 'tasks',
+        method: 'POST',
         body: task,
       }),
-      invalidatesTags: ["Tasks"],
+      invalidatesTags: ['Tasks'],
     }),
-    updateTaskStatus: build.mutation<Task, { taskId: number; status: string }>({
-      query: ({ taskId, status }) => ({
-        url: `tasks/${taskId}/status`,
-        method: "PATCH",
-        body: { status },
+
+    updateTask: build.mutation<Task, { taskId: string; task: Partial<Task> }>({
+      query: ({ taskId, task }) => ({
+        url: `tasks/${taskId}`,
+        method: 'PUT',
+        body: task,
       }),
-      invalidatesTags: (result, error, { taskId }) => [
-        { type: "Tasks", id: taskId },
-      ],
+      invalidatesTags: ['Tasks'],
     }),
+
+    deleteTask: build.mutation<void, string>({
+      query: (taskId) => ({
+        url: `tasks/${taskId}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Tasks'],
+    }),
+
     getUsers: build.query<User[], void>({
-      query: () => "users",
-      providesTags: ["Users"],
+      query: () => ({
+        url: 'users',
+        method: 'GET',
+      }),
+      providesTags: ['Users'],
     }),
-    getTeams: build.query<Team[], void>({
-      query: () => "teams",
-      providesTags: ["Teams"],
+
+    getUser: build.query<User, string>({
+      query: (userId) => ({
+        url: `users/${userId}`,
+        method: 'GET',
+      }),
+      providesTags: ['Users'],
     }),
-    search: build.query<SearchResults, string>({
-      query: (query) => `search?query=${query}`,
+
+    getTasksByUser: build.query<Task[], string>({
+      query: (userId) => ({
+        url: `tasks/user/${userId}`,
+        method: 'GET',
+      }),
+      providesTags: ['Tasks'],
+    }),
+
+    searchItems: build.query<SearchResults, string>({
+      query: (searchTerm) => ({
+        url: `search?q=${encodeURIComponent(searchTerm)}`,
+        method: 'GET',
+      }),
     }),
   }),
 });
 
 export const {
   useGetProjectsQuery,
+  useGetProjectQuery,
   useCreateProjectMutation,
+  useUpdateProjectMutation,
+  useDeleteProjectMutation,
   useGetTasksQuery,
+  useGetTaskQuery,
   useCreateTaskMutation,
-  useUpdateTaskStatusMutation,
-  useSearchQuery,
+  useUpdateTaskMutation,
+  useDeleteTaskMutation,
   useGetUsersQuery,
-  useGetTeamsQuery,
+  useGetUserQuery,
   useGetTasksByUserQuery,
-  useGetAuthUserQuery,
+  useSearchItemsQuery,
 } = api;

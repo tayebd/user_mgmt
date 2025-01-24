@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+import Header from "@/components/Header/index";
 import React from "react";
 
 const Settings = () => {

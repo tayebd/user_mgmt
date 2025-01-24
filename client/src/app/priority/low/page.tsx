@@ -1,9 +1,17 @@
-import React from "react";
-import ReusablePriorityPage from "../reusablePriorityPage";
-import { Priority } from "@/state/api";
+'use client';
 
-const Urgent = () => {
-  return <ReusablePriorityPage priority={Priority.Low} />;
+import React from 'react';
+import { TaskPriority } from '@/types';
+import ReusablePriorityPage from '../reusablePriorityPage';
+
+const LowPriorityPage = () => {
+  return (
+    <ReusablePriorityPage
+      priority={TaskPriority.LOW}
+      title="Low Priority Tasks"
+      description="Tasks that can be completed when time permits"
+    />
+  );
 };
 
-export default Urgent;
+export default LowPriorityPage;

@@ -1,8 +1,8 @@
 "use client";
 import { useGetUsersQuery } from "@/state/api";
 import React from "react";
-import { useAppSelector } from "../redux";
-import Header from "@/components/Header";
+import { useAppSelector } from "@/app/redux";
+import Header from "@/components/Header/index";
 import {
   DataGrid,
   GridColDef,
@@ -31,7 +31,7 @@ const columns: GridColDef[] = [
       <div className="flex h-full w-full items-center justify-center">
         <div className="h-9 w-9">
           <Image
-            src={`https://pm-s3-images.s3.us-east-2.amazonaws.com/${params.value}`}
+            src={params.value}
             alt={params.row.username}
             width={100}
             height={50}
@@ -62,8 +62,8 @@ const Users = () => {
           slots={{
             toolbar: CustomToolbar,
           }}
-          className={dataGridClassNames}
-          sx={dataGridSxStyles(isDarkMode)}
+          className={dataGridClassNames.root}
+          sx={dataGridSxStyles}
         />
       </div>
     </div>

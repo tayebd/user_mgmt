@@ -1,105 +1,86 @@
+'use client';
+
 import React from "react";
-import { Menu, Moon, Search, Settings, Sun, User } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { auth } from "@/lib/firebase";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
-import { setIsDarkMode, setIsSidebarCollapsed } from "@/state";
-import { useGetAuthUserQuery } from "@/state/api";
-import { signOut } from "aws-amplify/auth";
-import Image from "next/image";
+import { setIsDarkMode } from "@/state";
+import { signOut } from "firebase/auth";
+import { Menu, Moon, Search, Settings, Sun } from "lucide-react";
 
 const Navbar = () => {
+  const pathname = usePathname();
   const dispatch = useAppDispatch();
-  const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed,
-  );
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
-  const { data: currentUser } = useGetAuthUserQuery({});
   const handleSignOut = async () => {
     try {
-      await signOut();
+      await signOut(auth);
     } catch (error) {
-      console.error("Error signing out: ", error);
+      console.error('Error signing out:', error);
     }
   };
 
-  if (!currentUser) return null;
-  const currentUserDetails = currentUser?.userDetails;
-
   return (
-    <div className="flex items-center justify-between bg-white px-4 py-3 dark:bg-black">
-      {/* Search Bar */}
-      <div className="flex items-center gap-8">
-        {!isSidebarCollapsed ? null : (
-          <button
-            onClick={() => dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}
-          >
-            <Menu className="h-8 w-8 dark:text-white" />
-          </button>
-        )}
+    <nav className="flex items-center justify-between bg-white px-4 py-3 dark:bg-gray-800">
+      {/* Left side */}
+      <div className="flex items-center gap-4">
+        <Link href="/" className="text-lg font-semibold">
+          Project Management
+        </Link>
         <div className="relative flex h-min w-[200px]">
-          <Search className="absolute left-[4px] top-1/2 mr-2 h-5 w-5 -translate-y-1/2 transform cursor-pointer dark:text-white" />
+          <Search className="absolute left-[4px] top-1/2 h-5 w-5 -translate-y-1/2 transform cursor-pointer dark:text-white" />
           <input
-            className="w-full rounded border-none bg-gray-100 p-2 pl-8 placeholder-gray-500 focus:border-transparent focus:outline-none dark:bg-gray-700 dark:text-white dark:placeholder-white"
-            type="search"
+            type="text"
+            className="h-8 w-full rounded-md border border-gray-300 bg-white pl-8 pr-4 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             placeholder="Search..."
           />
         </div>
       </div>
 
-      {/* Icons */}
-      <div className="flex items-center">
+      {/* Right side */}
+      <div className="flex items-center gap-4">
+        <Link
+          href="/projects"
+          className={`text-sm ${
+            pathname === "/projects" ? "text-blue-500" : "text-gray-700 dark:text-white"
+          } hover:text-blue-500`}
+        >
+          Projects
+        </Link>
+        <Link
+          href="/tasks"
+          className={`text-sm ${
+            pathname === "/tasks" ? "text-blue-500" : "text-gray-700 dark:text-white"
+          } hover:text-blue-500`}
+        >
+          Tasks
+        </Link>
         <button
           onClick={() => dispatch(setIsDarkMode(!isDarkMode))}
-          className={
-            isDarkMode
-              ? `rounded p-2 dark:hover:bg-gray-700`
-              : `rounded p-2 hover:bg-gray-100`
-          }
+          className="rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           {isDarkMode ? (
-            <Sun className="h-6 w-6 cursor-pointer dark:text-white" />
+            <Sun className="h-5 w-5 text-gray-700 dark:text-white" />
           ) : (
-            <Moon className="h-6 w-6 cursor-pointer dark:text-white" />
+            <Moon className="h-5 w-5 text-gray-700" />
           )}
         </button>
         <Link
           href="/settings"
-          className={
-            isDarkMode
-              ? `h-min w-min rounded p-2 dark:hover:bg-gray-700`
-              : `h-min w-min rounded p-2 hover:bg-gray-100`
-          }
+          className="rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
-          <Settings className="h-6 w-6 cursor-pointer dark:text-white" />
+          <Settings className="h-5 w-5 text-gray-700 dark:text-white" />
         </Link>
-        <div className="ml-2 mr-5 hidden min-h-[2em] w-[0.1rem] bg-gray-200 md:inline-block"></div>
-        <div className="hidden items-center justify-between md:flex">
-          <div className="align-center flex h-9 w-9 justify-center">
-            {!!currentUserDetails?.profilePictureUrl ? (
-              <Image
-                src={`https://pm-s3-images.s3.us-east-2.amazonaws.com/${currentUserDetails?.profilePictureUrl}`}
-                alt={currentUserDetails?.username || "User Profile Picture"}
-                width={100}
-                height={50}
-                className="h-full rounded-full object-cover"
-              />
-            ) : (
-              <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
-            )}
-          </div>
-          <span className="mx-3 text-gray-800 dark:text-white">
-            {currentUserDetails?.username}
-          </span>
-          <button
-            className="hidden rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block"
-            onClick={handleSignOut}
-          >
-            Sign out
-          </button>
-        </div>
+        <button
+          onClick={handleSignOut}
+          className="rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+        >
+          Sign Out
+        </button>
       </div>
-    </div>
+    </nav>
   );
 };
 

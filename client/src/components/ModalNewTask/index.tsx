@@ -1,168 +1,170 @@
-import Modal from "@/components/Modal";
-import { Priority, Status, useCreateTaskMutation } from "@/state/api";
-import React, { useState } from "react";
-import { formatISO } from "date-fns";
+'use client';
 
-type Props = {
+import React, { useState } from 'react';
+import { useCreateTaskMutation } from '@/state/api';
+import { TaskStatus, TaskPriority } from '@/types';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { useToast } from '@/components/ui/use-toast';
+
+interface ModalNewTaskProps {
   isOpen: boolean;
   onClose: () => void;
-  id?: string | null;
-};
+  projectId: string;
+}
 
-const ModalNewTask = ({ isOpen, onClose, id = null }: Props) => {
-  const [createTask, { isLoading }] = useCreateTaskMutation();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [status, setStatus] = useState<Status>(Status.ToDo);
-  const [priority, setPriority] = useState<Priority>(Priority.Backlog);
-  const [tags, setTags] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [dueDate, setDueDate] = useState("");
-  const [authorUserId, setAuthorUserId] = useState("");
-  const [assignedUserId, setAssignedUserId] = useState("");
-  const [projectId, setProjectId] = useState("");
+const ModalNewTask: React.FC<ModalNewTaskProps> = ({
+  isOpen,
+  onClose,
+  projectId,
+}) => {
+  const [createTask] = useCreateTaskMutation();
+  const { toast } = useToast();
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [status, setStatus] = useState<TaskStatus>(TaskStatus.NOT_STARTED);
+  const [priority, setPriority] = useState<TaskPriority>(TaskPriority.MEDIUM);
+  const [dueDate, setDueDate] = useState('');
 
-  const handleSubmit = async () => {
-    if (!title || !authorUserId || !(id !== null || projectId)) return;
-
-    const formattedStartDate = formatISO(new Date(startDate), {
-      representation: "complete",
-    });
-    const formattedDueDate = formatISO(new Date(dueDate), {
-      representation: "complete",
-    });
-
-    await createTask({
-      title,
-      description,
-      status,
-      priority,
-      tags,
-      startDate: formattedStartDate,
-      dueDate: formattedDueDate,
-      authorUserId: parseInt(authorUserId),
-      assignedUserId: parseInt(assignedUserId),
-      projectId: id !== null ? Number(id) : Number(projectId),
-    });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await createTask({
+        projectId,
+        title,
+        description,
+        status,
+        priority,
+        dueDate: new Date(dueDate),
+      }).unwrap();
+      
+      toast({
+        title: "Success",
+        description: "Task created successfully",
+      });
+      
+      onClose();
+      setTitle('');
+      setDescription('');
+      setStatus(TaskStatus.NOT_STARTED);
+      setPriority(TaskPriority.MEDIUM);
+      setDueDate('');
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create task. Please try again.",
+      });
+    }
   };
-
-  const isFormValid = () => {
-    return title && authorUserId && !(id !== null || projectId);
-  };
-
-  const selectStyles =
-    "mb-4 block w-full rounded border border-gray-300 px-3 py-2 dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none";
-
-  const inputStyles =
-    "w-full rounded border border-gray-300 p-2 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none";
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} name="Create New Task">
-      <form
-        className="mt-4 space-y-6"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmit();
-        }}
-      >
-        <input
-          type="text"
-          className={inputStyles}
-          placeholder="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <textarea
-          className={inputStyles}
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
-          <select
-            className={selectStyles}
-            value={status}
-            onChange={(e) =>
-              setStatus(Status[e.target.value as keyof typeof Status])
-            }
-          >
-            <option value="">Select Status</option>
-            <option value={Status.ToDo}>To Do</option>
-            <option value={Status.WorkInProgress}>Work In Progress</option>
-            <option value={Status.UnderReview}>Under Review</option>
-            <option value={Status.Completed}>Completed</option>
-          </select>
-          <select
-            className={selectStyles}
-            value={priority}
-            onChange={(e) =>
-              setPriority(Priority[e.target.value as keyof typeof Priority])
-            }
-          >
-            <option value="">Select Priority</option>
-            <option value={Priority.Urgent}>Urgent</option>
-            <option value={Priority.High}>High</option>
-            <option value={Priority.Medium}>Medium</option>
-            <option value={Priority.Low}>Low</option>
-            <option value={Priority.Backlog}>Backlog</option>
-          </select>
-        </div>
-        <input
-          type="text"
-          className={inputStyles}
-          placeholder="Tags (comma separated)"
-          value={tags}
-          onChange={(e) => setTags(e.target.value)}
-        />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Create New Task</DialogTitle>
+        </DialogHeader>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
-          <input
-            type="date"
-            className={inputStyles}
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-          />
-          <input
-            type="date"
-            className={inputStyles}
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-          />
-        </div>
-        <input
-          type="text"
-          className={inputStyles}
-          placeholder="Author User ID"
-          value={authorUserId}
-          onChange={(e) => setAuthorUserId(e.target.value)}
-        />
-        <input
-          type="text"
-          className={inputStyles}
-          placeholder="Assigned User ID"
-          value={assignedUserId}
-          onChange={(e) => setAssignedUserId(e.target.value)}
-        />
-        {id === null && (
-          <input
-            type="text"
-            className={inputStyles}
-            placeholder="ProjectId"
-            value={projectId}
-            onChange={(e) => setProjectId(e.target.value)}
-          />
-        )}
-        <button
-          type="submit"
-          className={`focus-offset-2 mt-4 flex w-full justify-center rounded-md border border-transparent bg-blue-primary px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 ${
-            !isFormValid() || isLoading ? "cursor-not-allowed opacity-50" : ""
-          }`}
-          disabled={!isFormValid() || isLoading}
-        >
-          {isLoading ? "Creating..." : "Create Task"}
-        </button>
-      </form>
-    </Modal>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">
+                Title
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+                placeholder="Enter task title"
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">
+                Description
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
+                rows={3}
+                placeholder="Enter task description"
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">
+                Status
+              </label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value as TaskStatus)}
+                className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                {Object.values(TaskStatus).map((status) => (
+                  <option key={status} value={status}>
+                    {status.replace('_', ' ')}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">
+                Priority
+              </label>
+              <select
+                value={priority}
+                onChange={(e) => setPriority(e.target.value as TaskPriority)}
+                className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
+              >
+                {Object.values(TaskPriority).map((priority) => (
+                  <option key={priority} value={priority}>
+                    {priority}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="grid gap-2">
+              <label className="text-sm font-medium">
+                Due Date
+              </label>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 p-2.5 text-sm focus:border-blue-500 focus:ring-blue-500"
+                required
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+            >
+              Create Task
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

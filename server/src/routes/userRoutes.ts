@@ -1,11 +1,13 @@
 import { Router } from "express";
-
-import { getUser, getUsers, postUser } from "../controllers/userController";
+import { getUser, createUser } from "../controllers/userController";
+import { authenticateToken } from "../middleware/auth";
 
 const router = Router();
 
-router.get("/", getUsers);
-router.post("/", postUser);
-router.get("/:cognitoId", getUser);
+// Create a new user (signup)
+router.post("/", createUser);
+
+// Get current user profile (requires authentication)
+router.get("/me", authenticateToken, getUser);
 
 export default router;

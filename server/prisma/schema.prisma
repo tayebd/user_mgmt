@@ -14,96 +14,80 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  userId            Int     @id @default(autoincrement())
-  cognitoId         String  @unique
-  username          String  @unique
-  profilePictureUrl String?
-  teamId            Int?
-
-  authoredTasks   Task[]           @relation("TaskAuthor")
-  assignedTasks   Task[]           @relation("TaskAssignee")
-  taskAssignments TaskAssignment[]
-  attachments     Attachment[]
-  comments        Comment[]
-  team            Team?            @relation(fields: [teamId], references: [id])
+enum UserRole {
+  ADMIN
+  USER
 }
 
-model Team {
-  id                   Int           @id @default(autoincrement())
-  teamName             String
-  productOwnerUserId   Int?
-  projectManagerUserId Int?
-  projectTeams         ProjectTeam[]
-  user                 User[]
+enum ProjectStatus {
+  NOT_STARTED
+  PLANNING
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+}
+
+enum TaskStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model User {
+  id              String   @id // Using Firebase UID as the primary key
+  email           String   @unique
+  name            String
+  role            UserRole @default(USER)
+  profilePictureUrl String?
+  phone           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relationships
+  projects      Project[] @relation("ProjectCreator")
+  tasks         Task[]    @relation("TaskAssignee")
+  createdTasks  Task[]    @relation("TaskCreator")
 }
 
 model Project {
-  id           Int           @id @default(autoincrement())
-  name         String
-  description  String?
-  startDate    DateTime?
-  endDate      DateTime?
-  tasks        Task[]
-  projectTeams ProjectTeam[]
-}
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  status      ProjectStatus @default(NOT_STARTED)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
-model ProjectTeam {
-  id        Int     @id @default(autoincrement())
-  teamId    Int
-  projectId Int
-  team      Team    @relation(fields: [teamId], references: [id])
-  project   Project @relation(fields: [projectId], references: [id])
+  // Relationships
+  createdBy    User   @relation("ProjectCreator", fields: [createdById], references: [id])
+  createdById  String
+  tasks        Task[]
 }
 
 model Task {
-  id             Int       @id @default(autoincrement())
-  title          String
-  description    String?
-  status         String?
-  priority       String?
-  tags           String?
-  startDate      DateTime?
-  dueDate        DateTime?
-  points         Int?
-  projectId      Int
-  authorUserId   Int
-  assignedUserId Int?
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  dueDate     DateTime
+  status      TaskStatus  @default(NOT_STARTED)
+  priority    TaskPriority @default(MEDIUM)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
-  project         Project          @relation(fields: [projectId], references: [id])
-  author          User             @relation("TaskAuthor", fields: [authorUserId], references: [userId])
-  assignee        User?            @relation("TaskAssignee", fields: [assignedUserId], references: [userId])
-  taskAssignments TaskAssignment[]
-  attachments     Attachment[]
-  comments        Comment[]
-}
-
-model TaskAssignment {
-  id     Int @id @default(autoincrement())
-  userId Int
-  taskId Int
-
-  user User @relation(fields: [userId], references: [userId])
-  task Task @relation(fields: [taskId], references: [id])
-}
-
-model Attachment {
-  id           Int     @id @default(autoincrement())
-  fileURL      String
-  fileName     String?
-  taskId       Int
-  uploadedById Int
-
-  task       Task @relation(fields: [taskId], references: [id])
-  uploadedBy User @relation(fields: [uploadedById], references: [userId])
-}
-
-model Comment {
-  id     Int    @id @default(autoincrement())
-  text   String
-  taskId Int
-  userId Int
-
-  task Task @relation(fields: [taskId], references: [id])
-  user User @relation(fields: [userId], references: [userId])
+  // Relationships
+  project     Project  @relation(fields: [projectId], references: [id])
+  projectId   String
+  assignedTo  User     @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  assignedToId String
+  createdBy   User     @relation("TaskCreator", fields: [createdById], references: [id])
+  createdById String
 }

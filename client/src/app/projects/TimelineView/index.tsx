@@ -3,21 +3,22 @@ import { useGetTasksQuery } from "@/state/api";
 import { DisplayOption, Gantt, ViewMode } from "gantt-task-react";
 import "gantt-task-react/dist/index.css";
 import React, { useMemo, useState } from "react";
+import { TaskStatus } from "@/types";
 
 type Props = {
-  id: string;
-  setIsModalNewTaskOpen: (isOpen: boolean) => void;
+  projectId: string;
+  setIsModalNewTaskOpen?: (isOpen: boolean) => void;
 };
 
 type TaskTypeItems = "task" | "milestone" | "project";
 
-const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
+const Timeline = ({ projectId, setIsModalNewTaskOpen }: Props) => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
   const {
     data: tasks,
     error,
     isLoading,
-  } = useGetTasksQuery({ projectId: Number(id) });
+  } = useGetTasksQuery(projectId);
 
   const [displayOptions, setDisplayOptions] = useState<DisplayOption>({
     viewMode: ViewMode.Month,
@@ -25,18 +26,25 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
   });
 
   const ganttTasks = useMemo(() => {
-    return (
-      tasks?.map((task) => ({
-        start: new Date(task.startDate as string),
-        end: new Date(task.dueDate as string),
+    if (!tasks) return [];
+
+    return tasks.map((task) => {
+      // Set default dates if not provided
+      const start = task.createdAt ? new Date(task.createdAt) : new Date();
+      const end = task.dueDate ? new Date(task.dueDate) : new Date(start.getTime() + 24 * 60 * 60 * 1000); // Default to 1 day duration
+
+      return {
+        start,
+        end,
         name: task.title,
         id: `Task-${task.id}`,
         type: "task" as TaskTypeItems,
-        progress: task.points ? (task.points / 10) * 100 : 0,
+        progress: task.status === TaskStatus.COMPLETED ? 100 : task.status === TaskStatus.IN_PROGRESS ? 50 : 0,
         isDisabled: false,
-      })) || []
-    );
-  }, [tasks]);
+        project: projectId,
+      };
+    });
+  }, [tasks, projectId]);
 
   const handleViewModeChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
@@ -47,39 +55,55 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
     }));
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error || !tasks) return <div>An error occurred while fetching tasks</div>;
+  if (isLoading) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  if (error || !tasks) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p className="text-red-500">Error loading project timeline</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="px-4 xl:px-6">
-      <div className="flex flex-wrap items-center justify-between gap-2 py-5">
-        <h1 className="me-2 text-lg font-bold dark:text-white">
-          Project Tasks Timeline
-        </h1>
-        <div className="relative inline-block w-64">
-          <select
-            className="focus:shadow-outline block w-full appearance-none rounded border border-gray-400 bg-white px-4 py-2 pr-8 leading-tight shadow hover:border-gray-500 focus:outline-none dark:border-dark-secondary dark:bg-dark-secondary dark:text-white"
-            value={displayOptions.viewMode}
-            onChange={handleViewModeChange}
-          >
-            <option value={ViewMode.Day}>Day</option>
-            <option value={ViewMode.Week}>Week</option>
-            <option value={ViewMode.Month}>Month</option>
-          </select>
-        </div>
+    <div className="flex h-full flex-col gap-4 p-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Project Tasks Timeline</h2>
+        <select
+          className="rounded-md border border-gray-300 px-3 py-1.5"
+          value={displayOptions.viewMode}
+          onChange={handleViewModeChange}
+        >
+          <option value={ViewMode.Month}>Month</option>
+          <option value={ViewMode.Week}>Week</option>
+          <option value={ViewMode.Day}>Day</option>
+        </select>
       </div>
 
-      <div className="overflow-hidden rounded-md bg-white shadow dark:bg-dark-secondary dark:text-white">
-        <div className="timeline">
+      <div className="flex-1">
+        {ganttTasks.length > 0 ? (
           <Gantt
             tasks={ganttTasks}
-            {...displayOptions}
-            columnWidth={displayOptions.viewMode === ViewMode.Month ? 150 : 100}
+            viewMode={displayOptions.viewMode}
+            locale={displayOptions.locale}
             listCellWidth="100px"
+            columnWidth={displayOptions.viewMode === ViewMode.Month ? 150 : 100}
             barBackgroundColor={isDarkMode ? "#101214" : "#aeb8c2"}
             barBackgroundSelectedColor={isDarkMode ? "#000" : "#9ba1a6"}
           />
-        </div>
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <p className="text-gray-500">No tasks found in this project</p>
+          </div>
+        )}
+      </div>
+      {setIsModalNewTaskOpen && (
         <div className="px-4 pb-5 pt-1">
           <button
             className="flex items-center rounded bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
@@ -88,7 +112,7 @@ const Timeline = ({ id, setIsModalNewTaskOpen }: Props) => {
             Add New Task
           </button>
         </div>
-      </div>
+      )}
     </div>
   );
 };

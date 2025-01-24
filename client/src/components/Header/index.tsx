@@ -1,17 +1,19 @@
 import React from "react";
 
-type Props = {
+interface HeaderProps {
   name: string;
-  buttonComponent?: any;
+  buttonComponent?: React.ReactNode;
   isSmallText?: boolean;
-};
+}
 
-const Header = ({ name, buttonComponent, isSmallText = false }: Props) => {
+const Header: React.FC<HeaderProps> = ({ 
+  name, 
+  buttonComponent = null, 
+  isSmallText = false 
+}) => {
   return (
-    <div className="mb-5 flex w-full items-center justify-between">
-      <h1
-        className={`${isSmallText ? "text-lg" : "text-2xl"} font-semibold dark:text-white`}
-      >
+    <div className="mb-8 flex items-center justify-between">
+      <h1 className={`${isSmallText ? 'text-xl' : 'text-3xl'} font-bold text-gray-900 dark:text-white`}>
         {name}
       </h1>
       {buttonComponent}

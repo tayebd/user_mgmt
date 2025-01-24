@@ -4,11 +4,18 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "pm-s3-images.s3.us-east-2.amazonaws.com",
+        hostname: "api.dicebear.com",
         port: "",
         pathname: "/**",
       }
     ]
+  },
+  experimental: {
+    turbo: {
+      rules: {
+        // Configure any Turbopack-specific rules
+      }
+    }
   }
 };
 
