@@ -78,3 +78,4 @@ Ensure you have these tools installed:
   ```sql
   SELECT setval(pg_get_serial_sequence('"[DATA_MODEL_NAME_HERE]"', 'id'), coalesce(max(id)+1, 1), false) FROM "[DATA_MODEL_NAME_HERE]";
   ```
+# solar_pv
