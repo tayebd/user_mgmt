@@ -17,6 +17,10 @@ import {
   ChevronFirst,
   ChevronLast,
   LogOut,
+  MapPin,
+  Sun,
+  Battery,
+  Wrench,
 } from "lucide-react";
 import { setIsSidebarCollapsed } from "@/state";
 
@@ -36,68 +40,108 @@ const Sidebar = () => {
     }
   };
 
-  const menuItems = [
-    {
-      title: "Pages",
-      list: [
-        {
-          title: "Dashboard",
-          href: "/",
-          icon: LayoutDashboard,
-        },
-        {
-          title: "Projects",
-          href: "/projects",
-          icon: ListTodo,
-        },
-        {
-          title: "Timeline",
-          href: "/timeline",
-          icon: Calendar,
-        },
-      ],
-    },
-    {
-      title: "Analytics",
-      list: [
-        {
-          title: "Search",
-          href: "/search",
-          icon: Search,
-        },
-        {
-          title: "Settings",
-          href: "/settings",
-          icon: Settings,
-        },
-      ],
-    },
-    {
-      title: "Tasks",
-      list: [
-        {
-          title: "Urgent",
-          href: "/priority/urgent",
-          icon: Timer,
-        },
-        {
-          title: "High",
-          href: "/priority/high",
-          icon: AlertTriangle,
-        },
-        {
-          title: "Medium",
-          href: "/priority/medium",
-          icon: AlertCircle,
-        },
-        {
-          title: "Low",
-          href: "/priority/low",
-          icon: AlertCircle,
-        },
-      ],
-    },
-  ];
+const menuItems = [
+  {
+    title: "Pages",
+    list: [
+      {
+        title: "Dashboard",
+        href: "/",
+        icon: LayoutDashboard,
+      },
+      {
+        title: "Projects",
+        href: "/projects",
+        icon: ListTodo,
+      },
+      {
+        title: "Timeline",
+        href: "/timeline",
+        icon: Calendar,
+      },
+    ],
+  },
+  {
+    title: "Solar Farm",
+    list: [
+      {
+        title: "Project Location",
+        href: "/solar/location",
+        icon: MapPin,
+      },
+      {
+        title: "Solar Panels",
+        href: "/solar/components/panels",
+        icon: Sun,
+      },
+      {
+        title: "Inverters",
+        href: "/solar/components/inverters",
+        icon: Battery,
+      },
+      {
+        title: "Mounting Hardware",
+        href: "/solar/components/mounting",
+        icon: Wrench,
+      },
+      {
+        title: "Mounting Cost",
+        href: "/solar/components/mounting-cost",
+        icon: Wrench,
+      },
+    ],
+  },
+  {
+    title: "Analytics",
+    list: [
+      {
+        title: "Search",
+        href: "/search",
+        icon: Search,
+      },
+      {
+        title: "Settings",
+        href: "/settings",
+        icon: Settings,
+      },
+    ],
+  },
+  {
+    title: "Tasks",
+    list: [
+      {
+        title: "Urgent",
+        href: "/priority/urgent",
+        icon: Timer,
+      },
+      {
+        title: "High",
+        href: "/priority/high",
+        icon: AlertTriangle,
+      },
+      {
+        title: "Medium",
+        href: "/priority/medium",
+        icon: AlertCircle,
+      },
+      {
+        title: "Low",
+        href: "/priority/low",
+        icon: AlertCircle,
+      },
+    ],
+  },
+  {
+    title: "Solar Companies",
+    list: [
+      {
+        title: "Solar Companies",
+        href: "/solar/companies",
+        icon: Sun,
+      },
+    ],
+  },
+];
 
   return (
     <aside

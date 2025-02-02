@@ -70,7 +70,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   return (
     <>
       <Link href={`/tasks/${task.id}`}>
-        <div className="group relative rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all hover:shadow-md">
+        <div className="group relative rounded-lg border border-gray-200 bg-white p-4 shadow-2xs transition-all hover:shadow-md">
           {/* Action buttons */}
           <div className="absolute right-4 top-4 flex space-x-2 opacity-0 transition-opacity group-hover:opacity-100">
             <button

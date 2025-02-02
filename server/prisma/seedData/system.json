@@ -1,0 +1,20 @@
+[
+  {
+    "id": "system-uuid-1",
+    "systemType": "Residential Solar",
+    "capacity": 10.5,
+    "annualProduction": 14000,
+    "projectId": "project-uuid-1",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "system-uuid-2",
+    "systemType": "Commercial Solar",
+    "capacity": 50.0,
+    "annualProduction": 65000,
+    "projectId": "project-uuid-2",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  }
+]

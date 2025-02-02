@@ -1,0 +1,17 @@
+[
+  {
+    "projectId": "project-uuid-1",
+    "roleId": "role-uuid-1",
+    "assignmentType": "ASSIGNED_INSTALLER"
+  },
+  {
+    "projectId": "project-uuid-1",
+    "roleId": "role-uuid-2",
+    "assignmentType": "ASSIGNED_SITE_INSPECTOR"
+  },
+  {
+    "projectId": "project-uuid-2",
+    "roleId": "role-uuid-1",
+    "assignmentType": "ASSIGNED_INSTALLER"
+  }
+]

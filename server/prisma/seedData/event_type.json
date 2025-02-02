@@ -1,0 +1,23 @@
+[
+  {
+    "id": "event-type-uuid-1",
+    "typeName": "Site Survey",
+    "orgId": "org-uuid-1",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "event-type-uuid-2",
+    "typeName": "Installation",
+    "orgId": "org-uuid-1",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "event-type-uuid-3",
+    "typeName": "Inspection",
+    "orgId": "org-uuid-1",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  }
+]

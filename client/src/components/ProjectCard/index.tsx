@@ -35,7 +35,7 @@ const ProjectCard = ({ project }: Props) => {
 
   return (
     <Link href={`/projects/${project.id}`}>
-      <div className="group relative flex h-full flex-col rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
+      <div className="group relative flex h-full flex-col rounded-lg border border-gray-200 bg-white p-6 shadow-2xs transition-all hover:-translate-y-1 hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
         {/* Action buttons */}
         <div className="absolute right-4 top-4 flex space-x-2 opacity-0 transition-opacity group-hover:opacity-100">
           <button

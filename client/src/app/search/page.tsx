@@ -34,7 +34,7 @@ const Search = () => {
           <input
             type="text"
             placeholder="Search for projects, tasks, or team members..."
-            className="w-full rounded-lg border border-gray-300 bg-white p-4 pl-12 shadow-sm transition-all focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+            className="w-full rounded-lg border border-gray-300 bg-white p-4 pl-12 shadow-2xs transition-all focus:border-blue-500 focus:outline-hidden focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             onChange={handleSearch}
           />
           <SearchIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />

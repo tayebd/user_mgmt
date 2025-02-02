@@ -1,0 +1,32 @@
+[
+  {
+    "id": "stage-uuid-1",
+    "title": "Site Survey",
+    "milestone": true,
+    "order": 1,
+    "isArchived": false,
+    "workflowId": "residential-solar-install",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "stage-uuid-2",
+    "title": "Design",
+    "milestone": true,
+    "order": 2,
+    "isArchived": false,
+    "workflowId": "residential-solar-install",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "stage-uuid-3",
+    "title": "Installation",
+    "milestone": true,
+    "order": 3,
+    "isArchived": false,
+    "workflowId": "residential-solar-install",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z"
+  }
+]

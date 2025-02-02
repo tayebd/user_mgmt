@@ -1,68 +1,151 @@
-@config "../../tailwind.config.ts";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+@custom-variant dark (&:is(class *));
+
+@theme {
+  --color-white: #ffffff;
+
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-500: #6b7280;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+
+  --color-blue-200: #93c5fd;
+  --color-blue-400: #60a5fa;
+  --color-blue-500: #3b82f6;
+
+  --color-dark-bg: #101214;
+  --color-dark-secondary: #1d1f21;
+  --color-dark-tertiary: #3b3d40;
+  --color-blue-primary: #0275ff;
+  --color-stroke-dark: #2d3135;
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
+  --background-image-gradient-conic: conic-gradient(
+    from 180deg at 50% 50%,
+    var(--tw-gradient-stops)
+  );
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
 }
 
-html,
-body,
-#root,
-.app {
-  height: 100%;
-  width: 100%;
-  @apply text-sm;
-  @apply bg-white;
-  @apply dark:bg-black;
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
 }
 
-/* TIMELINE STYLING */
-.timeline ._3_ygE {
-  @apply rounded-tl-md border border-r-0 border-[#e6e4e4] dark:border-stroke-dark;
-}
-.timeline ._2eZzQ {
-  @apply border-[#e6e4e4] dark:border-stroke-dark;
-}
-.timeline ._2dZTy {
-  @apply fill-white dark:fill-dark-secondary;
-}
-.timeline ._2dZTy:nth-child(even) {
-  @apply fill-[#f5f5f5] dark:fill-dark-tertiary;
-}
-.timeline ._35nLX {
-  @apply fill-white stroke-[#e6e4e4] dark:fill-dark-secondary dark:stroke-stroke-dark;
-}
-.timeline ._9w8d5 {
-  @apply fill-[#333] dark:fill-white;
-}
-.timeline ._34SS0 {
-  @apply bg-white dark:bg-dark-secondary;
-}
-.timeline ._34SS0:nth-of-type(even) {
-  @apply bg-[#f5f5f5] dark:bg-dark-tertiary;
-}
-.timeline ._RuwuK,
-.timeline ._3rUKi,
-.timeline ._1rLuZ {
-  @apply stroke-[#e6e4e4] dark:stroke-stroke-dark;
-}
-.timeline ._3ZbQT {
-  @apply border-l-0 border-[#e6e4e4] dark:border-stroke-dark;
-}
-.timeline ._3T42e {
-  @apply bg-white dark:bg-dark-bg;
-}
-.timeline ._29NTg {
-  @apply dark:text-neutral-500;
-}
+@layer utilities {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
-::-webkit-scrollbar {
-  width: 0px;
-  height: 0px;
+  html,
+  body,
+  #root,
+  .app {
+    height: 100%;
+    width: 100%;
+    @apply text-sm;
+    @apply bg-white;
+    @apply dark:bg-black;
+  }
+
+  /* TIMELINE STYLING */
+  .timeline ._3_ygE {
+    @apply rounded-tl-md border border-r-0 border-[#e6e4e4] dark:border-stroke-dark;
+  }
+  .timeline ._2eZzQ {
+    @apply border-[#e6e4e4] dark:border-stroke-dark;
+  }
+  .timeline ._2dZTy {
+    @apply fill-white dark:fill-dark-secondary;
+  }
+  .timeline ._2dZTy:nth-child(even) {
+    @apply fill-[#f5f5f5] dark:fill-dark-tertiary;
+  }
+  .timeline ._35nLX {
+    @apply fill-white stroke-[#e6e4e4] dark:fill-dark-secondary dark:stroke-stroke-dark;
+  }
+  .timeline ._9w8d5 {
+    @apply fill-[#333] dark:fill-white;
+  }
+  .timeline ._34SS0 {
+    @apply bg-white dark:bg-dark-secondary;
+  }
+  .timeline ._34SS0:nth-of-type(even) {
+    @apply bg-[#f5f5f5] dark:bg-dark-tertiary;
+  }
+  .timeline ._RuwuK,
+  .timeline ._3rUKi,
+  .timeline ._1rLuZ {
+    @apply stroke-[#e6e4e4] dark:stroke-stroke-dark;
+  }
+  .timeline ._3ZbQT {
+    @apply border-l-0 border-[#e6e4e4] dark:border-stroke-dark;
+  }
+  .timeline ._3T42e {
+    @apply bg-white dark:bg-dark-bg;
+  }
+  .timeline ._29NTg {
+    @apply dark:text-neutral-500;
+  }
+
+  ::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+  }
 }
 
 @layer base {

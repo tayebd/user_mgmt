@@ -83,7 +83,7 @@ const Timeline = () => {
         <select
           value={displayOptions.viewMode}
           onChange={handleViewModeChange}
-          className="rounded border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+          className="rounded border border-gray-300 bg-white px-3 py-2 shadow-2xs focus:border-blue-500 focus:outline-hidden dark:border-gray-600 dark:bg-gray-700 dark:text-white"
         >
           <option value={ViewMode.QuarterDay}>Quarter Day</option>
           <option value={ViewMode.HalfDay}>Half Day</option>
@@ -94,7 +94,7 @@ const Timeline = () => {
         </select>
       </div>
 
-      <div className="rounded-lg bg-white p-4 shadow dark:bg-gray-800">
+      <div className="rounded-lg bg-white p-4 shadow-2xs dark:bg-gray-800">
         {ganttTasks.length > 0 ? (
           <Gantt
             tasks={ganttTasks}

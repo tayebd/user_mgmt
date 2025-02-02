@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Project, Task, User } from '@/types';
+import { Project, Task, User, SolarCompany } from '@/types';
 import { auth } from '@/lib/firebase';
 
 export interface SearchResults {
@@ -31,7 +31,7 @@ export const api = createApi({
     },
     credentials: 'include',
   }),
-  tagTypes: ['Projects', 'Tasks', 'Users'],
+  tagTypes: ['Projects', 'Tasks', 'Users', 'SolarCompanies'],
   endpoints: (build) => ({
     getProjects: build.query<Project[], void>({
       query: () => ({
@@ -147,6 +147,14 @@ export const api = createApi({
         method: 'GET',
       }),
     }),
+
+    getSolarCompanies: build.query<SolarCompany[], void>({
+      query: () => ({
+        url: 'solar-companies',
+        method: 'GET',
+      }),
+      providesTags: ['SolarCompanies'],
+    }),
   }),
 });
 
@@ -165,4 +173,5 @@ export const {
   useGetUserQuery,
   useGetTasksByUserQuery,
   useSearchItemsQuery,
+  useGetSolarCompaniesQuery,
 } = api;
