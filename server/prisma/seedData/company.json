@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Tech Innovators",
+    "location": "San Francisco, CA",
+    "website": "https://techinnovators.com"
+  },
+  {
+    "name": "GreenTech Solutions",
+    "location": "New York, NY",
+    "website": "https://greentechsolutions.com"
+  },
+  {
+    "name": "Innovatech",
+    "location": "Seattle, WA",
+    "website": "https://innovatech.com"
+  }
+]
