@@ -10,8 +10,8 @@ import {
 
 const router = express.Router();
 
-router.get('/', authenticateToken, getCompanies);
-router.get('/:companyId', authenticateToken, getCompany);
+router.get('/', getCompanies);
+router.get('/:companyId', getCompany);
 router.post('/', authenticateToken, createCompany);
 router.put('/:companyId', authenticateToken, updateCompany);
 router.delete('/:companyId', authenticateToken, deleteCompany);

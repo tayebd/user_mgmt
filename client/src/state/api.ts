@@ -4,6 +4,7 @@ import { auth } from '@/lib/firebase';
 
 export interface SearchResults {
   users?: User[];
+  companies?: Company[];
 }
 
 // Helper function to get the current auth token
@@ -30,6 +31,7 @@ interface ApiState {
   updateUser: (userId: string, user: Partial<User>) => Promise<void>;
   deleteUser: (userId: string) => Promise<void>;
   searchItems: (searchTerm: string) => Promise<void>;
+  searchCompanies: (criteria: { searchTerm: string; location: string; capability: string; rating: string }) => Promise<void>;
   fetchCompanies: () => Promise<void>;
   createCompany: (company: Partial<Company>) => Promise<void>;
   updateCompany: (companyId: string, company: Partial<Company>) => Promise<void>;
@@ -119,13 +121,23 @@ const apiStore = create<ApiState>((set) => ({
     const data = await response.json();
     set({ searchResults: data });
   },
+  searchCompanies: async (criteria: { searchTerm: string; location: string; capability: string; rating: string }) => {
+    const queryParams = new URLSearchParams({
+      q: criteria.searchTerm,
+      location: criteria.location,
+      capability: criteria.capability,
+      rating: criteria.rating,
+    });
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/search/companies?${queryParams.toString()}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+    const data = await response.json();
+    set({ searchResults: { companies: data } });
+  },
   fetchCompanies: async () => {
-    const token = await getAuthToken();
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies`, {
       method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
       credentials: 'include',
     });
     const data = await response.json();

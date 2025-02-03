@@ -23,7 +23,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex items-center justify-between bg-white px-4 py-3 dark:bg-gray-800">
+    <nav className="flex items-center justify-between bg-white px-4 py-3 dark:bg-gray-800 ml-64">
       {/* Left side */}
       <div className="flex items-center gap-4">
         <Link href="/" className="text-lg font-semibold">

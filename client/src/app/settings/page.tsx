@@ -1,4 +1,3 @@
-import Header from "@/components/Header/index";
 import React from "react";
 
 const Settings = () => {
@@ -9,30 +8,36 @@ const Settings = () => {
     roleName: "Developer",
   };
 
-  const labelStyles = "block text-sm font-medium dark:text-white";
-  const textStyles =
-    "mt-1 block w-full border border-gray-300 rounded-md shadow-2xs p-2 dark:text-white";
-
   return (
-    <div className="p-8">
-      <Header name="Settings" />
-      <div className="space-y-4">
-        <div>
-          <label className={labelStyles}>Username</label>
-          <div className={textStyles}>{userSettings.username}</div>
-        </div>
-        <div>
-          <label className={labelStyles}>Email</label>
-          <div className={textStyles}>{userSettings.email}</div>
-        </div>
-        <div>
-          <label className={labelStyles}>Team</label>
-          <div className={textStyles}>{userSettings.teamName}</div>
-        </div>
-        <div>
-          <label className={labelStyles}>Role</label>
-          <div className={textStyles}>{userSettings.roleName}</div>
-        </div>
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Settings</h1>
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="py-2 px-4 text-left">Setting</th>
+              <th className="py-2 px-4 text-left">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr className="hover:bg-gray-50">
+              <td className="py-2 px-4">Username</td>
+              <td className="py-2 px-4">{userSettings.username}</td>
+            </tr>
+            <tr className="hover:bg-gray-50">
+              <td className="py-2 px-4">Email</td>
+              <td className="py-2 px-4">{userSettings.email}</td>
+            </tr>
+            <tr className="hover:bg-gray-50">
+              <td className="py-2 px-4">Team</td>
+              <td className="py-2 px-4">{userSettings.teamName}</td>
+            </tr>
+            <tr className="hover:bg-gray-50">
+              <td className="py-2 px-4">Role</td>
+              <td className="py-2 px-4">{userSettings.roleName}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );

@@ -18,4 +18,6 @@ export interface Company {
   createdAt: Date;
   updatedAt: Date;
   phone: string;
+  capability: string;
+  rating: number;
 }
