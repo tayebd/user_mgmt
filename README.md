@@ -1,4 +1,4 @@
-# User Managment
+# User Management
 
 ## Technology Stack
 
