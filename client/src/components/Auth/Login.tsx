@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { FirebaseError } from 'firebase/app';
 import { Button } from "@/components/ui/button";
+import { useRouter } from 'next/navigation';
 
 const getErrorMessage = (error: FirebaseError) => {
   switch (error.code) {
@@ -31,7 +32,15 @@ export const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp } = useAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { signIn, signUp, user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user && isAuthenticated) {
+      router.push('/welcome');
+    }
+  }, [user, isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +53,7 @@ export const Login = () => {
       } else {
         await signIn(email, password);
       }
+      setIsAuthenticated(true);
     } catch (error) {
       console.error('Authentication error:', error);
       if (error instanceof FirebaseError) {

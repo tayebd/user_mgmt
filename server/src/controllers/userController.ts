@@ -1,93 +1,67 @@
 import { Request, Response } from 'express';
-import { prisma } from '../config/db';
-import { UserRole } from '@prisma/client';
+import { getAuth } from 'firebase-admin/auth';
+import { app } from '../config/firebase';
 
-export const createUser = async (req: Request, res: Response) => {
+const auth = getAuth(app);
+
+export const getUsers = async (req: Request, res: Response) => {
   try {
-    const { email, name, id } = req.body;
-
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
-    });
-
-    if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
-    }
-
-    const user = await prisma.user.create({
-      data: {
-        id: id, // Firebase UID
-        email,
-        name,
-        role: UserRole.USER
-      },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        createdAt: true
-      }
-    });
-
-    res.status(201).json(user);
+    const users = await auth.listUsers();
+    res.status(200).json(users.users);
   } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ message: 'Error creating user' });
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };
 
 export const getUser = async (req: Request, res: Response) => {
+  const { userId } = req.params;
   try {
-    const userId = req.user?.id;
-
-    if (!userId) {
-      return res.status(401).json({ message: 'User not authenticated' });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        projects: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            status: true,
-            startDate: true,
-            endDate: true
-          }
-        },
-        tasks: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            status: true,
-            priority: true,
-            dueDate: true,
-            project: {
-              select: {
-                id: true,
-                name: true
-              }
-            }
-          }
-        }
-      }
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    res.json(user);
+    const user = await auth.getUser(userId);
+    res.status(200).json(user);
   } catch (error) {
-    console.error('Error getting user:', error);
-    res.status(500).json({ message: 'Error getting user' });
+    console.error('Error fetching user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const createUser = async (req: Request, res: Response) => {
+  const { email, password, displayName } = req.body;
+  try {
+    const user = await auth.createUser({
+      email,
+      password,
+      displayName,
+    });
+    res.status(201).json(user);
+  } catch (error) {
+    console.error('Error creating user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const updateUser = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  const { email, displayName } = req.body;
+  try {
+    const user = await auth.updateUser(userId, {
+      email,
+      displayName,
+    });
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+export const deleteUser = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  try {
+    await auth.deleteUser(userId);
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };

@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAppSelector, useAppDispatch } from "@/app/redux";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
@@ -22,15 +21,14 @@ import {
   Battery,
   Wrench,
 } from "lucide-react";
-import { setIsSidebarCollapsed } from "@/state";
+import useStore from "@/state";
+import { GlobalState } from "@/state";
 
 const Sidebar = () => {
   const pathname = usePathname();
   const { signOut } = useAuth();
-  const dispatch = useAppDispatch();
-  const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed
-  );
+  const isSidebarCollapsed = useStore((state: GlobalState) => state.isSidebarCollapsed);
+  const setIsSidebarCollapsed = useStore((state: GlobalState) => state.setIsSidebarCollapsed);
 
   const handleSignOut = async () => {
     try {
@@ -132,11 +130,11 @@ const menuItems = [
     ],
   },
   {
-    title: "Solar Companies",
+    title: "Companies",
     list: [
       {
-        title: "Solar Companies",
-        href: "/solar/companies",
+        title: "Companies",
+        href: "/companies",
         icon: Sun,
       },
     ],
@@ -157,7 +155,7 @@ const menuItems = [
                 <span className="text-xl font-bold">Taskify</span>
               )}
               <button
-                onClick={() => dispatch(setIsSidebarCollapsed(!isSidebarCollapsed))}
+                onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
                 className="grid h-6 w-6 place-items-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 {isSidebarCollapsed ? (
@@ -205,13 +203,13 @@ const menuItems = [
         </div>
 
         <div className="border-t border-gray-200 p-4 dark:border-gray-700">
-          <button
-            onClick={handleSignOut}
-            className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
-          >
-            <LogOut className="h-5 w-5" />
-            {!isSidebarCollapsed && <span className="text-sm">Logout</span>}
-          </button>
+<button
+  onClick={signOut}
+  className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+>
+  <LogOut className="h-5 w-5" />
+  {!isSidebarCollapsed && <span className="text-sm">Logout</span>}
+</button>
         </div>
       </div>
     </aside>

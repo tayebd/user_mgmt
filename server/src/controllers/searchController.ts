@@ -14,61 +14,6 @@ export const search = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Search query is required' });
     }
 
-    const projects = await prisma.project.findMany({
-      where: {
-        createdById: userId,
-        OR: [
-          { name: { contains: query, mode: 'insensitive' } },
-          { description: { contains: query, mode: 'insensitive' } }
-        ]
-      },
-      include: {
-        tasks: true,
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        }
-      }
-    });
-
-    const tasks = await prisma.task.findMany({
-      where: {
-        AND: [
-          {
-            OR: [
-              { title: { contains: query, mode: 'insensitive' } },
-              { description: { contains: query, mode: 'insensitive' } }
-            ]
-          },
-          {
-            OR: [
-              { createdById: userId },
-              { assignedToId: userId }
-            ]
-          }
-        ]
-      },
-      include: {
-        project: true,
-        assignedTo: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        },
-        createdBy: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
-        }
-      }
-    });
 
     const users = await prisma.user.findMany({
       where: {
@@ -86,8 +31,6 @@ export const search = async (req: Request, res: Response) => {
     });
 
     res.json({
-      projects,
-      tasks,
       users
     });
   } catch (error) {

@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rimraf dist && npx tsc",
-    "start": "npm run build && node dist/index.js",
-    "dev": "npm run build && concurrently \"npx tsc -w\" \"nodemon --exec ts-node src/index.ts\"",
+    "start": "pnpm run build && node dist/index.js",
+    "dev": "pnpm run build && concurrently \"npx tsc -w\" \"nodemon --exec ts-node src/index.ts\"",
     "seed": "ts-node prisma/seed.ts",
     "seed:excel": "ts-node prisma/utils/excelSeeder.ts"
   },
@@ -23,7 +23,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^22.10.9",
+    "@types/node": "^22.13.0",
     "concurrently": "^8.2.2",
     "nodemon": "^3.1.4",
     "rimraf": "^6.0.1",

@@ -5,13 +5,13 @@ import { ServiceAccount } from 'firebase-admin';
 if (!admin.apps.length) {
   try {
     let credential;
-    
+
     // Try to get service account from env var
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
       const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT) as ServiceAccount;
       credential = admin.credential.cert(serviceAccount);
       console.log('Using Firebase service account from environment variable');
-    } 
+    }
     // Try to use application default credentials
     else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
       credential = admin.credential.applicationDefault();
@@ -42,3 +42,4 @@ if (!admin.apps.length) {
 }
 
 export const auth = admin.auth();
+export const app = admin.app();

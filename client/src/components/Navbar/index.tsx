@@ -4,15 +4,15 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { auth } from "@/lib/firebase";
-import { useAppDispatch, useAppSelector } from "@/app/redux";
-import { setIsDarkMode } from "@/state";
+import useStore from "@/state";
+import { GlobalState } from "@/state";
 import { signOut } from "firebase/auth";
 import { Menu, Moon, Search, Settings, Sun } from "lucide-react";
 
 const Navbar = () => {
   const pathname = usePathname();
-  const dispatch = useAppDispatch();
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const isDarkMode = useStore((state: GlobalState) => state.isDarkMode);
+  const setIsDarkMode = useStore((state: GlobalState) => state.setIsDarkMode);
 
   const handleSignOut = async () => {
     try {
@@ -58,7 +58,7 @@ const Navbar = () => {
           Tasks
         </Link>
         <button
-          onClick={() => dispatch(setIsDarkMode(!isDarkMode))}
+          onClick={() => setIsDarkMode(!isDarkMode)}
           className="rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           {isDarkMode ? (
