@@ -29,7 +29,7 @@ const CompanyDetailPage = () => {
         <p><strong>Location:</strong> {company.location}</p>
         <p><strong>Website:</strong> <a href={company.website} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">{company.website}</a></p>
         <p><strong>Phone Number:</strong> {company.phone}</p>
-        <p><strong>Capability:</strong> {company.capability}</p>
+        <p><strong>Capabilities:</strong> {company.capabilities}</p>
         <p><strong>Rating:</strong> {company.rating}</p>
       </div>
     </div>

@@ -6,7 +6,7 @@
 -   **Backend:** Express.js
 -   **Database:** Prisma (PostgreSQL)
 -   **Data Import:** XLSX library for Excel parsing
--   **Typescript:** For both frontend and backend
+-   **Typescript**: For both frontend and backend
 
 ## Development Setup
 
