@@ -1,0 +1,48 @@
+# .clinerules
+
+## Critical Implementation Paths
+
+- **User Authentication:**
+  - Client: `Login.tsx`, `AuthContext.tsx`
+  - Firebase
+  - Server: `auth.ts` (middleware)
+
+- **Company Data Retrieval:**
+  - Client: `CompanyManagement.tsx`, `api.ts`
+  - Server: `companyRoutes.ts`, `companyController.ts`
+  - Prisma
+  - Database
+
+## User Preferences and Workflow
+
+- Prefers using the command line for tasks.
+- Values clear and concise documentation.
+
+## Project-Specific Patterns
+
+- Client-server architecture with Next.js and Express.js.
+- Prisma for database interaction.
+- Firebase for authentication.
+- Data seeding using Excel files (`excelSeeder.ts`).
+
+## Known Challenges
+
+- Need to determine how to best manage and associate company logos.
+
+## Project Scope
+- The application is a company directory.
+- Company data is loaded from Excel files.
+
+## Evolution of Project Decisions
+
+- Initial database setup with migrations.
+- Added Firebase authentication.
+- Implemented basic company CRUD.
+- Added company descriptions and icon URLs.
+
+## Tool Usage Patterns
+
+- Uses `execute_command` for running server and client commands and database operations.
+- Uses `read_file` to inspect code and configuration files.
+- Uses `write_to_file` and `replace_in_file` to update documentation and code.
+- Uses `search_files` to find specific code patterns or implementations.

@@ -1,9 +1,8 @@
 import { create } from 'zustand';
-import { User, Company } from '@/types';
+import { Company, Review } from '@/types';
 import { auth } from '@/lib/firebase';
 
 export interface SearchResults {
-  users?: User[];
   companies?: Company[];
 }
 
@@ -22,119 +21,19 @@ const getAuthToken = async () => {
 };
 
 interface ApiState {
-  users: User[];
   companies: Company[];
   searchResults: SearchResults;
-  fetchUsers: () => Promise<void>;
-  fetchUser: (userId: string) => Promise<User>;
-  createUser: (user: Partial<User>) => Promise<void>;
-  updateUser: (userId: string, user: Partial<User>) => Promise<void>;
-  deleteUser: (userId: string) => Promise<void>;
-  searchItems: (searchTerm: string) => Promise<void>;
-  searchCompanies: (criteria: { searchTerm: string; location: string; capability: string; rating: string }) => Promise<void>;
   fetchCompanies: () => Promise<void>;
   createCompany: (company: Partial<Company>) => Promise<void>;
   updateCompany: (companyId: string, company: Partial<Company>) => Promise<void>;
   deleteCompany: (companyId: string) => Promise<void>;
+  createReview: (companyId: string, review: Partial<Review>) => Promise<void>;
+  fetchReviews: (companyId: string) => Promise<Review[]>;
 }
 
 const apiStore = create<ApiState>((set) => ({
-  users: [],
   companies: [],
   searchResults: {},
-  fetchUsers: async () => {
-    const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/users`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: 'include',
-    });
-    const data = await response.json();
-    set({ users: data });
-  },
-  fetchUser: async (userId: string) => {
-    const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/users/${userId}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: 'include',
-    });
-    const data = await response.json();
-    return data;
-  },
-  createUser: async (user: Partial<User>) => {
-    const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/users`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(user),
-      credentials: 'include',
-    });
-    const data = await response.json();
-    set((state) => ({ users: [...state.users, data] }));
-  },
-  updateUser: async (userId: string, user: Partial<User>) => {
-    const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/users/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(user),
-      credentials: 'include',
-    });
-    const data = await response.json();
-    set((state) => ({
-      users: state.users.map((u) => (u.id === userId ? data : u)),
-    }));
-  },
-  deleteUser: async (userId: string) => {
-    const token = await getAuthToken();
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/users/${userId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: 'include',
-    });
-    set((state) => ({
-      users: state.users.filter((u) => u.id !== userId),
-    }));
-  },
-  searchItems: async (searchTerm: string) => {
-    const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/search?q=${encodeURIComponent(searchTerm)}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: 'include',
-    });
-    const data = await response.json();
-    set({ searchResults: data });
-  },
-  searchCompanies: async (criteria: { searchTerm: string; location: string; capability: string; rating: string }) => {
-    const queryParams = new URLSearchParams({
-      q: criteria.searchTerm,
-      location: criteria.location,
-      capability: criteria.capability,
-      rating: criteria.rating,
-    });
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/search/companies?${queryParams.toString()}`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-    const data = await response.json();
-    set({ searchResults: { companies: data } });
-  },
   fetchCompanies: async () => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies`, {
       method: 'GET',
@@ -151,7 +50,13 @@ const apiStore = create<ApiState>((set) => ({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(company),
+      body: JSON.stringify({
+        ...company,
+        descriptions: company.descriptions?.map((desc) => ({
+          ...desc,
+          id: desc.id || crypto.randomUUID(),
+        })),
+      }),
       credentials: 'include',
     });
     const data = await response.json();
@@ -165,7 +70,13 @@ const apiStore = create<ApiState>((set) => ({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(company),
+      body: JSON.stringify({
+        ...company,
+        descriptions: company.descriptions?.map((desc) => ({
+          ...desc,
+          id: desc.id || crypto.randomUUID(),
+        })),
+      }),
       credentials: 'include',
     });
     const data = await response.json();
@@ -185,6 +96,28 @@ const apiStore = create<ApiState>((set) => ({
     set((state) => ({
       companies: state.companies.filter((c) => c.id !== companyId),
     }));
+  },
+  createReview: async (companyId: string, review: Partial<Review>) => {
+    const token = await getAuthToken();
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies/${companyId}/reviews`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(review),
+      credentials: 'include',
+    });
+    const data = await response.json();
+    return data;
+  },
+  fetchReviews: async (companyId: string) => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies/${companyId}/reviews`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+    const data = await response.json();
+    return data;
   },
 }));
 

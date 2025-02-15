@@ -1,4 +1,5 @@
-generator client {
+
+ generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
@@ -17,6 +18,7 @@ model User {
   updatedAt         DateTime  @updatedAt
   profilePictureUrl String?
   phone             String?
+  reviews           Review[]
 }
 
 model Country {
@@ -28,10 +30,113 @@ model Country {
 }
 
 model Company {
+  id              String           @id @default(uuid())
+  name            String
+  location        String?
+  address         String?
+  city            String?
+  state           String?
+  zipCode         String?
+  country         String?
+  latitude        Float? // Latitude for map integration
+  longitude       Float? // Longitude for map integration
+  phone           String?
+  email           String?
+  website         String?
+  iconUrl         String?
+  foundedYear     Int?
+  web_validity  Boolean?
+  capabilities  String?
+  fb_handle     String?
+  residential   Boolean?
+  commercial    Boolean?
+  distributor    Boolean?
+  serviceAreas    String[]
+  certifications  Certification[]
+  partnerships    Partnership[]
+  services        Service[]
+  descriptions    Description[]
+  reviews         Review[]
+  projects        CompanyProject[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model CompanyProject {
+  id          String   @id @default(uuid())
+  name        String   // Project name (e.g., "Smith Residence Solar Install")
+  description String?  // Brief project overview
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  location    String?  // Project location (City, State)
+  latitude    Float?   // Latitude for map integration
+  longitude   Float?   // Longitude for map integration
+  capacityKw  Float?   // Size of the solar system in kW
+  completedAt DateTime? // Completion date
+  photos      ProjectPhoto[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ProjectPhoto {
+  id        String   @id @default(uuid())
+  url       String   // Link to the photo
+  caption   String?  // Optional description
+  projectId String
+  project   CompanyProject @relation(fields: [projectId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Certification {
+  id         String   @id @default(uuid())
+  name       String
+  companyId  String
+  company    Company  @relation(fields: [companyId], references: [id])
+  issuedBy   String?
+  issuedYear Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+
+model Partnership {
   id        String   @id @default(uuid())
   name      String
-  location  String
-  website   String
+  type      String
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Service {
+  id        String   @id @default(uuid())
+  type      String
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Description {
+  id        String   @id @default(uuid())
+  language  String
+  text      String
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  rating    Int
+  comment   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

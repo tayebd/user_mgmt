@@ -1,43 +1,36 @@
 # Technical Context
 
 ## Technologies Used
-- **Frontend**:
-  - **Framework**: React with Next.js
-  - **Styling**: Tailwind CSS with ShadCN components
-  - **State Management**: Zustand
-  - **Map Integration**: Integration with mapping services (e.g., Google Maps API)
-- **Backend**:
-  - **Server**: Node.js with Express
-  - **Database Operations**: Prisma ORM
-  - **Data Storage**: PostgreSQL
-  - **Authentication**: Firebase
-- **Development Tools**:
-  - **Version Control**: Git
-  - **Package Manager**: pnpm
-  - **Code Editor**: Visual Studio Code
+
+-   **Frontend:** Next.js (React)
+-   **Backend:** Express.js
+-   **Database:** Prisma (PostgreSQL)
+-   **Data Import:** XLSX library for Excel parsing
+-   **Typescript:** For both frontend and backend
 
 ## Development Setup
-- **Frontend**:
-  - Initialize a Next.js project: `npx create-next-app@latest`
-  - Install dependencies: `pnpm install`
-  - Configure Tailwind CSS and ShadCN components
-  - Set up Zustand for state management
-  - Integrate mapping services for location-based features
-- **Backend**:
-  - Initialize a Node.js project: `npm init -y`
-  - Install dependencies: `pnpm install express prisma @prisma/client pg firebase-admin`
-  - Set up Express for RESTful API endpoints
-  - Configure Prisma ORM for database operations
-  - Set up PostgreSQL for data storage
-  - Integrate Firebase for authentication and management
-- **Database**:
-  - Set up PostgreSQL database
-  - Run Prisma migrations: `npx prisma migrate dev`
-  - Seed initial data: `npx prisma db seed`
+
+1.  **Project Initialization:**
+    -   Created a Next.js project using `create-next-app`.
+    -   Created an Express.js server within the project.
+    -   Initialized Prisma with PostgreSQL.
+
+2.  **Environment Variables:**
+    -   `.env` file in the `server` directory for database connection string (`DATABASE_URL`).
+
+3.  **Dependencies:**
+    -   `@prisma/client`: Prisma client for database interaction.
+    -   `prisma`: Prisma CLI for database migrations and schema management.
+    -   `express`: Web framework for building the API.
+    -   `@types/express`: TypeScript definitions for Express.
+    -   `xlsx`: Library for parsing Excel files.
+    -   `@types/node`: TypeScript definitions for Node.js (should be installed, but currently missing).
+    -   `@reduxjs/toolkit`: For state management in the client.
+    -   `react-redux`: Redux bindings for React.
+    -   `@tanstack/react-query`: For data fetching and caching in the client.
 
 ## Technical Constraints
-- **Scalability**: The system must be designed to handle a large number of users and data.
-- **Security**: Ensure secure user authentication and data protection.
-- **Performance**: Optimize frontend and backend performance for a seamless user experience.
-- **Maintainability**: The codebase must be well-organized and easy to maintain.
-- **Compatibility**: Ensure compatibility with different browsers and devices.
+
+-   The project uses PostgreSQL as the database.
+-   The data seeding process relies on the structure of the provided Excel files.
+- The frontend is built with Next.js, which has implications for routing and server-side rendering.

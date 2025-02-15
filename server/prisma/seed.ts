@@ -1,62 +1,118 @@
-import { PrismaClient } from "@prisma/client";
-import * as fs from "fs";
-import * as path from "path";
-import * as process from "process";
+import { PrismaClient } from '@prisma/client';
+import { seedFromExcel } from './utils/excelSeeder';
+
 const prisma = new PrismaClient();
 
-declare const __dirname: string;
-
-async function deleteAllData() {
-  const tablesToDelete: string[] = ["Company"];
-
-  for (const table of tablesToDelete) {
-    const model = prisma[table.charAt(0).toLowerCase() + table.slice(1) as keyof typeof prisma];
-    try {
-      await (model as any).deleteMany({});
-      console.log(`Cleared data from ${table}`);
-    } catch (error) {
-      console.error(`Error clearing data from ${table}:`, error);
-    }
-  }
-}
-
 async function main() {
-  const dataDirectory = path.join(__dirname, "seedData");
+  /*
+  // Create sample companies
+const company1 = await prisma.company.create({
+  data: {
+    name: 'Sample Company 1',
+    location: 'Sample Location 1',
+    website: 'http://sample1.com',
+    iconUrl: '/icon1.png',
+    descriptions: {
+      create: [
+        { language: 'en', text: 'English description for Sample Company 1' },
+        { language: 'es', text: 'Descripción en español para Sample Company 1' },
+        { language: 'fr', text: 'Description en français pour Sample Company 1' },
+      ],
+    },
+  },
+});
 
-  // Order matters due to foreign key constraints
-  const orderedFileNames = [
-    "company.json",
-  ];
+const company2 = await prisma.company.create({
+  data: {
+    name: 'Sample Company 2',
+    location: 'Sample Location 2',
+    website: 'http://sample2.com',
+    iconUrl: '/icon2.png',
+    descriptions: {
+      create: [
+        { language: 'en', text: 'English description for Sample Company 2' },
+        { language: 'es', text: 'Descripción en español para Sample Company 2' },
+        { language: 'fr', text: 'Description en français pour Sample Company 2' },
+      ],
+    },
+  },
+});
 
-  await deleteAllData();
+  // Create sample CompanyProjects
+  const companyProject1 = await prisma.companyProject.create({
+    data: {
+      name: 'Project 1 for Company 1',
+      description: 'Description of Project 1',
+      companyId: company1.id,
+      location: 'Project 1 Location',
+      capacityKw: 10.5,
+      completedAt: new Date()
+    },
+  });
 
-  for (const fileName of orderedFileNames) {
-    const filePath = path.join(dataDirectory, fileName);
+    // Create photos for companyProject1
+  const project1Photos = await prisma.projectPhoto.createMany({
+    data: [
+      {
+        url: 'http://example.com/project1_photo1.jpg',
+        caption: 'Project 1 Photo 1',
+        projectId: companyProject1.id,
+      },
+      {
+        url: 'http://example.com/project1_photo2.jpg',
+        caption: 'Project 1 Photo 2',
+        projectId: companyProject1.id,
+      },
+    ],
+  });
 
-    // Skip if file doesn't exist
-    if (!fs.existsSync(filePath)) {
-      console.log(`Skipping ${fileName} - file not found`);
-      continue;
+  const companyProject2 = await prisma.companyProject.create({
+    data: {
+      name: 'Project 2 for Company 1',
+      description: 'Description of Project 2',
+      companyId: company1.id,
+      location: 'Project 2 Location',
+      capacityKw: 5.2
+    },
+  });
+
+  const project2Photo = await prisma.projectPhoto.create({
+    data: {
+      url: 'http://example.com/project2_photo1.jpg',
+      projectId: companyProject2.id
     }
+  });
 
-    const jsonData = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-    const modelName = path.basename(fileName, path.extname(fileName))
-      .split('_')
-      .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-      .join('');
+    const companyProject3 = await prisma.companyProject.create({
+    data: {
+      name: 'Project 1 for Company 2',
+      description: 'Description of Project 1 for company 2',
+      companyId: company2.id,
+      location: 'Project 1 Location',
+      capacityKw: 10.5,
+      completedAt: new Date()
+    },
+  });
 
-    const model = prisma[modelName.charAt(0).toLowerCase() + modelName.slice(1) as keyof typeof prisma];
+  const project3Photos = await prisma.projectPhoto.createMany({
+    data: [
+      {
+        url: 'http://example.com/project1_photo1.jpg',
+        caption: 'Project 1 Photo 1',
+        projectId: companyProject3.id,
+      },
+      {
+        url: 'http://example.com/project1_photo2.jpg',
+        caption: 'Project 1 Photo 2',
+        projectId: companyProject3.id,
+      },
+    ],
+  });
 
-    try {
-      for (const data of jsonData) {
-        await (model as any).create({ data });
-      }
-      console.log(`Seeded ${modelName} with data from ${fileName}`);
-    } catch (error) {
-      console.error(`Error seeding data for ${modelName}:`, error);
-      console.error(error);
-    }
-  }
+  console.log({ company1, company2, companyProject1, companyProject2, companyProject3 });
+}
+*/
+  await seedFromExcel();
 }
 
 main()

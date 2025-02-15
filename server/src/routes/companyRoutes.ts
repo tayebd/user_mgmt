@@ -1,19 +1,27 @@
 import express from 'express';
-import { authenticateToken } from '../middleware/auth';
 import {
   getCompanies,
   getCompany,
   createCompany,
   updateCompany,
-  deleteCompany
+  deleteCompany,
+  createReview,
+  getReviews,
+  updateReview,
+  deleteReview,
 } from '../controllers/companyController';
 
 const router = express.Router();
 
-router.get('/', getCompanies);
-router.get('/:companyId', getCompany);
-router.post('/', authenticateToken, createCompany);
-router.put('/:companyId', authenticateToken, updateCompany);
-router.delete('/:companyId', authenticateToken, deleteCompany);
+router.get('/companies', getCompanies);
+router.get('/companies/:companyId', getCompany);
+router.post('/companies', createCompany);
+router.put('/companies/:companyId', updateCompany);
+router.delete('/companies/:companyId', deleteCompany);
+
+router.post('/companies/:companyId/reviews', createReview);
+router.get('/companies/:companyId/reviews', getReviews);
+router.put('/reviews/:reviewId', updateReview);
+router.delete('/reviews/:reviewId', deleteReview);
 
 export default router;

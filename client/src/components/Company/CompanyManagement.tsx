@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useApiStore } from '@/state/api';
-import { Company } from '@/types';
+import { Company, Review } from '@/types';
 
 const CompanyManagement = () => {
-  const { companies, fetchCompanies, createCompany, updateCompany, deleteCompany } = useApiStore();
-  const [newCompany, setNewCompany] = useState<Partial<Company>>({});
+  const { companies, fetchCompanies, createCompany, updateCompany, deleteCompany, createReview, fetchReviews } = useApiStore();
+  const [newCompany, setNewCompany] = useState<Partial<Company>>({ descriptions: [], iconUrl: '' });
   const [editingCompany, setEditingCompany] = useState<Partial<Company> | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [newReview, setNewReview] = useState<Partial<Review>>({ rating: 0, comment: '' });
 
   const handleCreateCompany = async () => {
     await createCompany(newCompany);
@@ -21,6 +23,17 @@ const CompanyManagement = () => {
 
   const handleDeleteCompany = async (companyId: string) => {
     await deleteCompany(companyId);
+  };
+
+  const handleCreateReview = async (companyId: string) => {
+    await createReview(companyId, newReview);
+    setNewReview({ rating: 0, comment: '' });
+    fetchCompanyReviews(companyId);
+  };
+
+  const fetchCompanyReviews = async (companyId: string) => {
+    const data = await fetchReviews(companyId);
+    setReviews(data);
   };
 
   useEffect(() => {
@@ -50,6 +63,46 @@ const CompanyManagement = () => {
           value={newCompany.website || ''}
           onChange={(e) => setNewCompany({ ...newCompany, website: e.target.value })}
         />
+        <div>
+          <h3>Descriptions</h3>
+          {newCompany.descriptions?.map((desc, index) => (
+            <div key={index}>
+              <input
+                type="text"
+                placeholder="Language"
+                value={desc.language || ''}
+                onChange={(e) => {
+                  const updatedDescriptions = [...newCompany.descriptions!];
+                  updatedDescriptions[index] = { ...desc, language: e.target.value };
+                  setNewCompany({ ...newCompany, descriptions: updatedDescriptions });
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Description"
+                value={desc.text || ''}
+                onChange={(e) => {
+                  const updatedDescriptions = [...newCompany.descriptions!];
+                  updatedDescriptions[index] = { ...desc, text: e.target.value };
+                  setNewCompany({ ...newCompany, descriptions: updatedDescriptions });
+                }}
+              />
+              <button onClick={() => {
+                const updatedDescriptions = newCompany.descriptions!.filter((_, i) => i !== index);
+                setNewCompany({ ...newCompany, descriptions: updatedDescriptions });
+              }}>Remove</button>
+            </div>
+          ))}
+          <button onClick={() => {
+            setNewCompany({ ...newCompany, descriptions: [...(newCompany.descriptions || []), { id: crypto.randomUUID(), language: '', text: '' }] });
+          }}>Add Description</button>
+        </div>
+        <input
+          type="text"
+          placeholder="Icon URL"
+          value={newCompany.iconUrl || ''}
+          onChange={(e) => setNewCompany({ ...newCompany, iconUrl: e.target.value })}
+        />
         <button onClick={handleCreateCompany}>Create Company</button>
       </div>
       <div>
@@ -60,6 +113,7 @@ const CompanyManagement = () => {
               {company.name} ({company.location})
               <button onClick={() => setEditingCompany(company)}>Edit</button>
               <button onClick={() => handleDeleteCompany(company.id)}>Delete</button>
+              <button onClick={() => fetchCompanyReviews(company.id)}>View Reviews</button>
             </li>
           ))}
         </ul>
@@ -85,10 +139,80 @@ const CompanyManagement = () => {
             value={editingCompany.website || ''}
             onChange={(e) => setEditingCompany({ ...editingCompany, website: e.target.value })}
           />
+          <input
+            type="text"
+            placeholder="Icon URL"
+            value={editingCompany.iconUrl || ''}
+            onChange={(e) => setEditingCompany({ ...editingCompany, iconUrl: e.target.value })}
+          />
+          <div>
+            <h3>Descriptions</h3>
+            {editingCompany.descriptions?.map((desc, index) => (
+              <div key={index}>
+                <input
+                  type="text"
+                  placeholder="Language"
+                  value={desc.language || ''}
+                  onChange={(e) => {
+                    const updatedDescriptions = [...editingCompany.descriptions!];
+                    updatedDescriptions[index] = { ...desc, language: e.target.value };
+                    setEditingCompany({ ...editingCompany, descriptions: updatedDescriptions });
+                  }}
+                />
+                <input
+                  type="text"
+                  placeholder="Description"
+                  value={desc.text || ''}
+                  onChange={(e) => {
+                    const updatedDescriptions = [...editingCompany.descriptions!];
+                    updatedDescriptions[index] = { ...desc, text: e.target.value };
+                    setEditingCompany({ ...editingCompany, descriptions: updatedDescriptions });
+                  }}
+                />
+                <button onClick={() => {
+                  const updatedDescriptions = editingCompany.descriptions!.filter((_, i) => i !== index);
+                  setEditingCompany({ ...editingCompany, descriptions: updatedDescriptions });
+                }}>Remove</button>
+              </div>
+            ))}
+            <button onClick={() => {
+              setEditingCompany({ ...editingCompany, descriptions: [...(editingCompany.descriptions || []), { id: crypto.randomUUID(), language: '', text: '' }] });
+            }}>Add Description</button>
+          </div>
           <button onClick={handleUpdateCompany}>Update Company</button>
           <button onClick={() => setEditingCompany(null)}>Cancel</button>
         </div>
       )}
+      {reviews.length > 0 && (
+        <div>
+          <h2>Reviews</h2>
+          <ul>
+            {reviews.map((review) => (
+              <li key={review.id}>
+                <p>Rating: {review.rating}</p>
+                <p>Comment: {review.comment}</p>
+                <p>By: {review.user.name}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <div>
+        <h2>Add Review</h2>
+        <input
+          type="number"
+          placeholder="Rating"
+          value={newReview.rating || ''}
+          onChange={(e) => setNewReview({ ...newReview, rating: parseInt(e.target.value) })}
+        />
+        <input
+          type="text"
+          placeholder="Comment"
+          value={newReview.comment || ''}
+          onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+        />
+        <button onClick={() => handleCreateReview(editingCompany?.id || '')}>Add Review</button>
+      </div>
     </div>
   );
 };
