@@ -1,4 +1,4 @@
-# Active Context
+ni .# Active Context
 
 ## Current Work Focus
 
@@ -12,6 +12,7 @@ The current focus is on implementing the CRUD operations for companies and relat
 - Implemented Excel seeding functionality to import data from `Company.xlsx` into the database.
 - Created API endpoint for getting all companies.
 - Displayed companies on the client-side `/companies` page.
+- Updated companies page and related components
 
 ## Next Steps
 
