@@ -43,7 +43,7 @@ const InverterList = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {inverters.map((inverter) => (
               <tr key={inverter.id}>
-                <td className="py-4 px-6 text-sm font-medium text-gray-900">{inverter.manufacturerName}</td>
+                <td className="py-4 px-6 text-sm font-medium text-gray-900">{inverter.manufacturer}</td>
                 <td className="py-4 px-6 text-sm text-gray-500">{inverter.modelNumber}</td>
                 <td className="py-4 px-6 text-sm text-gray-500">{inverter.description}</td>
                 <td className="py-4 px-6 text-sm text-gray-500">{inverter.phaseType}</td>

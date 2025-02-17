@@ -5,7 +5,7 @@ import React, { useState, useEffect } from 'react';
 
 interface MiscEquipment {
   id: string;
-  manufacturerName: string;
+  manufacturer: string;
   modelNumber: string;
   equipmentType: string;
   description: string;
@@ -52,7 +52,7 @@ const MiscEquipment: React.FC = () => {
       <ul>
         {miscEquipment.map((item) => (
           <li key={item.id}>
-            {item.manufacturerName} - {item.modelNumber} - {item.equipmentType}
+            {item.manufacturer} - {item.modelNumber} - {item.equipmentType}
           </li>
         ))}
       </ul>

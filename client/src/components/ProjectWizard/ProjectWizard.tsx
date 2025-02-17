@@ -16,8 +16,9 @@ import {
   MiscEquipmentStep,
   ReportStep
 } from './steps/index';
-import { GoogleMapsProvider } from '@/contexts/GoogleMapsContext';
 import { useApiStore } from '@/state/api';
+import { getPVPanels, getInverters } from '@/services/equipment';
+import { PVPanel, Inverter } from '@/types';
 
 const INITIAL_PROJECT_DATA: ProjectData = {
   address: '',
@@ -71,9 +72,13 @@ export function ProjectWizard() {
   const [currentStep, setCurrentStep] = useState(0);
   const [projectData, setProjectData] = useState<ProjectData>(INITIAL_PROJECT_DATA);
   const { fetchProject, createProject, updateProject } = useApiStore();
+  const [pvPanels, setPVPanels] = useState<PVPanel[]>([]);
+  const [inverters, setInverters] = useState<Inverter[]>([]);
 
   useEffect(() => {
     fetchProject();
+    getPVPanels().then(setPVPanels);
+    getInverters().then(setInverters);
   }, [fetchProject]);
 
   const methods = useForm<ProjectData>({
@@ -121,7 +126,6 @@ export function ProjectWizard() {
   const CurrentStepComponent = steps[currentStep].component;
 
   return (
-    <GoogleMapsProvider>
       <FormProvider {...methods}>
         <div className="max-w-4xl mx-auto p-6">
           <ProgressIndicator
@@ -134,6 +138,8 @@ export function ProjectWizard() {
               form={methods}
               projectData={projectData}
               setProjectData={setProjectData}
+              pvPanels={pvPanels}
+              inverters={inverters}
             />
           </Card>
 
@@ -160,6 +166,5 @@ export function ProjectWizard() {
           </div>
         </div>
       </FormProvider>
-    </GoogleMapsProvider>
   );
 }

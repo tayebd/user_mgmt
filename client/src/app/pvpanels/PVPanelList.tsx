@@ -43,7 +43,7 @@ const PVPanelList = () => {
                 <td className="py-4 px-6 text-sm font-medium text-gray-900">{panel.manufacturer}</td>
                 <td className="py-4 px-6 text-sm text-gray-500">{panel.modelNumber}</td>
                 <td className="py-4 px-6 text-sm text-gray-500">{panel.description}</td>
-                <td className="py-4 px-6 text-sm text-gray-500">{panel.nameplateMaxPower}</td>
+                <td className="py-4 px-6 text-sm text-gray-500">{panel.power}</td>
               </tr>
             ))}
           </tbody>

@@ -175,7 +175,7 @@ model PVPanel {
   modelNumber                  String    @unique
   description                  String?
   safetyCertification          String?
-  nameplateMaxPower            Float?
+  power                        Float?
   ptcRating                    Float?
   notes                        String?
   designQualificationCert      String?
@@ -186,8 +186,8 @@ model PVPanel {
   numberOfCells                Int?
   numberOfPanels               Int?
   bipv                         Boolean   @default(false)
-  nameplateShortCircuitCurrent Float?
-  nameplateOpenCircuitVoltage  Float?
+  shortCircuitCurrent          Float?
+  openCircuitVoltage           Float?
   nameplateMaxCurrentAtPmax    Float?
   nameplateVoltageAtPmax       Float?
   averageNoct                  Float?
@@ -214,6 +214,7 @@ model PVPanel {
   connectorType                String?
   performanceWarranty          String?
   productWarranty              String?
+  efficiency                   Float?
   projectEquipment ProjectEquipment[] @relation("ProjectPVPanel")
 
   @@index([manufacturer, modelNumber])
@@ -221,7 +222,7 @@ model PVPanel {
 
 model Inverter {
   id                           String    @id @default(uuid())
-  manufacturerName             String
+  manufacturer                 String?
   modelNumber                  String    @unique
   equipmentType                String?
   additionalRequiredDevices    String?
@@ -248,12 +249,12 @@ model Inverter {
 
   projectEquipment ProjectEquipment[] @relation("ProjectInverter")
 
-  @@index([manufacturerName, modelNumber])
+  @@index([manufacturer, modelNumber])
 }
 
 model MountingHardware {
   id               String    @id @default(uuid())
-  manufacturerName String
+  manufacturer String
   modelNumber      String    @unique
   equipmentType    String?
   description      String?
@@ -263,12 +264,12 @@ model MountingHardware {
 
   projectEquipment ProjectEquipment[] @relation("ProjectMountingHardware")
 
-  @@index([manufacturerName, modelNumber])
+  @@index([manufacturer, modelNumber])
 }
 
 model MiscEquipment {
   id               String    @id @default(uuid())
-  manufacturerName String
+  manufacturer String
   modelNumber      String    @unique
   equipmentType    String?
   description      String?
@@ -277,12 +278,12 @@ model MiscEquipment {
   lastUpdate       DateTime?
   projectEquipment ProjectEquipment[] @relation("ProjectMiscEquipment")
 
-  @@index([manufacturerName, modelNumber])
+  @@index([manufacturer, modelNumber])
 }
 
 model Wire {
   id               String    @id @default(uuid())
-  manufacturerName String
+  manufacturer String
   modelNumber      String    @unique
   equipmentType    String?
   description      String?
@@ -292,7 +293,7 @@ model Wire {
 
   projectEquipment ProjectEquipment[] @relation("ProjectWire")
 
-  @@index([manufacturerName, modelNumber])
+  @@index([manufacturer, modelNumber])
 }
 
 model ProjectEquipment {

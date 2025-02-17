@@ -15,9 +15,9 @@ export const getPVPanels = async (req: Request, res: Response) => {
         manufacturer: true,
         modelNumber: true,
         description: true,
-        nameplateMaxPower: true,
-        nameplateShortCircuitCurrent: true,
-        nameplateOpenCircuitVoltage: true,
+        power: true,
+        shortCircuitCurrent: true,
+        openCircuitVoltage: true,
         tempCoeffPmax: true,
         tempCoeffIsc: true,
         tempCoeffVoc: true,
@@ -45,9 +45,9 @@ export const getPVPanel = async (req: Request, res: Response) => {
         manufacturer: true,
         modelNumber: true,
         description: true,
-        nameplateMaxPower: true,
-        nameplateShortCircuitCurrent: true,
-        nameplateOpenCircuitVoltage: true,
+        power: true,
+        shortCircuitCurrent: true,
+        openCircuitVoltage: true,
         tempCoeffPmax: true,
         tempCoeffIsc: true,
         tempCoeffVoc: true,
@@ -69,16 +69,16 @@ export const getPVPanel = async (req: Request, res: Response) => {
 };
 
 export const createPVPanel = async (req: Request, res: Response) => {
-  const { manufacturer, modelNumber, description, nameplateMaxPower, nameplateShortCircuitCurrent, nameplateOpenCircuitVoltage, tempCoeffPmax, tempCoeffIsc, tempCoeffVoc, shortSide, longSide, weight, performanceWarranty, productWarranty } = req.body;
+  const { manufacturer, modelNumber, description, power, nameplateShortCircuitCurrent, openCircuitVoltage, tempCoeffPmax, tempCoeffIsc, tempCoeffVoc, shortSide, longSide, weight, performanceWarranty, productWarranty } = req.body;
   try {
     const pvPanel = await prisma.pVPanel.create({
       data: {
         manufacturer,
         modelNumber,
         description,
-        nameplateMaxPower,
-        nameplateShortCircuitCurrent,
-        nameplateOpenCircuitVoltage,
+        power,
+        // shortCircuitCurrent,
+        openCircuitVoltage,
         tempCoeffPmax,
         tempCoeffIsc,
         tempCoeffVoc,
@@ -98,7 +98,7 @@ export const createPVPanel = async (req: Request, res: Response) => {
 
 export const updatePVPanel = async (req: Request, res: Response) => {
   const { pvPanelId } = req.params;
-  const { manufacturer, modelNumber, description, nameplateMaxPower, nameplateShortCircuitCurrent, nameplateOpenCircuitVoltage, tempCoeffPmax, tempCoeffIsc, tempCoeffVoc, shortSide, longSide, weight, performanceWarranty, productWarranty } = req.body;
+  const { manufacturer, modelNumber, description, power, nameplateShortCircuitCurrent, openCircuitVoltage, tempCoeffPmax, tempCoeffIsc, tempCoeffVoc, shortSide, longSide, weight, performanceWarranty, productWarranty } = req.body;
   try {
     const pvPanel = await prisma.pVPanel.update({
       where: { id: pvPanelId },
@@ -106,9 +106,9 @@ export const updatePVPanel = async (req: Request, res: Response) => {
         manufacturer,
         modelNumber,
         description,
-        nameplateMaxPower,
-        nameplateShortCircuitCurrent,
-        nameplateOpenCircuitVoltage,
+        power,
+        // shortCircuitCurrent,
+        openCircuitVoltage,
         tempCoeffPmax,
         tempCoeffIsc,
         tempCoeffVoc,

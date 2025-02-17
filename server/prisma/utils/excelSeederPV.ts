@@ -28,7 +28,7 @@ const fileConfig: Record<ModelName, { skipRows: number }> = {
 // Define field mappings for each model
 const fieldMappings: Record<ModelName, ExcelMapping[]> = {
   inverter: [
-    { excelField: 'Manufacturer Name', modelField: 'manufacturerName', required: true },
+    { excelField: 'Manufacturer Name', modelField: 'manufacturer', required: true },
     { excelField: 'Model Number', modelField: 'modelNumber', transform: (v) => String(v), required: true },
     { excelField: 'Description', modelField: 'description' },
     { excelField: 'Phase', modelField: 'phaseType' },
@@ -40,7 +40,7 @@ const fieldMappings: Record<ModelName, ExcelMapping[]> = {
     { excelField: 'Manufacturer', modelField: 'manufacturer', required: true },
     { excelField: 'Model Number', modelField: 'modelNumber', transform: (v) => String(v), required: true },
     { excelField: 'Description', modelField: 'description' },
-    { excelField: 'Nameplate Max Power', modelField: 'nameplateMaxPower', transform: (v) => parseFloat(v) },
+    { excelField: 'Nameplate Max Power', modelField: 'power', transform: (v) => parseFloat(v) },
     { excelField: 'PTC Rating', modelField: 'ptcRating', transform: (v) => parseFloat(v) },
     { excelField: 'Technology', modelField: 'technology' },
     { excelField: 'Number of Cells', modelField: 'numberOfCells', transform: (v) => parseInt(v) },
@@ -48,7 +48,7 @@ const fieldMappings: Record<ModelName, ExcelMapping[]> = {
     { excelField: 'Notes', modelField: 'notes' }
   ],
   // energyStorageSystem: [
-  //   { excelField: 'Manufacturer Name', modelField: 'manufacturerName', required: true },
+  //   { excelField: 'Manufacturer Name', modelField: 'manufacturer', required: true },
   //   { excelField: 'Brand', modelField: 'brand' },
   //   { excelField: 'Model Number', modelField: 'modelNumber', transform: (v) => String(v), required: true },
   //   { excelField: 'Technology', modelField: 'technology' },
@@ -117,13 +117,13 @@ function transformExcelData<T extends ModelName>(
       });
 
       // Type guard based on model
-      if (modelName === 'inverter' && (!transformedRow.manufacturerName || !transformedRow.modelNumber)) {
+      if (modelName === 'inverter' && (!transformedRow.manufacturer || !transformedRow.modelNumber)) {
         return null;
       }
       if (modelName === 'pVPanel' && (!transformedRow.manufacturer || !transformedRow.modelNumber)) {
         return null;
       }
-      // if (modelName === 'energyStorageSystem' && (!transformedRow.manufacturerName || !transformedRow.modelNumber)) {
+      // if (modelName === 'energyStorageSystem' && (!transformedRow.manufacturer || !transformedRow.modelNumber)) {
       //   return null;
       // }
 

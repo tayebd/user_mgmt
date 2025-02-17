@@ -51,9 +51,9 @@ export type PVPanel = {
   manufacturer: string;
   modelNumber: string;
   description: string;
-  nameplateMaxPower: number;
-  nameplateShortCircuitCurrent: number;
-  nameplateOpenCircuitVoltage: number;
+  power: number;
+  shortCircuitCurrent: number;
+  openCircuitVoltage: number;
   tempCoeffPmax: number;
   tempCoeffIsc: number;
   tempCoeffVoc: number;
@@ -66,7 +66,7 @@ export type PVPanel = {
 
 export type Inverter = {
   id: string;
-  manufacturerName: string;
+  manufacturer: string;
   modelNumber: string;
   description: string;
   phaseType: string;

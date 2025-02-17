@@ -12,7 +12,7 @@ export const getInverters = async (req: Request, res: Response) => {
       take: limitNumber,
       select: {
         id: true,
-        manufacturerName: true,
+        manufacturer: true,
         modelNumber: true,
         description: true,
         outputVoltage: true,
@@ -34,7 +34,7 @@ export const getInverter = async (req: Request, res: Response) => {
       where: { id: inverterId },
       select: {
         id: true,
-        manufacturerName: true,
+        manufacturer: true,
         modelNumber: true,
         description: true,
         outputVoltage: true,
@@ -53,11 +53,11 @@ export const getInverter = async (req: Request, res: Response) => {
 };
 
 export const createInverter = async (req: Request, res: Response) => {
-  const { manufacturerName, modelNumber, description, outputVoltage, maxContinuousCurrent, maxContinuousPower } = req.body;
+  const { manufacturer, modelNumber, description, outputVoltage, maxContinuousCurrent, maxContinuousPower } = req.body;
   try {
     const inverter = await prisma.inverter.create({
       data: {
-        manufacturerName,
+        manufacturer,
         modelNumber,
         description,
         outputVoltage,
@@ -74,12 +74,12 @@ export const createInverter = async (req: Request, res: Response) => {
 
 export const updateInverter = async (req: Request, res: Response) => {
   const { inverterId } = req.params;
-  const { manufacturerName, modelNumber, description, outputVoltage, maxContinuousCurrent, maxContinuousPower } = req.body;
+  const { manufacturer, modelNumber, description, outputVoltage, maxContinuousCurrent, maxContinuousPower } = req.body;
   try {
     const inverter = await prisma.inverter.update({
       where: { id: inverterId },
       data: {
-        manufacturerName,
+        manufacturer,
         modelNumber,
         description,
         outputVoltage,

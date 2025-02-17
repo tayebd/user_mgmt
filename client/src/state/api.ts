@@ -221,3 +221,6 @@ const apiStore = create<ApiState>((set) => ({
 }));
 
 export const useApiStore = apiStore;
+
+export const fetchPVPanels = apiStore.getState().fetchPVPanels;
+export const fetchInverters = apiStore.getState().fetchInverters;
