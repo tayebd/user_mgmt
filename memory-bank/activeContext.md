@@ -1,31 +1,31 @@
-ni .# Active Context
+# Active Context
 
 ## Current Work Focus
-
-The current focus is on implementing the CRUD operations for companies and related models. The database seeding is complete, and the company data is displayed on the client.
+- Implementing pagination for PVPanel data to limit the number of entries displayed at a time.
+- Updating the `pvPanelController.ts` file to support pagination.
+- Updating the `api.ts` file to include pagination parameters.
+- Updating the `PVPanelList.tsx` file to handle pagination and display data in a table format.
+- Implementing the same improvements for the Inverter object and following the style and pattern of the Company object.
+- Seeding the inverter data using the `excelSeederPV.ts` script.
+- Reviewing the wizard object and the wizard files to understand how the wizard is structured and how to integrate the inverter data into the wizard.
 
 ## Recent Changes
-
-- Implemented basic project setup with Next.js (client) and Express (server).
-- Defined Prisma schema for Company, Service, Partnership, Certification, Description, Review, CompanyProject, and ProjectPhoto models.
-- Established database connection.
-- Implemented Excel seeding functionality to import data from `Company.xlsx` into the database.
-- Created API endpoint for getting all companies.
-- Displayed companies on the client-side `/companies` page.
-- Updated companies page and related components
+- Updated `pvPanelController.ts` to support pagination.
+- Updated `api.ts` to include pagination parameters.
+- Updated `PVPanelList.tsx` to handle pagination and display data in a table format.
+- Created `inverterController.ts` and `inverterRoutes.ts` to support the Inverter object.
+- Updated `index.ts` to include the `inverterRoutes`.
+- Updated `excelSeederPV.ts` to include the inverter data.
+- Reviewed the `ProjectWizard.tsx`, `steps/index.ts`, and `InverterStep.tsx` files to understand the wizard structure and inverter selection step.
 
 ## Next Steps
-
-- Implement API endpoints for creating, updating, and deleting companies.
-- Implement API endpoints for related models (services, partnerships, etc.).
-- Develop UI components to display and manage company data (beyond the basic list).
-- Develop UI components for related models.
-- Implement user authentication and authorization.
-- Implement image uploading and management.
-- Configure deployment.
+- Ensure the implementation is fully tested and confirmed to work as expected.
+- Update the memory bank to include the information that the object is called `pVPanel` by Prisma.
 
 ## Active Decisions and Considerations
-
-- The project uses PostgreSQL as the database.
-- The data seeding process relies on the structure of the provided Excel files.
-- The frontend is built with Next.js, which has implications for routing and server-side rendering.
+- The object in the Prisma schema is called `pVPanel`.
+- Pagination parameters are set to default to page 1 and limit 50 entries per page.
+- The PVPanel data is displayed in a table format with the specified fields: `manufacturer`, `modelNumber`, `description`, and `nameplateMaxPower`.
+- The Inverter data is displayed in a table format with the specified fields: `manufacturerName`, `modelNumber`, `description`, `phaseType`, `outputVoltage`, `maxContinuousCurrent`, and `maxContinuousPower`.
+- The `excelSeederPV.ts` script is used to seed the inverter data.
+- The wizard structure and inverter selection step are reviewed and understood.

@@ -45,3 +45,64 @@ export type User = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type PVPanel = {
+  id: string;
+  manufacturer: string;
+  modelNumber: string;
+  description: string;
+  nameplateMaxPower: number;
+  nameplateShortCircuitCurrent: number;
+  nameplateOpenCircuitVoltage: number;
+  tempCoeffPmax: number;
+  tempCoeffIsc: number;
+  tempCoeffVoc: number;
+  shortSide: number;
+  longSide: number;
+  weight: number;
+  performanceWarranty: string;
+  productWarranty: string;
+};
+
+export type Inverter = {
+  id: string;
+  manufacturerName: string;
+  modelNumber: string;
+  description: string;
+  phaseType: string;
+  outputVoltage: number;
+  maxContinuousCurrent: number;
+  maxContinuousPower: number;
+};
+
+export type ProjectData = {
+  address: string;
+  coordinates: { lat: number; lng: number };
+  dcSystemSize: number;
+  arrayType: string;
+  systemLosses: number;
+  tilt: number;
+  azimuth: number;
+  bifacial: boolean;
+  selectedPanelId: string;
+  pvPanelQuantity: number;
+  selectedInverterId: string;
+  inverterQuantity: number;
+  mountingType: string;
+  roofMaterial: string;
+  derivedEquipment: {
+    fuses: number;
+    dcSurgeProtector: number;
+    dcDisconnectSwitches: number;
+    acSurgeProtector: number;
+    generalDisconnectSwitch: number;
+    residualCurrentBreaker: number;
+    generalCircuitBreaker: number;
+    dcCableLength: number;
+    acCableLength: number;
+    earthingCableLength: number;
+    mc4ConnectorPairs: number;
+    splitters: number;
+    cableTrayLength: number;
+  };
+};

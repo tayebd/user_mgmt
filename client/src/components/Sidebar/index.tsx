@@ -40,51 +40,31 @@ const Sidebar = () => {
 
 const menuItems = [
   {
-    title: "Pages",
-    list: [
-      {
-        title: "Dashboard",
-        href: "/",
-        icon: LayoutDashboard,
-      },
-      {
-        title: "Projects",
-        href: "/projects",
-        icon: ListTodo,
-      },
-      {
-        title: "Timeline",
-        href: "/timeline",
-        icon: Calendar,
-      },
-    ],
-  },
-  {
-    title: "Solar Farm",
+    title: "Solar Project",
     list: [
       {
         title: "Project Location",
-        href: "/solar/location",
+        href: "/location",
         icon: MapPin,
       },
       {
         title: "Solar Panels",
-        href: "/solar/components/panels",
+        href: "pvpanels",
         icon: Sun,
       },
       {
         title: "Inverters",
-        href: "/solar/components/inverters",
+        href: "/inverters",
         icon: Battery,
       },
       {
         title: "Mounting Hardware",
-        href: "/solar/components/mounting",
+        href: "/mounting",
         icon: Wrench,
       },
       {
         title: "Mounting Cost",
-        href: "/solar/components/mounting-cost",
+        href: "/mounting-cost",
         icon: Wrench,
       },
     ],
@@ -101,31 +81,6 @@ const menuItems = [
         title: "Settings",
         href: "/settings",
         icon: Settings,
-      },
-    ],
-  },
-  {
-    title: "Tasks",
-    list: [
-      {
-        title: "Urgent",
-        href: "/priority/urgent",
-        icon: Timer,
-      },
-      {
-        title: "High",
-        href: "/priority/high",
-        icon: AlertTriangle,
-      },
-      {
-        title: "Medium",
-        href: "/priority/medium",
-        icon: AlertCircle,
-      },
-      {
-        title: "Low",
-        href: "/priority/low",
-        icon: AlertCircle,
       },
     ],
   },

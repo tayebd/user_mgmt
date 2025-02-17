@@ -27,7 +27,7 @@ const Navbar = () => {
       {/* Left side */}
       <div className="flex items-center gap-4">
         <Link href="/" className="text-lg font-semibold">
-          Project Management
+          Solar Companies
         </Link>
         <div className="relative flex h-min w-[200px]">
           <Search className="absolute left-[4px] top-1/2 h-5 w-5 -translate-y-1/2 transform cursor-pointer dark:text-white" />
@@ -42,20 +42,20 @@ const Navbar = () => {
       {/* Right side */}
       <div className="flex items-center gap-4">
         <Link
-          href="/projects"
+          href="/inverters"
           className={`text-sm ${
             pathname === "/projects" ? "text-blue-500" : "text-gray-700 dark:text-white"
           } hover:text-blue-500`}
         >
-          Projects
+          Inverters
         </Link>
         <Link
-          href="/tasks"
+          href="/pvpanels"
           className={`text-sm ${
             pathname === "/tasks" ? "text-blue-500" : "text-gray-700 dark:text-white"
           } hover:text-blue-500`}
         >
-          Tasks
+          PV Panels
         </Link>
         <button
           onClick={() => setIsDarkMode(!isDarkMode)}

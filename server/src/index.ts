@@ -9,6 +9,8 @@ import searchRoutes from "./routes/searchRoutes";
 import userRoutes from "./routes/userRoutes";
 import companyRoutes from "./routes/companyRoutes";
 import companiesRouter from './routes/companies';
+import pvPanelRoutes from './routes/pvPanelRoutes';
+import inverterRoutes from './routes/inverterRoutes';
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -50,6 +52,8 @@ app.use("/api/search", searchRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/companies", companyRoutes);
 app.use('/api', companiesRouter);
+app.use('/api', pvPanelRoutes);
+app.use('/api', inverterRoutes);
 
 /* ERROR HANDLING */
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

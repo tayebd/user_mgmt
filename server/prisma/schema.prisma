@@ -1,5 +1,4 @@
-
- generator client {
+generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
@@ -45,12 +44,12 @@ model Company {
   website         String?
   iconUrl         String?
   foundedYear     Int?
-  web_validity  Boolean?
-  capabilities  String?
-  fb_handle     String?
-  residential   Boolean?
-  commercial    Boolean?
-  distributor    Boolean?
+  web_validity    Boolean?
+  capabilities    String?
+  fb_handle       String?
+  residential     Boolean?
+  commercial      Boolean?
+  distributor     Boolean?
   serviceAreas    String[]
   certifications  Certification[]
   partnerships    Partnership[]
@@ -99,7 +98,6 @@ model Certification {
   updatedAt  DateTime @updatedAt
 }
 
-
 model Partnership {
   id        String   @id @default(uuid())
   name      String
@@ -141,7 +139,221 @@ model Review {
   updatedAt DateTime @updatedAt
 }
 
+model Project {
+  id             String                 @id @default(uuid())
+  name           String
+  description    String?
+  startDate      DateTime
+  endDate        DateTime
+  createdAt      DateTime               @default(now())
+  createdById    String
+  status         ProjectStatus          @default(NOT_STARTED)
+  updatedAt      DateTime               @updatedAt
+  tasks          Task[]
+  equipment      ProjectEquipment[]
+  @@index([createdById])
+}
+
+model Task {
+  id           String       @id @default(uuid())
+  title        String
+  description  String?
+  dueDate      DateTime
+  projectId    String
+  assignedToId String
+  createdAt    DateTime     @default(now())
+  createdById  String
+  updatedAt    DateTime     @updatedAt
+  status       TaskStatus   @default(NOT_STARTED)
+  priority     TaskPriority @default(MEDIUM)
+  project      Project      @relation(fields: [projectId], references: [id])
+}
+
+model PVPanel {
+  id                           String    @id @default(uuid())
+  manufacturer                 String
+  modelNumber                  String    @unique
+  description                  String?
+  safetyCertification          String?
+  nameplateMaxPower            Float?
+  ptcRating                    Float?
+  notes                        String?
+  designQualificationCert      String?
+  performanceEvaluation        String?
+  family                       String?
+  technology                   String?
+  activeArea                   Float?
+  numberOfCells                Int?
+  numberOfPanels               Int?
+  bipv                         Boolean   @default(false)
+  nameplateShortCircuitCurrent Float?
+  nameplateOpenCircuitVoltage  Float?
+  nameplateMaxCurrentAtPmax    Float?
+  nameplateVoltageAtPmax       Float?
+  averageNoct                  Float?
+  tempCoeffPmax                Float?
+  tempCoeffIsc                 Float?
+  tempCoeffVoc                 Float?
+  tempCoeffIpmax               Float?
+  tempCoeffVpmax               Float?
+  currentAtLowPower            Float?
+  voltageAtLowPower            Float?
+  currentAtNoct                Float?
+  voltageAtNoct                Float?
+  mountingType                 String?
+  moduleType                   String?
+  shortSide                    Float?
+  longSide                     Float?
+  geometricMultiplier          Float?
+  performanceRatio             Float?
+  cecListingDate               DateTime?
+  lastUpdate                   DateTime?
+  weight                       Float?
+  framingMaterial              String?
+  junctionBoxType              String?
+  connectorType                String?
+  performanceWarranty          String?
+  productWarranty              String?
+  projectEquipment ProjectEquipment[] @relation("ProjectPVPanel")
+
+  @@index([manufacturer, modelNumber])
+}
+
+model Inverter {
+  id                           String    @id @default(uuid())
+  manufacturerName             String
+  modelNumber                  String    @unique
+  equipmentType                String?
+  additionalRequiredDevices    String?
+  currentMeasurementReference  String?
+  description                  String?
+  pcsIssuerEntity              String?
+  pcsDocumentDate              DateTime?
+  unrestrictedMode             Boolean   @default(false)
+  exportOnlyMode               Boolean   @default(false)
+  importOnlyMode               Boolean   @default(false)
+  noExchangeMode               Boolean   @default(false)
+  unrestrictedModeResponseTime Float?
+  exportOnlyModeResponseTime   Float?
+  importOnlyModeResponseTime   Float?
+  noExchangeModeResponseTime   Float?
+  phaseType                    String?
+  outputVoltage                Float?
+  maxContinuousCurrent         Float?
+  maxContinuousPower           Float?
+  notes                        String?
+  pcsListingDate               DateTime?
+  lastUpdate                   DateTime?
+  inverterOrEss                String?
+
+  projectEquipment ProjectEquipment[] @relation("ProjectInverter")
+
+  @@index([manufacturerName, modelNumber])
+}
+
+model MountingHardware {
+  id               String    @id @default(uuid())
+  manufacturerName String
+  modelNumber      String    @unique
+  equipmentType    String?
+  description      String?
+  notes            String?
+  cecListingDate   DateTime?
+  lastUpdate       DateTime?
+
+  projectEquipment ProjectEquipment[] @relation("ProjectMountingHardware")
+
+  @@index([manufacturerName, modelNumber])
+}
+
+model MiscEquipment {
+  id               String    @id @default(uuid())
+  manufacturerName String
+  modelNumber      String    @unique
+  equipmentType    String?
+  description      String?
+  notes            String?
+  cecListingDate   DateTime?
+  lastUpdate       DateTime?
+  projectEquipment ProjectEquipment[] @relation("ProjectMiscEquipment")
+
+  @@index([manufacturerName, modelNumber])
+}
+
+model Wire {
+  id               String    @id @default(uuid())
+  manufacturerName String
+  modelNumber      String    @unique
+  equipmentType    String?
+  description      String?
+  notes            String?
+  cecListingDate   DateTime?
+  lastUpdate       DateTime?
+
+  projectEquipment ProjectEquipment[] @relation("ProjectWire")
+
+  @@index([manufacturerName, modelNumber])
+}
+
+model ProjectEquipment {
+  id            String        @id @default(uuid())
+  projectId     String
+  equipmentId   String
+  pvPanelId     String?
+  inverterId    String?
+  mountingHardwareId   String?
+  miscEquipmentId   String?
+  wireId   String?
+  equipmentType EquipmentType
+  quantity      Int          @default(1)
+  position      Json?        // Flexible JSON field for position/layout data
+  specifications Json?        // For equipment-specific configuration
+  project       Project      @relation(fields: [projectId], references: [id])
+  pvPanel       PVPanel?     @relation("ProjectPVPanel", fields: [pvPanelId], references: [id])
+  inverter      Inverter?    @relation("ProjectInverter", fields: [inverterId], references: [id])
+  mountingHardware MountingHardware? @relation("ProjectMountingHardware", fields: [mountingHardwareId], references: [id])
+  miscEquipment MiscEquipment? @relation("ProjectMiscEquipment", fields: [miscEquipmentId], references: [id])
+  wire          Wire?        @relation("ProjectWire", fields: [wireId], references: [id])
+
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([projectId, equipmentId, equipmentType])
+  @@index([projectId])
+  @@index([equipmentId])
+}
+
 enum UserRole {
   ADMIN
   USER
+}
+
+enum ProjectStatus {
+  NOT_STARTED
+  PLANNING
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+}
+
+enum TaskStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum EquipmentType {
+  PV_PANEL
+  INVERTER
+  MOUNTING_HARDWARE
+  MISC_EQUIPMENT
+  WIRE
 }

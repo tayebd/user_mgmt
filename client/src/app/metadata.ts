@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Project Management App",
-  description: "A modern project management application",
+  title: "Solar PV Project Designer",
+  description: "Solar PV Project Designer",
 };

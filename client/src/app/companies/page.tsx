@@ -33,7 +33,7 @@ const CompaniesPage = () => {
                     <img
                       src={company.iconUrl || company.logo}
                       alt={`${company.name} logo`}
-                      className="w-full h-full object-contain p-1"
+                      className="w-full h-full object-contain p-1 "
                       // className="w-16 h-16 rounded-lg object-cover"
                     />
                   </div>

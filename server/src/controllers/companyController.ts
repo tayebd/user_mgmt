@@ -7,6 +7,10 @@ export const getCompanies = async (req: Request, res: Response) => {
       include: {
         descriptions: true,
         reviews: true,
+        projects: true,
+        certifications: true,
+        partnerships: true,
+        services: true,
       },
     });
     res.status(200).json(companies);
@@ -24,6 +28,10 @@ export const getCompany = async (req: Request, res: Response) => {
       include: {
         descriptions: true,
         reviews: true,
+        projects: true,
+        certifications: true,
+        partnerships: true,
+        services: true,
       },
     });
     if (!company) {
@@ -37,7 +45,7 @@ export const getCompany = async (req: Request, res: Response) => {
 };
 
 export const createCompany = async (req: Request, res: Response) => {
-  const { name, location, website, iconUrl, descriptions } = req.body;
+  const { name, location, website, iconUrl, descriptions, projects, certifications, partnerships, services } = req.body;
   try {
     const company = await prisma.company.create({
       data: {
@@ -51,6 +59,35 @@ export const createCompany = async (req: Request, res: Response) => {
             text: desc.text,
           })),
         },
+        projects: {
+          create: projects.map((project: any) => ({
+            name: project.name,
+            description: project.description,
+            location: project.location,
+            latitude: project.latitude,
+            longitude: project.longitude,
+            capacityKw: project.capacityKw,
+            completedAt: project.completedAt,
+          })),
+        },
+        certifications: {
+          create: certifications.map((cert: any) => ({
+            name: cert.name,
+            issuedBy: cert.issuedBy,
+            issuedYear: cert.issuedYear,
+          })),
+        },
+        partnerships: {
+          create: partnerships.map((partnership: any) => ({
+            name: partnership.name,
+            type: partnership.type,
+          })),
+        },
+        services: {
+          create: services.map((service: any) => ({
+            type: service.type,
+          })),
+        },
       },
     });
     res.status(201).json(company);
@@ -62,7 +99,7 @@ export const createCompany = async (req: Request, res: Response) => {
 
 export const updateCompany = async (req: Request, res: Response) => {
   const { companyId } = req.params;
-  const { name, location, website, iconUrl, descriptions } = req.body;
+  const { name, location, website, iconUrl, descriptions, projects, certifications, partnerships, services } = req.body;
   try {
     const company = await prisma.company.update({
       where: { id: companyId },
@@ -76,6 +113,39 @@ export const updateCompany = async (req: Request, res: Response) => {
           create: descriptions.map((desc: any) => ({
             language: desc.language,
             text: desc.text,
+          })),
+        },
+        projects: {
+          deleteMany: {},
+          create: projects.map((project: any) => ({
+            name: project.name,
+            description: project.description,
+            location: project.location,
+            latitude: project.latitude,
+            longitude: project.longitude,
+            capacityKw: project.capacityKw,
+            completedAt: project.completedAt,
+          })),
+        },
+        certifications: {
+          deleteMany: {},
+          create: certifications.map((cert: any) => ({
+            name: cert.name,
+            issuedBy: cert.issuedBy,
+            issuedYear: cert.issuedYear,
+          })),
+        },
+        partnerships: {
+          deleteMany: {},
+          create: partnerships.map((partnership: any) => ({
+            name: partnership.name,
+            type: partnership.type,
+          })),
+        },
+        services: {
+          deleteMany: {},
+          create: services.map((service: any) => ({
+            type: service.type,
           })),
         },
       },

@@ -1,0 +1,70 @@
+Wizard Files Overview
+============================
+
+1. Core Wizard Components
+------------------------
+client/src/components/ProjectWizard/ProjectWizard.tsx
+- Main wizard container component
+- Handles step navigation and form state
+- Manages overall wizard flow
+
+client/src/components/ProjectWizard/ProgressIndicator.tsx
+- Visual progress bar component
+- Shows current step and completion status
+- Provides step navigation interface
+
+2. Wizard Steps
+--------------
+client/src/components/ProjectWizard/steps/index.ts
+- Exports all step components
+- Defines step order and configuration
+
+client/src/components/ProjectWizard/steps/LocationStep.tsx
+- Project location selection step
+- Integrates Google Maps for location picking
+- Handles address geocoding and validation
+
+client/src/components/ProjectWizard/steps/PVPanelStep.tsx
+- Solar panel selection step
+- Panel type and configuration
+- Panel specifications input
+
+client/src/components/ProjectWizard/steps/InverterStep.tsx
+- Inverter selection step
+- Inverter type and configuration
+- Inverter specifications input
+
+client/src/components/ProjectWizard/steps/SystemAttributesStep.tsx
+- System configuration step
+- Overall system attributes
+- Technical specifications input
+
+client/src/components/ProjectWizard/steps/MiscEquipmentStep.tsx
+- Additional equipment step
+- Optional components selection
+- Supplementary equipment configuration
+
+3. Supporting Components
+-----------------------
+client/src/contexts/GoogleMapsContext.tsx
+- Google Maps initialization context
+- Handles Maps API loading
+- Provides geocoding services
+
+4. Configuration
+---------------
+client/.env.local
+- Environment variables
+- API keys and configuration
+- Development settings
+
+googleMap.ts
+project.ts
+equipment.ts
+
+This wizard implementation follows a modular approach with:
+- Separate components for each step
+- Centralized state management
+- Progressive form completion
+- Reusable UI components
+- Map integration for location selection 

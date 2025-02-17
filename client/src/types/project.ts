@@ -1,0 +1,31 @@
+export type ProjectData = {
+  address: string;
+  coordinates: { lat: number; lng: number };
+  dcSystemSize: number;
+  arrayType: string;
+  systemLosses: number;
+  tilt: number;
+  azimuth: number;
+  bifacial: boolean;
+  selectedPanelId: string;
+  pvPanelQuantity: number;
+  selectedInverterId: string;
+  inverterQuantity: number;
+  mountingType: string;
+  roofMaterial: string;
+  derivedEquipment: {
+    fuses: number;
+    dcSurgeProtector: number;
+    dcDisconnectSwitches: number;
+    acSurgeProtector: number;
+    generalDisconnectSwitch: number;
+    residualCurrentBreaker: number;
+    generalCircuitBreaker: number;
+    dcCableLength: number;
+    acCableLength: number;
+    earthingCableLength: number;
+    mc4ConnectorPairs: number;
+    splitters: number;
+    cableTrayLength: number;
+  };
+};
