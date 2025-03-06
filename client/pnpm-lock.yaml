@@ -104,9 +104,6 @@ importers:
       typescript:
         specifier: 5.3.3
         version: 5.3.3
-      undici:
-        specifier: 5.28.2
-        version: 5.28.2
       zod:
         specifier: ^3.24.1
         version: 3.24.1

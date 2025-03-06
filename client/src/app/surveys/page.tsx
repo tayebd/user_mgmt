@@ -11,6 +11,7 @@ import { useApiStore } from '@/state/api';
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow
 } from '@/components/ui/table';
+import { Survey } from '@/types';
 
 function SurveysPage() {
   const router = useRouter();
@@ -59,10 +60,12 @@ function SurveysPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {surveys.map((survey) => (
+              {surveys.map((survey: Survey) => (
                 <TableRow key={survey.id}>
                   <TableCell className="font-medium">{survey.title}</TableCell>
-                  <TableCell>{new Date(survey.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    {survey.createdAt ? new Date(survey.createdAt).toLocaleDateString() : 'N/A'}
+                  </TableCell>
                   <TableCell>
                     {survey.active ? (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>

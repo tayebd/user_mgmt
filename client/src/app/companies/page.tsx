@@ -4,9 +4,10 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star } from 'lucide-react';
+import Image from 'next/image';
 
 import Sidebar from '@/components/Sidebar';
-import CompanyManagement from '@/components/Company/CompanyManagement';
+// import CompanyManagement from '@/components/Company/CompanyManagement';
 import { useApiStore } from '@/state/api';
 import { Company } from '@/types';
 
@@ -31,7 +32,7 @@ const CompaniesPage = () => {
                 <div className="grid grid-cols-8 gap-4 items-center">
                   {/* Column 1: Logo (1/8) */}
                   <div className="col-span-1 flex justify-center">
-                    <img
+                    <Image
                       src={company.iconUrl || company.logo}
                       alt={`${company.name} logo`}
                       className="w-full h-full object-contain p-1 "

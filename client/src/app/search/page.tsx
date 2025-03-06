@@ -4,14 +4,14 @@ import React, { useState } from 'react';
 import { useApiStore } from '@/state/api';
 
 const SearchPage = () => {
-  const { searchResults, searchCompanies } = useApiStore();
+  const { searchResults } = useApiStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [location, setLocation] = useState('');
   const [capability, setCapability] = useState('');
   const [rating, setRating] = useState('');
 
   const handleSearch = async () => {
-    await searchCompanies({ searchTerm, location, capability, rating });
+    // await searchCompanies({ searchTerm, location, capability, rating });
   };
 
   return (
@@ -73,7 +73,6 @@ const SearchPage = () => {
                 <tr key={company.id} className="hover:bg-gray-50">
                   <td className="py-2 px-4">{company.name}</td>
                   <td className="py-2 px-4">{company.location}</td>
-                  <td className="py-2 px-4">{company.capability}</td>
                   <td className="py-2 px-4">{company.rating}</td>
                 </tr>
               ))}

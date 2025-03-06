@@ -76,21 +76,21 @@ interface ApiState {
   searchResults: SearchResults;
   fetchCompanies: () => Promise<void>;
   fetchSurveys: () => Promise<void>;
-  createSurvey: (project: CreateSurveyParams) => Promise<void>;
-  fetchPVPanels: (page: number, limit: number) => Promise<void>;
-  fetchInverters: (page: number, limit: number) => Promise<void>;
-  fetchProject: () => Promise<void>;
-  createProject: (project: ProjectData) => Promise<void>;
+  createSurvey: (project: CreateSurveyParams) => Promise<Survey>;
+  fetchPVPanels: (page: number, limit: number) => Promise<PVPanel[]>;
+  fetchInverters: (page: number, limit: number) => Promise<Inverter[]>;
+  fetchProject: () => Promise<ProjectData>;
+  createProject: (project: ProjectData) => Promise<ProjectData>;
   updateProject: (projectId: string, project: Partial<ProjectData>) => Promise<void>;
-  createCompany: (company: Partial<Company>) => Promise<void>;
+  createCompany: (company: Partial<Company>) => Promise<Company>;
   updateCompany: (companyId: string, company: Partial<Company>) => Promise<void>;
   deleteCompany: (companyId: string) => Promise<void>;
-  createReview: (companyId: string, review: Partial<Review>) => Promise<void>;
-  createSurveyResponse: (surveyId: string, replyJson: string) => Promise<void>;
+  createReview: (companyId: string, review: Partial<Review>) => Promise<Review>;
+  createSurveyResponse: (surveyId: string, replyJson: string) => Promise<SurveyResponse>;
   fetchReviews: (companyId: string) => Promise<Review[]>;
-  fetchSurveyResponses: (surveyId: string) => Promise<Review[]>;
-  fetchSurveysByUserId: (userId: string) => Promise<void>;
-  fetchSurveyById: (userId: string) => Promise<void>;
+  fetchSurveyResponses: (surveyId: string) => Promise<SurveyResponse[]>;
+  fetchSurveysByUserId: (userId: string) => Promise<Survey>;
+  fetchSurveyById: (userId: string) => Promise<Survey>;
 }
 
 const apiStore = create<ApiState>((set) => ({
@@ -124,6 +124,7 @@ const apiStore = create<ApiState>((set) => ({
     });
     const data = await response.json();
     set({ surveys: data });
+    return data;
   },
   fetchSurveyById:  async (surveyId: string) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys/${surveyId}`, {
@@ -141,6 +142,7 @@ const apiStore = create<ApiState>((set) => ({
     });
     const data = await response.json();
     set({ pvPanels: data });
+    return data;
   },
   fetchInverters: async (page = 1, limit = 50) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/inverters?page=${page}&limit=${limit}`, {
@@ -149,6 +151,7 @@ const apiStore = create<ApiState>((set) => ({
     });
     const data = await response.json();
     set({ inverters: data });
+    return data;
   },
   createSurvey: async (survey: CreateSurveyParams) => {
     const token = await getAuthToken();
@@ -172,6 +175,7 @@ const apiStore = create<ApiState>((set) => ({
     });
     const data = await response.json();
     set({ project: data });
+    return data;
   },
   createProject: async (project: ProjectData) => {
     const token = await getAuthToken();
@@ -186,6 +190,7 @@ const apiStore = create<ApiState>((set) => ({
     });
     const data = await response.json();
     set({ project: data });
+    return data;
   },
   updateProject: async (projectId: string, project: Partial<ProjectData>) => {
     const token = await getAuthToken();
@@ -220,6 +225,7 @@ const apiStore = create<ApiState>((set) => ({
     });
     const data = await response.json();
     set((state) => ({ companies: [...state.companies, data] }));
+    return data;
   },
   updateCompany: async (companyId: string, company: Partial<Company>) => {
     const token = await getAuthToken();

@@ -5,9 +5,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { Toaster } from "@/components/ui/toaster";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
-import useStore from '@/state';
 import { usePathname } from 'next/navigation';
-import { metadata } from './metadata';
 
 export default function RootLayout({
   children,

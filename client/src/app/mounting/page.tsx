@@ -1,5 +1,5 @@
 import React from "react";
-import MountingHardware from "@/components//MountingHardware";
+import MountingHardware from "@/components/MountingHardware";
 
 export default function MountingHardwarePage() {
   return (

@@ -1,5 +1,5 @@
 import React from "react";
-import MountingCost from "@/components//MountingCost";
+import MountingCost from "@/components/MountingCost";
 
 export default function MountingCostPage() {
   return (

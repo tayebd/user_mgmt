@@ -5,14 +5,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  LayoutDashboard,
-  ListTodo,
-  Calendar,
+  // LayoutDashboard,
+  // ListTodo,
+  // Calendar,
+  // Timer,
+  // AlertTriangle,
+  // AlertCircle,
   Settings,
   Search,
-  Timer,
-  AlertTriangle,
-  AlertCircle,
   ChevronFirst,
   ChevronLast,
   LogOut,

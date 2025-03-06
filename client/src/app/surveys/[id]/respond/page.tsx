@@ -9,7 +9,6 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { useApiStore } from '@/state/api';
 
 export default function RespondPage() {
-  const router = useRouter();
   const [survey, setSurvey] = useState<Survey | null>(null);
   const [surveyId, setsurveyId] = useState('');
   const [loading, setLoading] = useState(true);
@@ -17,7 +16,7 @@ export default function RespondPage() {
 
   const pathname = usePathname()
   const searchParams = useSearchParams()
-   const { fetchSurveyById, createSurveyResponse } = useApiStore();
+  const { fetchSurveyById, createSurveyResponse } = useApiStore();
  
   useEffect(() => {
     const fetchSurvey = async () => {
@@ -33,7 +32,7 @@ export default function RespondPage() {
       
         // Create a SurveyJS Model from the survey JSON
         // const surveyModel = new Model(JSON.parse(surveyData.surveyJson));
-        setSurvey(survey);
+        if (survey) setSurvey(survey);
       } catch (err) {
         setError('Failed to load survey');
         console.error(err);
