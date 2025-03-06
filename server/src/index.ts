@@ -8,8 +8,8 @@ import morgan from "morgan";
 import searchRoutes from "./routes/searchRoutes";
 import userRoutes from "./routes/userRoutes";
 import companyRoutes from "./routes/companyRoutes";
-import companiesRouter from './routes/companies';
 import pvPanelRoutes from './routes/pvPanelRoutes';
+import surveyRoutes from "./routes/surveyRoutes";
 import inverterRoutes from './routes/inverterRoutes';
 
 /* CONFIGURATIONS */
@@ -51,8 +51,8 @@ app.get("/", (req, res) => {
 app.use("/api/search", searchRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/companies", companyRoutes);
-app.use('/api', companiesRouter);
 app.use('/api', pvPanelRoutes);
+app.use('/api', surveyRoutes);
 app.use('/api', inverterRoutes);
 
 /* ERROR HANDLING */

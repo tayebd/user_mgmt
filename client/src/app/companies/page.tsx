@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { useApiStore } from '@/state/api';
-import { Company } from '@/types';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star } from 'lucide-react';
+
 import Sidebar from '@/components/Sidebar';
 import CompanyManagement from '@/components/Company/CompanyManagement';
+import { useApiStore } from '@/state/api';
+import { Company } from '@/types';
 
 const CompaniesPage = () => {
   const { companies, fetchCompanies }: { companies: Company[]; fetchCompanies: () => void } = useApiStore();

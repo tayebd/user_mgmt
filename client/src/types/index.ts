@@ -106,3 +106,35 @@ export type ProjectData = {
     cableTrayLength: number;
   };
 };
+
+export interface Survey {
+  id: string;
+  title: string;
+  description: string;
+  active: boolean;
+  status?: 'draft' | 'active' | 'completed' | 'archived';
+  surveyJson: string;
+  responseCount: number;
+  targetResponses: number;
+  original?: Survey;
+  expiresAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateSurveyParams {
+  title: string;
+  description: string;
+  active: boolean;
+  surveyJson: string;
+  responseCount: number;
+  targetResponses: number;
+}
+
+export interface SurveyResponse {
+    id: string;
+    surveyid: string;
+    responseJson: string;
+    createdAt: string;
+    updatedAt: string;
+}

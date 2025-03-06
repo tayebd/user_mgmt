@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useApiStore } from '@/state/api';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { Company } from '@/types';
 
 const CompanyDetailPage = () => {

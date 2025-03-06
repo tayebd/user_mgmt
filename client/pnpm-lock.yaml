@@ -68,6 +68,9 @@ importers:
       next:
         specifier: ^15.0.0
         version: 15.1.6(@babel/core@7.26.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      next-themes:
+        specifier: ^0.4.4
+        version: 0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react:
         specifier: ^19.0.0-rc.0
         version: 19.0.0
@@ -77,6 +80,18 @@ importers:
       react-hook-form:
         specifier: ^7.54.2
         version: 7.54.2(react@19.0.0)
+      sonner:
+        specifier: ^2.0.1
+        version: 2.0.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      survey-core:
+        specifier: ^1.12.26
+        version: 1.12.26
+      survey-creator-react:
+        specifier: ^1.12.26
+        version: 1.12.26(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(survey-core@1.12.26)(survey-creator-core@1.12.26(survey-core@1.12.26))(survey-react-ui@1.12.26(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(survey-core@1.12.26))
+      survey-react-ui:
+        specifier: ^1.12.26
+        version: 1.12.26(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(survey-core@1.12.26)
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.0
@@ -2566,6 +2581,12 @@ packages:
   natural-compare@1.4.0:
     resolution: {integrity: sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==}
 
+  next-themes@0.4.4:
+    resolution: {integrity: sha512-LDQ2qIOJF0VnuVrrMSMLrWGjRMkq+0mpgl6e0juCLqdJ+oo8Q84JRWT6Wh11VDQKkMMe+dVzDKLWs5n87T+PkQ==}
+    peerDependencies:
+      react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+      react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+
   next@15.1.6:
     resolution: {integrity: sha512-Hch4wzbaX0vKQtalpXvUiw5sYivBy4cm5rzUKrBnUB/y436LGrvOUqYvlSeNVCWFO/770gDlltR9gqZH62ct4Q==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
@@ -2867,6 +2888,12 @@ packages:
   simple-swizzle@0.2.2:
     resolution: {integrity: sha512-JA//kQgZtbuY83m+xT+tXJkmJncGMTFT+C+g2h2R9uxkYIrE2yy9sgmcLhCnw57/WSD+Eh3J97FPEDFnbXnDUg==}
 
+  sonner@2.0.1:
+    resolution: {integrity: sha512-FRBphaehZ5tLdLcQ8g2WOIRE+Y7BCfWi5Zyd8bCvBjiW8TxxAyoWZIxS661Yz6TGPqFQ4VLzOF89WEYhfynSFQ==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+      react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
@@ -2937,6 +2964,40 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  survey-core@1.12.26:
+    resolution: {integrity: sha512-tBZ4n1z+1gXd8UfLZz/KH5rbS8NpJfCt0t5VcYbIjWKE5wkRBQQu/OppSu4ruP5JyC17y6OKWV1hO7/0eexBew==}
+
+  survey-creator-core@1.12.26:
+    resolution: {integrity: sha512-2Mio5y9UA8vZB7iupyzI+SCKuZghOxbBSW/onmvGOFWBCOYQmHKzdoNFXR10dIPxW9Ujb8K2W/i7/YWCmKiAXw==}
+    engines: {node: '>=0.10.0'}
+    peerDependencies:
+      ace-builds: ^1.4.12
+      survey-core: 1.12.26
+    peerDependenciesMeta:
+      ace-builds:
+        optional: true
+
+  survey-creator-react@1.12.26:
+    resolution: {integrity: sha512-+qisSF5IGJ0RwRkQQu049FufGjiw+2j9waJtDou4fMhCtBB5Y2b4XtlmwrjP3/ghEN0qRlI6h2yPGeA5qmPOdA==}
+    engines: {node: '>=0.10.0'}
+    peerDependencies:
+      ace-builds: ^1.4.12
+      react: ^16.5.0 || ^17.0.1 || ^18.1.0 || ^19.0.0
+      react-dom: ^16.5.0 || ^17.0.1 || ^18.1.0 || ^19.0.0
+      survey-core: 1.12.26
+      survey-creator-core: 1.12.26
+      survey-react-ui: 1.12.26
+    peerDependenciesMeta:
+      ace-builds:
+        optional: true
+
+  survey-react-ui@1.12.26:
+    resolution: {integrity: sha512-lrs9CisCWqKB0/dlEFB96ZadX9kvBSjl/xF9OuUqeHYGel7BuPR14MJYdQB3ASOWVGKBQmZqDtOTW2BG3PO47A==}
+    peerDependencies:
+      react: ^16.5.0 || ^17.0.1 || ^18.2.0 || ^19.0.0
+      react-dom: ^16.5.0 || ^17.0.1 || ^18.2.0 || ^19.0.0
+      survey-core: 1.12.26
 
   tailwind-merge@2.6.0:
     resolution: {integrity: sha512-P+Vu1qXfzediirmHOC3xKGAYeZtPcV9g76X+xg2FD4tYgR71ewMA35Y3sCz3zhiN/dwefRpJX0yBcgwi1fXNQA==}
@@ -5981,6 +6042,11 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
+  next-themes@0.4.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+    dependencies:
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+
   next@15.1.6(@babel/core@7.26.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       '@next/env': 15.1.6
@@ -6353,6 +6419,11 @@ snapshots:
       is-arrayish: 0.3.2
     optional: true
 
+  sonner@2.0.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+    dependencies:
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+
   source-map-js@1.2.1: {}
 
   stable-hash@0.0.4: {}
@@ -6435,6 +6506,26 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  survey-core@1.12.26: {}
+
+  survey-creator-core@1.12.26(survey-core@1.12.26):
+    dependencies:
+      survey-core: 1.12.26
+
+  survey-creator-react@1.12.26(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(survey-core@1.12.26)(survey-creator-core@1.12.26(survey-core@1.12.26))(survey-react-ui@1.12.26(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(survey-core@1.12.26)):
+    dependencies:
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+      survey-core: 1.12.26
+      survey-creator-core: 1.12.26(survey-core@1.12.26)
+      survey-react-ui: 1.12.26(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(survey-core@1.12.26)
+
+  survey-react-ui@1.12.26(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(survey-core@1.12.26):
+    dependencies:
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+      survey-core: 1.12.26
 
   tailwind-merge@2.6.0: {}
 

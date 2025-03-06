@@ -6,7 +6,8 @@ import { PVPanel } from '@/types';
 import Sidebar from '@/components/Sidebar';
 
 const PVPanelList = () => {
-  const { pvPanels, fetchPVPanels }: { pvPanels: PVPanel[]; fetchPVPanels: (page: number, limit: number) => void } = useApiStore();
+  const { pvPanels, fetchPVPanels }: 
+  { pvPanels: PVPanel[]; fetchPVPanels: (page: number, limit: number) => void } = useApiStore();
   const [page, setPage] = useState(1);
   const [limit] = useState(50);
 

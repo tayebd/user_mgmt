@@ -9,12 +9,12 @@ datasource db {
 }
 
 model User {
-  id                String    @id @default(uuid())
-  createdAt         DateTime  @default(now())
-  email             String    @unique
+  createdAt         DateTime @default(now())
+  email             String   @unique
+  id                String   @id @default(uuid())
   name              String
-  role              UserRole  @default(USER)
-  updatedAt         DateTime  @updatedAt
+  role              UserRole @default(USER)
+  updatedAt         DateTime @updatedAt
   profilePictureUrl String?
   phone             String?
   reviews           Review[]
@@ -29,73 +29,73 @@ model Country {
 }
 
 model Company {
-  id              String           @id @default(uuid())
-  name            String
-  location        String?
-  address         String?
-  city            String?
-  state           String?
-  zipCode         String?
-  country         String?
-  latitude        Float? // Latitude for map integration
-  longitude       Float? // Longitude for map integration
-  phone           String?
-  email           String?
-  website         String?
-  iconUrl         String?
-  foundedYear     Int?
-  web_validity    Boolean?
-  capabilities    String?
-  fb_handle       String?
-  residential     Boolean?
-  commercial      Boolean?
-  distributor     Boolean?
-  serviceAreas    String[]
-  certifications  Certification[]
-  partnerships    Partnership[]
-  services        Service[]
-  descriptions    Description[]
-  reviews         Review[]
-  projects        CompanyProject[]
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id             String           @id @default(uuid())
+  name           String
+  location       String?
+  website        String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  iconUrl        String?
+  address        String?
+  city           String?
+  country        String?
+  email          String?
+  foundedYear    Int?
+  latitude       Float?
+  longitude      Float?
+  phone          String?
+  serviceAreas   String[]
+  state          String?
+  zipCode        String?
+  capabilities   String?
+  commercial     Boolean?
+  fb_handle      String?
+  residential    Boolean?
+  web_validity   Boolean?
+  distributor    Boolean?
+  certifications Certification[]
+  projects       CompanyProject[]
+  descriptions   Description[]
+  partnerships   Partnership[]
+  reviews        Review[]
+  services       Service[]
 }
 
 model CompanyProject {
-  id          String   @id @default(uuid())
-  name        String   // Project name (e.g., "Smith Residence Solar Install")
-  description String?  // Brief project overview
+  id          String         @id @default(uuid())
+  name        String
+  description String?
   companyId   String
-  company     Company  @relation(fields: [companyId], references: [id])
-  location    String?  // Project location (City, State)
-  latitude    Float?   // Latitude for map integration
-  longitude   Float?   // Longitude for map integration
-  capacityKw  Float?   // Size of the solar system in kW
-  completedAt DateTime? // Completion date
+  location    String?
+  latitude    Float?
+  longitude   Float?
+  capacityKw  Float?
+  completedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  company     Company        @relation(fields: [companyId], references: [id])
   photos      ProjectPhoto[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }
 
 model ProjectPhoto {
-  id        String   @id @default(uuid())
-  url       String   // Link to the photo
-  caption   String?  // Optional description
+  id        String         @id @default(uuid())
+  url       String
+  caption   String?
   projectId String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
   project   CompanyProject @relation(fields: [projectId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Certification {
   id         String   @id @default(uuid())
   name       String
   companyId  String
-  company    Company  @relation(fields: [companyId], references: [id])
   issuedBy   String?
   issuedYear Int?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  company    Company  @relation(fields: [companyId], references: [id])
 }
 
 model Partnership {
@@ -103,18 +103,18 @@ model Partnership {
   name      String
   type      String
   companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  company   Company  @relation(fields: [companyId], references: [id])
 }
 
 model Service {
   id        String   @id @default(uuid())
   type      String
   companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  company   Company  @relation(fields: [companyId], references: [id])
 }
 
 model Description {
@@ -122,35 +122,36 @@ model Description {
   language  String
   text      String
   companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  company   Company  @relation(fields: [companyId], references: [id])
 }
 
 model Review {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
   companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
   rating    Int
   comment   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  company   Company  @relation(fields: [companyId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Project {
-  id             String                 @id @default(uuid())
-  name           String
-  description    String?
-  startDate      DateTime
-  endDate        DateTime
-  createdAt      DateTime               @default(now())
-  createdById    String
-  status         ProjectStatus          @default(NOT_STARTED)
-  updatedAt      DateTime               @updatedAt
-  tasks          Task[]
-  equipment      ProjectEquipment[]
+  id          String             @id @default(uuid())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime           @default(now())
+  createdById String
+  status      ProjectStatus      @default(NOT_STARTED)
+  updatedAt   DateTime           @updatedAt
+  equipment   ProjectEquipment[]
+  tasks       Task[]
+
   @@index([createdById])
 }
 
@@ -170,70 +171,69 @@ model Task {
 }
 
 model PVPanel {
-  id                           String    @id @default(uuid())
-  manufacturer                 String
-  modelNumber                  String    @unique
-  description                  String?
-  safetyCertification          String?
-  power                        Float?
-  ptcRating                    Float?
-  notes                        String?
-  designQualificationCert      String?
-  performanceEvaluation        String?
-  family                       String?
-  technology                   String?
-  activeArea                   Float?
-  numberOfCells                Int?
-  numberOfPanels               Int?
-  bipv                         Boolean   @default(false)
-  shortCircuitCurrent          Float?
-  openCircuitVoltage           Float?
-  nameplateMaxCurrentAtPmax    Float?
-  nameplateVoltageAtPmax       Float?
-  averageNoct                  Float?
-  tempCoeffPmax                Float?
-  tempCoeffIsc                 Float?
-  tempCoeffVoc                 Float?
-  tempCoeffIpmax               Float?
-  tempCoeffVpmax               Float?
-  currentAtLowPower            Float?
-  voltageAtLowPower            Float?
-  currentAtNoct                Float?
-  voltageAtNoct                Float?
-  mountingType                 String?
-  moduleType                   String?
-  shortSide                    Float?
-  longSide                     Float?
-  geometricMultiplier          Float?
-  performanceRatio             Float?
-  cecListingDate               DateTime?
-  lastUpdate                   DateTime?
-  weight                       Float?
-  framingMaterial              String?
-  junctionBoxType              String?
-  connectorType                String?
-  performanceWarranty          String?
-  productWarranty              String?
-  efficiency                   Float?
-  projectEquipment ProjectEquipment[] @relation("ProjectPVPanel")
+  id                        String             @id @default(uuid())
+  manufacturer              String
+  modelNumber               String             @unique
+  description               String?
+  safetyCertification       String?
+  ptcRating                 Float?
+  notes                     String?
+  designQualificationCert   String?
+  performanceEvaluation     String?
+  family                    String?
+  technology                String?
+  activeArea                Float?
+  numberOfCells             Int?
+  numberOfPanels            Int?
+  bipv                      Boolean            @default(false)
+  nameplateMaxCurrentAtPmax Float?
+  nameplateVoltageAtPmax    Float?
+  averageNoct               Float?
+  tempCoeffPmax             Float?
+  tempCoeffIsc              Float?
+  tempCoeffVoc              Float?
+  tempCoeffIpmax            Float?
+  tempCoeffVpmax            Float?
+  currentAtLowPower         Float?
+  voltageAtLowPower         Float?
+  currentAtNoct             Float?
+  voltageAtNoct             Float?
+  mountingType              String?
+  moduleType                String?
+  shortSide                 Float?
+  longSide                  Float?
+  geometricMultiplier       Float?
+  performanceRatio          Float?
+  cecListingDate            DateTime?
+  lastUpdate                DateTime?
+  weight                    Float?
+  framingMaterial           String?
+  junctionBoxType           String?
+  connectorType             String?
+  performanceWarranty       String?
+  productWarranty           String?
+  efficiency                Float?
+  openCircuitVoltage        Float?
+  power                     Float?
+  shortCircuitCurrent       Float?
+  projectEquipment          ProjectEquipment[] @relation("ProjectPVPanel")
 
   @@index([manufacturer, modelNumber])
 }
 
 model Inverter {
-  id                           String    @id @default(uuid())
-  manufacturer                 String?
-  modelNumber                  String    @unique
+  id                           String             @id @default(uuid())
+  modelNumber                  String             @unique
   equipmentType                String?
   additionalRequiredDevices    String?
   currentMeasurementReference  String?
   description                  String?
   pcsIssuerEntity              String?
   pcsDocumentDate              DateTime?
-  unrestrictedMode             Boolean   @default(false)
-  exportOnlyMode               Boolean   @default(false)
-  importOnlyMode               Boolean   @default(false)
-  noExchangeMode               Boolean   @default(false)
+  unrestrictedMode             Boolean            @default(false)
+  exportOnlyMode               Boolean            @default(false)
+  importOnlyMode               Boolean            @default(false)
+  noExchangeMode               Boolean            @default(false)
   unrestrictedModeResponseTime Float?
   exportOnlyModeResponseTime   Float?
   importOnlyModeResponseTime   Float?
@@ -246,82 +246,107 @@ model Inverter {
   pcsListingDate               DateTime?
   lastUpdate                   DateTime?
   inverterOrEss                String?
-
-  projectEquipment ProjectEquipment[] @relation("ProjectInverter")
+  manufacturer                 String?
+  projectEquipment             ProjectEquipment[] @relation("ProjectInverter")
 
   @@index([manufacturer, modelNumber])
 }
 
 model MountingHardware {
-  id               String    @id @default(uuid())
-  manufacturer String
-  modelNumber      String    @unique
+  id               String             @id @default(uuid())
+  modelNumber      String             @unique
   equipmentType    String?
   description      String?
   notes            String?
   cecListingDate   DateTime?
   lastUpdate       DateTime?
-
+  manufacturer     String
   projectEquipment ProjectEquipment[] @relation("ProjectMountingHardware")
 
   @@index([manufacturer, modelNumber])
 }
 
 model MiscEquipment {
-  id               String    @id @default(uuid())
-  manufacturer String
-  modelNumber      String    @unique
+  id               String             @id @default(uuid())
+  modelNumber      String             @unique
   equipmentType    String?
   description      String?
   notes            String?
   cecListingDate   DateTime?
   lastUpdate       DateTime?
+  manufacturer     String
   projectEquipment ProjectEquipment[] @relation("ProjectMiscEquipment")
 
   @@index([manufacturer, modelNumber])
 }
 
 model Wire {
-  id               String    @id @default(uuid())
-  manufacturer String
-  modelNumber      String    @unique
+  id               String             @id @default(uuid())
+  modelNumber      String             @unique
   equipmentType    String?
   description      String?
   notes            String?
   cecListingDate   DateTime?
   lastUpdate       DateTime?
-
+  manufacturer     String
   projectEquipment ProjectEquipment[] @relation("ProjectWire")
 
   @@index([manufacturer, modelNumber])
 }
 
 model ProjectEquipment {
-  id            String        @id @default(uuid())
-  projectId     String
-  equipmentId   String
-  pvPanelId     String?
-  inverterId    String?
-  mountingHardwareId   String?
-  miscEquipmentId   String?
-  wireId   String?
-  equipmentType EquipmentType
-  quantity      Int          @default(1)
-  position      Json?        // Flexible JSON field for position/layout data
-  specifications Json?        // For equipment-specific configuration
-  project       Project      @relation(fields: [projectId], references: [id])
-  pvPanel       PVPanel?     @relation("ProjectPVPanel", fields: [pvPanelId], references: [id])
-  inverter      Inverter?    @relation("ProjectInverter", fields: [inverterId], references: [id])
-  mountingHardware MountingHardware? @relation("ProjectMountingHardware", fields: [mountingHardwareId], references: [id])
-  miscEquipment MiscEquipment? @relation("ProjectMiscEquipment", fields: [miscEquipmentId], references: [id])
-  wire          Wire?        @relation("ProjectWire", fields: [wireId], references: [id])
-
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id                 String            @id @default(uuid())
+  projectId          String
+  equipmentId        String
+  pvPanelId          String?
+  inverterId         String?
+  mountingHardwareId String?
+  miscEquipmentId    String?
+  wireId             String?
+  equipmentType      EquipmentType
+  quantity           Int               @default(1)
+  position           Json?
+  specifications     Json?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  inverter           Inverter?         @relation("ProjectInverter", fields: [inverterId], references: [id])
+  miscEquipment      MiscEquipment?    @relation("ProjectMiscEquipment", fields: [miscEquipmentId], references: [id])
+  mountingHardware   MountingHardware? @relation("ProjectMountingHardware", fields: [mountingHardwareId], references: [id])
+  project            Project           @relation(fields: [projectId], references: [id])
+  pvPanel            PVPanel?          @relation("ProjectPVPanel", fields: [pvPanelId], references: [id])
+  wire               Wire?             @relation("ProjectWire", fields: [wireId], references: [id])
 
   @@unique([projectId, equipmentId, equipmentType])
   @@index([projectId])
   @@index([equipmentId])
+}
+
+model Survey {
+  id          String           @id @default(uuid())
+  title       String
+  description String
+  surveyJson  String
+  active      Boolean          @default(false)
+  isPublished Boolean          @default(false)
+  userId      String?
+  createdBy   String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  responses   SurveyResponse[]
+
+  @@index([userId])
+  @@map("surveys")
+}
+
+model SurveyResponse {
+  id           String   @id @default(cuid())
+  surveyId     String
+  createdAt    DateTime @default(now())
+  responseJson Json
+  survey       Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+
+  @@index([surveyId])
+  @@map("responses")
 }
 
 enum UserRole {

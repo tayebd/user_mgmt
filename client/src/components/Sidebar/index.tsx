@@ -94,6 +94,16 @@ const menuItems = [
       },
     ],
   },
+  {
+    title: "Surveys",
+    list: [
+      {
+        title: "Surveys",
+        href: "/surveys",
+        icon: Sun,
+      },
+    ],
+  },
 ];
 
   return (
