@@ -49,29 +49,11 @@ export default function RespondPage() {
       // Get the survey results as a string
       const resultAsStr = JSON.stringify(surveyModel.data);
       console.log(resultAsStr);
-      // Prepare the data object for submission
-      // const dataObj = {
-      //   postId: surveyId,
-      //   surveyResult: resultAsStr
-      // };
-
-      // // Create headers
-      // const headers = new Headers({
-      //   "Content-Type": "application/json; charset=utf-8"
-      // });
-      // // Submit the survey response using fetch
-      // const response = await fetch('/api/surveys/responses', {
-      //   method: 'POST',
-      //   headers: headers,
-      //   body: JSON.stringify(dataObj)
-      // });
-
-      // if (!response.ok) {
-      //   throw new Error('Could not post the survey results');
-      // }
+      const userId = 'user-1';
       const newSurveyResponse = await createSurveyResponse (
         surveyId,
         resultAsStr,
+        userId,
       );
 
       // Redirect to thank you page

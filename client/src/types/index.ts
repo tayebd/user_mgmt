@@ -111,15 +111,14 @@ export interface Survey {
   id: string;
   title: string;
   description: string;
-  active: boolean;
-  status?: 'draft' | 'active' | 'completed' | 'archived';
   surveyJson: string;
-  responseCount: number;
+  status?: 'draft' | 'active' | 'completed' | 'archived';
   targetResponses: number;
-  original?: Survey;
+  userId:     string;
   expiresAt?: string;
   createdAt?: string;
   updatedAt?: string;
+  responses?: SurveyResponse[];
 }
 
 export interface CreateSurveyParams {
@@ -135,6 +134,7 @@ export interface SurveyResponse {
     id: string;
     surveyid: string;
     responseJson: string;
+    userId:     string;
     createdAt: string;
     updatedAt: string;
 }

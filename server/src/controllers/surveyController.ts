@@ -87,27 +87,55 @@ export const deleteSurvey = async (req: Request, res: Response) => {
   }
 };
 
-  export const createSurveyResponse = async (req: Request, res: Response) => {
-    const { surveyId } = req.params;
-    const { responseJson } = req.body;
-    
-    if (!responseJson) {
-      return res.status(400).json({ message: 'responseJson is required' });
-    }
+export const createSurveyResponse = async (req: Request, res: Response) => {
+  const { surveyId } = req.params;
+  console.log('Request body received:', req.body);
+  
+  const { responseJson, userId } = req.body;
+  console.log('Extracted values:', { surveyId, responseJson: !!responseJson, userId });
+  
+  if (!responseJson) {
+    return res.status(400).json({ 
+      message: 'responseJson is required',
+      receivedBody: req.body
+    });
+  }
+  
+  if (!userId) {
+    return res.status(400).json({ 
+      message: 'userId is required',
+      receivedBody: req.body
+    });
+  }
 
+  try {
+    let parsedResponse;
     try {
-      const review = await prisma.surveyResponse.create({
-        data: {
-          surveyId,
-          responseJson: JSON.parse(responseJson),
-        },
+      parsedResponse = typeof responseJson === 'string' ? JSON.parse(responseJson) : responseJson;
+    } catch (parseError) {
+      return res.status(400).json({ 
+        message: 'Invalid JSON in responseJson',
+        error: parseError
       });
-      res.status(201).json(review);
-    } catch (error) {
-      console.error('Error creating review:', error);
-      res.status(500).json({ message: 'Internal server error' });
     }
-  };
+    
+    const surveyResponse = await prisma.surveyResponse.create({
+      data: {
+        surveyId,
+        responseJson: parsedResponse,
+        userId,
+      },
+    });
+    res.status(201).json(surveyResponse);
+  } catch (error) {
+    console.error('Error creating survey response:', error);
+    res.status(500).json({ 
+      message: 'Internal server error',
+      error: error,
+      stack: process.env.NODE_ENV === 'development' ? error : undefined
+    });
+  }
+};
   
   export const getSurveyResponses = async (req: Request, res: Response) => {
     const { surveyId } = req.params;

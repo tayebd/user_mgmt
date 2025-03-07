@@ -20,7 +20,7 @@ console.log('Environment loaded:', {
   DATABASE_URL: process.env.DATABASE_URL?.substring(0, 20) + '...',
 });
 
-const app = express();
+export const app = express();
 
 /* MIDDLEWARE */
 app.use(express.json());

@@ -322,17 +322,17 @@ model ProjectEquipment {
 }
 
 model Survey {
-  id          String           @id @default(uuid())
-  title       String
-  description String
-  surveyJson  String
-  active      Boolean          @default(false)
-  isPublished Boolean          @default(false)
-  userId      String?
-  createdBy   String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  responses   SurveyResponse[]
+  id              String           @id @default(uuid())
+  title           String
+  description     String
+  surveyJson      String
+  userId          String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  expiresAt       DateTime?
+  status          SurveyStatus     @default(DRAFT)
+  targetResponses Int              @default(0)
+  responses       SurveyResponse[]
 
   @@index([userId])
   @@map("surveys")
@@ -343,6 +343,8 @@ model SurveyResponse {
   surveyId     String
   createdAt    DateTime @default(now())
   responseJson Json
+  updatedAt    DateTime @updatedAt
+  userId       String
   survey       Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
 
   @@index([surveyId])
@@ -352,6 +354,13 @@ model SurveyResponse {
 enum UserRole {
   ADMIN
   USER
+}
+
+enum SurveyStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
 }
 
 enum ProjectStatus {

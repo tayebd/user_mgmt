@@ -74,8 +74,8 @@ interface ApiState {
   inverters: Inverter[];
   project: ProjectData;
   searchResults: SearchResults;
-  fetchCompanies: () => Promise<void>;
-  fetchSurveys: () => Promise<void>;
+  fetchCompanies: () => Promise<Company[]>;
+  fetchSurveys: () => Promise<Survey[]>;
   createSurvey: (project: CreateSurveyParams) => Promise<Survey>;
   fetchPVPanels: (page: number, limit: number) => Promise<PVPanel[]>;
   fetchInverters: (page: number, limit: number) => Promise<Inverter[]>;
@@ -86,10 +86,10 @@ interface ApiState {
   updateCompany: (companyId: string, company: Partial<Company>) => Promise<void>;
   deleteCompany: (companyId: string) => Promise<void>;
   createReview: (companyId: string, review: Partial<Review>) => Promise<Review>;
-  createSurveyResponse: (surveyId: string, replyJson: string) => Promise<SurveyResponse>;
+  createSurveyResponse: (surveyId: string, replyJson: string, userId: string) => Promise<SurveyResponse>;
   fetchReviews: (companyId: string) => Promise<Review[]>;
   fetchSurveyResponses: (surveyId: string) => Promise<SurveyResponse[]>;
-  fetchSurveysByUserId: (userId: string) => Promise<Survey>;
+  fetchSurveysByUserId: (userId: string) => Promise<Survey[]>;
   fetchSurveyById: (userId: string) => Promise<Survey>;
 }
 
@@ -108,6 +108,7 @@ const apiStore = create<ApiState>((set) => ({
     });
     const data = await response.json();
     set({ companies: data });
+    return data;
   },
   fetchSurveys: async () => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys`, {
@@ -116,6 +117,7 @@ const apiStore = create<ApiState>((set) => ({
     });
     const data = await response.json();
     set({ surveys: data });
+    return data;
   },
   fetchSurveysByUserId:  async (userId: string) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys`, {
@@ -284,7 +286,7 @@ const apiStore = create<ApiState>((set) => ({
     const data = await response.json();
     return data;
   },
-  createSurveyResponse: async (surveyId: string, surveyResponse: string) => {
+  createSurveyResponse: async (surveyId: string, surveyResponse: string, userId: string) => {
     const token = await getAuthToken();
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys/${surveyId}/surveyResponses`, {
       method: 'POST',
@@ -293,7 +295,8 @@ const apiStore = create<ApiState>((set) => ({
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        responseJson: surveyResponse
+        userId: userId,
+        responseJson: surveyResponse, 
       }),
       credentials: 'include',
     });

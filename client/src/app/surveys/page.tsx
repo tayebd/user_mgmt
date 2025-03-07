@@ -21,6 +21,10 @@ function SurveysPage() {
     const fetchSurveys = async () => {
       try {
         const surveys = await fetchSurveysByUserId("user-1");
+        const surveysWithResponseCounts = surveys.map(survey => ({
+          ...survey,
+          responseCount: survey.responses?.length || 0
+        }));
         // surveys.forEach(survey => addSurvey(survey));
       } catch (error) {
         console.error('Error fetching surveys:', error);
