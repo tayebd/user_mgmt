@@ -107,18 +107,26 @@ export type ProjectData = {
   };
 };
 
+export enum SurveyStatus {
+  DRAFT = 'DRAFT',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  ON_HOLD = 'ON_HOLD'
+}
+
 export interface Survey {
   id: string;
   title: string;
   description: string;
   surveyJson: string;
-  status?: 'draft' | 'active' | 'completed' | 'archived';
+  status?: SurveyStatus;
   targetResponses: number;
   userId:     string;
   expiresAt?: string;
   createdAt?: string;
   updatedAt?: string;
   responses?: SurveyResponse[];
+  responseCount?: number;
 }
 
 export interface CreateSurveyParams {

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { Company, Review, PVPanel, Inverter, ProjectData, Survey, CreateSurveyParams, SurveyResponse } from '@/types';
+import { Company, Review, PVPanel, Inverter, ProjectData, 
+         Survey, CreateSurveyParams, SurveyResponse, User} from '@/types';
 import { auth } from '@/lib/firebase';
 
 export interface SearchResults {
@@ -59,14 +60,14 @@ const INITIAL_PROJECT_DATA: ProjectData = {
 const INITIAL_SURVEY_DATA: Survey = {
   id: '',
   title: '',
-  description:'',
-  active: false,
+  description: '',
   surveyJson: '',
-  responseCount: 0,
   targetResponses: 0,
+  userId: ''
 };
 
 interface ApiState {
+  users: User[];
   companies: Company[];
   surveys: Survey[];
   survey: Survey;
@@ -74,26 +75,38 @@ interface ApiState {
   inverters: Inverter[];
   project: ProjectData;
   searchResults: SearchResults;
-  fetchCompanies: () => Promise<Company[]>;
-  fetchSurveys: () => Promise<Survey[]>;
-  createSurvey: (project: CreateSurveyParams) => Promise<Survey>;
+
+
   fetchPVPanels: (page: number, limit: number) => Promise<PVPanel[]>;
+
   fetchInverters: (page: number, limit: number) => Promise<Inverter[]>;
   fetchProject: () => Promise<ProjectData>;
+
   createProject: (project: ProjectData) => Promise<ProjectData>;
   updateProject: (projectId: string, project: Partial<ProjectData>) => Promise<void>;
+  
+  fetchCompanies: () => Promise<Company[]>;
   createCompany: (company: Partial<Company>) => Promise<Company>;
   updateCompany: (companyId: string, company: Partial<Company>) => Promise<void>;
   deleteCompany: (companyId: string) => Promise<void>;
   createReview: (companyId: string, review: Partial<Review>) => Promise<Review>;
+  
+  fetchSurveys: () => Promise<Survey[]>;
+  createSurvey: (project: CreateSurveyParams) => Promise<Survey>;
   createSurveyResponse: (surveyId: string, replyJson: string, userId: string) => Promise<SurveyResponse>;
   fetchReviews: (companyId: string) => Promise<Review[]>;
   fetchSurveyResponses: (surveyId: string) => Promise<SurveyResponse[]>;
   fetchSurveysByUserId: (userId: string) => Promise<Survey[]>;
   fetchSurveyById: (userId: string) => Promise<Survey>;
+
+  fetchUsers: () => Promise<User[]>;
+  createUser: (user: Partial<User>) => Promise<User>;
+  updateUser: (userId: string, company: Partial<User>) => Promise<void>;
+  deleteUser: (userId: string) => Promise<void>;
 }
 
 const apiStore = create<ApiState>((set) => ({
+  users:[],
   companies: [],
   surveys: [],
   pvPanels: [],
@@ -101,15 +114,72 @@ const apiStore = create<ApiState>((set) => ({
   project: INITIAL_PROJECT_DATA,
   survey: INITIAL_SURVEY_DATA,
   searchResults: {},
-  fetchCompanies: async () => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies`, {
+  fetchUsers: async () => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/users`, {
       method: 'GET',
       credentials: 'include',
     });
     const data = await response.json();
-    set({ companies: data });
+    set({ users: data });
     return data;
   },
+  createUser: async (user: Partial<User>) => {
+    const token = await getAuthToken();
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        ...user,
+        descriptions: user.descriptions?.map((desc) => ({
+          ...desc,
+          id: desc.id || crypto.randomUUID(),
+        })),
+      }),
+      credentials: 'include',
+    });
+    const data = await response.json();
+    set((state) => ({ users: [...state.users, data] }));
+    return data;
+  },
+  updateUser: async (userId: string, user: Partial<User>) => {
+    const token = await getAuthToken();
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/users/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        ...user,
+        descriptions: user.descriptions?.map((desc) => ({
+          ...desc,
+          id: desc.id || crypto.randomUUID(),
+        })),
+      }),
+      credentials: 'include',
+    });
+    const data = await response.json();
+    set((state) => ({
+      users: state.users.map((c) => (c.id === userId ? data : c)),
+    }));
+  },
+  deleteUser: async (userId: string) => {
+    const token = await getAuthToken();
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/users/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: 'include',
+    });
+    set((state) => ({
+      users: state.users.filter((c) => c.id !== userId),
+    }));
+  },
+
   fetchSurveys: async () => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys`, {
       method: 'GET',
@@ -207,6 +277,15 @@ const apiStore = create<ApiState>((set) => ({
     });
     const data = await response.json();
     set({ project: data });
+  },
+  fetchCompanies: async () => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+    const data = await response.json();
+    set({ companies: data });
+    return data;
   },
   createCompany: async (company: Partial<Company>) => {
     const token = await getAuthToken();

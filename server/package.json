@@ -48,8 +48,7 @@
     "firebase-admin": "^13.0.2",
     "helmet": "^7.1.0",
     "morgan": "^1.10.0",
-    "prisma": "^6.2.1",
-    "xlsx": "^0.18.5"
+    "prisma": "^6.2.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
