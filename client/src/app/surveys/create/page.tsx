@@ -8,11 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 // import { createSurvey } from '@/state/api';
-
-import Sidebar from '@/components/Sidebar';
+// import Sidebar from '@/components/Sidebar';
 // import SurveyManagement from '@/components/Survey/SurveyManagement';
 import { useApiStore } from '@/state/api';
-import { Survey } from '@/types';
 
 export default function CreateSurveyPage() {
   const router = useRouter();
@@ -32,7 +30,8 @@ export default function CreateSurveyPage() {
     
     try {
       setIsSubmitting(true);
-      
+      console.log('create survey:', { title, description, surveyJson });
+
       const newSurvey = await createSurvey({
         title,
         description,
@@ -40,6 +39,7 @@ export default function CreateSurveyPage() {
         active: false,
         responseCount: 0,
         targetResponses: 0,
+        userId: 28,
       });
       
       router.push(`/surveys/${newSurvey.id}`);

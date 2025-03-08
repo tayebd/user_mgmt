@@ -8,7 +8,8 @@ declare global {
   namespace Express {
     interface Request {
       user?: {
-        id: string;
+        id: number;
+        uid: string;
         email: string;
         role: string;
       };
@@ -47,7 +48,7 @@ export const authenticateToken = async (
 
       // First try to find user by Firebase UID
       let user = await prisma.user.findUnique({
-        where: { id: decodedToken.uid }
+        where: { uid: decodedToken.uid }
       });
 
       // If not found by UID, try to find by email
@@ -57,11 +58,11 @@ export const authenticateToken = async (
         });
 
         // If found by email but different UID, update the UID
-        if (user && user.id !== decodedToken.uid) {
+        if (user && user.uid !== decodedToken.uid) {
           console.log('Updating user ID to match Firebase UID');
           user = await prisma.user.update({
             where: { id: user.id },
-            data: { id: decodedToken.uid }
+            data: { uid: decodedToken.uid }
           });
         }
       }
@@ -72,7 +73,7 @@ export const authenticateToken = async (
         try {
           user = await prisma.user.create({
             data: {
-              id: decodedToken.uid,
+              uid: decodedToken.uid,
               email: decodedToken.email || '',
               name: decodedToken.name || decodedToken.email?.split('@')[0] || 'Anonymous',
               role: UserRole.USER,
@@ -101,6 +102,7 @@ export const authenticateToken = async (
       // Add the user to the request object
       req.user = {
         id: user.id,
+        uid: user.uid,
         email: user.email,
         role: user.role
       };

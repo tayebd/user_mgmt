@@ -5,7 +5,8 @@ import { useForm, FormProvider, Path } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ProjectData, projectValidationSchema } from '@/types/project';
+import { SolarProject, projectValidationSchema } from '@/types';
+import { z } from 'zod';
 import { ProgressIndicator } from './ProgressIndicator';
 import {
   LocationStep,
@@ -16,47 +17,11 @@ import {
   MiscEquipmentStep,
   ReportStep
 } from './steps/index';
-import { useApiStore } from '@/state/api';
+import { useApiStore, INITIAL_SOLARPROJECT_DATA } from '@/state/api';
 import { getPVPanels, getInverters } from '@/services/equipment';
 import { PVPanel, Inverter } from '@/types';
 
-const INITIAL_PROJECT_DATA: ProjectData = {
-  address: '',
-  coordinates: { lat: 0, lng: 0 },
-  dcSystemSize: 0,
-  arrayType: 'Roof Mount',
-  systemLosses: 14,
-  tilt: 0,
-  azimuth: 180,
-  bifacial: false,
-  // PV Panel Selection
-  selectedPanelId: '',
-  pvPanelQuantity: 1,
-  // Inverter Selection
-  selectedInverterId: '',
-  inverterQuantity: 1,
-  // Mounting
-  mountingType: 'Flat Roof',
-  roofMaterial: '',
-  // Derived Equipment
-  derivedEquipment: {
-    fuses: 0,
-    dcSurgeProtector: 0,
-    dcDisconnectSwitches: 0,
-    acSurgeProtector: 0,
-    generalDisconnectSwitch: 0,
-    residualCurrentBreaker: 0,
-    generalCircuitBreaker: 0,
-    dcCableLength: 0,
-    acCableLength: 0,
-    earthingCableLength: 0,
-    mc4ConnectorPairs: 0,
-    splitters: 0,
-    cableTrayLength: 0
-  }
-};
-
-const stepValidationFields: Record<number, Path<ProjectData>[]> = {
+const stepValidationFields: Record<number, Path<SolarProject>[]> = {
   0: ['address', 'coordinates'], // Location
   1: ['dcSystemSize', 'arrayType', 'systemLosses', 'tilt', 'azimuth', 'bifacial'], // System Attributes
   2: ['selectedPanelId', 'pvPanelQuantity'], // PV Panels
@@ -70,20 +35,26 @@ export function ProjectWizard() {
   console.log('ProjectWizard rendering');
 
   const [currentStep, setCurrentStep] = useState(0);
-  const [projectData, setProjectData] = useState<ProjectData>(INITIAL_PROJECT_DATA);
-  const { fetchProject, createProject, updateProject } = useApiStore();
+  const [projectData, setSolarProject] = useState<SolarProject>(INITIAL_SOLARPROJECT_DATA);
+  const { fetchSolarProject, createSolarProject } = useApiStore();
   const [pvPanels, setPVPanels] = useState<PVPanel[]>([]);
   const [inverters, setInverters] = useState<Inverter[]>([]);
 
   useEffect(() => {
-    fetchProject();
+    fetchSolarProject();
     getPVPanels().then(setPVPanels);
     getInverters().then(setInverters);
-  }, [fetchProject]);
+  }, [fetchSolarProject]);
 
-  const methods = useForm<ProjectData>({
+  // Define the type from the Zod schema
+  type ProjectFormValues = z.infer<typeof projectValidationSchema>;
+
+  const methods = useForm<ProjectFormValues>({
     resolver: zodResolver(projectValidationSchema),
-    defaultValues: INITIAL_PROJECT_DATA,
+    // defaultValues: {
+    //   ...INITIAL_PROJECT_DATA,
+    //   id: INITIAL_PROJECT_DATA.id || 0,
+    // },
     mode: 'onChange'
   });
 
@@ -117,9 +88,16 @@ export function ProjectWizard() {
   const handleSave = async () => {
     const isValid = await methods.trigger();
     if (isValid) {
-      const values = methods.getValues();
-      console.log('Saving project:', values);
-      await createProject(values);
+      const formValues = methods.getValues();
+      console.log('Saving project:', formValues);
+      
+      // Convert form values to SolarProject type
+      const solarProject: SolarProject = {
+        ...formValues,
+        id: formValues.id || 0, // Ensure id is always set
+      };
+      
+      await createSolarProject(solarProject);
     }
   };
 
@@ -137,7 +115,7 @@ export function ProjectWizard() {
             <CurrentStepComponent
               form={methods}
               projectData={projectData}
-              setProjectData={setProjectData}
+              setSolarProject={setSolarProject}
               pvPanels={pvPanels}
               inverters={inverters}
             />

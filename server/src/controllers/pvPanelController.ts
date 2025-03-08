@@ -15,7 +15,7 @@ export const getPVPanels = async (req: Request, res: Response) => {
         manufacturer: true,
         modelNumber: true,
         description: true,
-        power: true,
+        maxPower: true,
         shortCircuitCurrent: true,
         openCircuitVoltage: true,
         tempCoeffPmax: true,
@@ -39,13 +39,13 @@ export const getPVPanel = async (req: Request, res: Response) => {
   const { pvPanelId } = req.params;
   try {
     const pvPanel = await prisma.pVPanel.findUnique({
-      where: { id: pvPanelId },
+      where: { id: Number(pvPanelId) },
       select: {
         id: true,
         manufacturer: true,
         modelNumber: true,
         description: true,
-        power: true,
+        maxPower: true,
         shortCircuitCurrent: true,
         openCircuitVoltage: true,
         tempCoeffPmax: true,
@@ -76,7 +76,7 @@ export const createPVPanel = async (req: Request, res: Response) => {
         manufacturer,
         modelNumber,
         description,
-        power,
+        maxPower: power,
         // shortCircuitCurrent,
         openCircuitVoltage,
         tempCoeffPmax,
@@ -101,12 +101,12 @@ export const updatePVPanel = async (req: Request, res: Response) => {
   const { manufacturer, modelNumber, description, power, nameplateShortCircuitCurrent, openCircuitVoltage, tempCoeffPmax, tempCoeffIsc, tempCoeffVoc, shortSide, longSide, weight, performanceWarranty, productWarranty } = req.body;
   try {
     const pvPanel = await prisma.pVPanel.update({
-      where: { id: pvPanelId },
+      where: { id: Number(pvPanelId) },
       data: {
         manufacturer,
         modelNumber,
         description,
-        power,
+        maxPower: power,
         // shortCircuitCurrent,
         openCircuitVoltage,
         tempCoeffPmax,
@@ -130,7 +130,7 @@ export const deletePVPanel = async (req: Request, res: Response) => {
   const { pvPanelId } = req.params;
   try {
     await prisma.pVPanel.delete({
-      where: { id: pvPanelId },
+      where: { id: Number(pvPanelId) },
     });
     res.status(204).send();
   } catch (error) {

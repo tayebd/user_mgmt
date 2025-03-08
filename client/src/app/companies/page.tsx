@@ -53,10 +53,10 @@ const CompaniesPage = () => {
                     <div className="flex gap-2 text-sm text-gray-600">
                       <span>{company.location}</span>
                       <span>•</span>
-                      <span>Est. {company.established}</span>
+                      <span>Est. {company.established.toDateString()}</span>
                     </div>
                     <p className="text-sm text-gray-700 mt-1">
-                      {company.descriptions.find((desc) => desc.language === 'en')?.text}
+                      {company.descriptions?.find((desc) => desc.language === 'en')?.text}
                       <button className="text-blue-600 font-medium ml-1 hover:underline">
                         Show More
                       </button>

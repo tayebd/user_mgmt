@@ -74,17 +74,18 @@ export default function LoadSurveyPage() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const surveyModel = new Model(JSON.parse(surveyJson));
       
-
+      console.log('upload survey:', { title, description, surveyJson });
       const newSurvey = await createSurvey({
           title,
           description,
           surveyJson,
+          userId: 28,
           active: false,
           responseCount: 0,
-          targetResponses: 0,
+          targetResponses: 100,
       });
       
-      router.push(`/surveys/${newSurvey.id}`);
+      router.push(`/surveys/${newSurvey.id}/respond`);
     } catch (error: unknown) {
       console.error('Failed to create survey:', error);
       alert('Failed to create survey. Please check your JSON and try again.');

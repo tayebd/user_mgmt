@@ -57,8 +57,8 @@ export function LocationStep({ form }: StepProps) {
             {isSearching ? 'Searching...' : 'Search'}
           </Button>
         </div>
-        {errors.address && (
-          <p className="text-sm text-red-500">{errors.address.message}</p>
+        {errors.address?.message && (
+          <p className="text-sm text-red-500">{String(errors.address.message)}</p>
         )}
       </div>
 

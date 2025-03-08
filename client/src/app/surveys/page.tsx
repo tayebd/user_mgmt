@@ -15,17 +15,20 @@ import { Survey, SurveyStatus } from '@/types';
 
 function SurveysPage() {
   const router = useRouter();
-  const { surveys, fetchSurveysByUserId } = useApiStore();
+  const { surveys = [], fetchSurveysByUserId } = useApiStore();
 
   useEffect(() => {
     const fetchSurveys = async () => {
       try {
-        const surveys = await fetchSurveysByUserId("user-1");
-        const surveysWithResponseCounts = surveys.map(survey => ({
-          ...survey,
-          responseCount: survey.responses?.length || 0
-        }));
-        // surveys.forEach(survey => addSurvey(survey));
+        const data = await fetchSurveysByUserId(11);
+        if (Array.isArray(data)) {
+          const surveysWithResponseCounts = data.map(survey => ({
+            ...survey,
+            responseCount: survey.responses?.length || 0
+          }));
+        } else {
+          console.error('Invalid surveys data:', data);
+        }
       } catch (error) {
         console.error('Error fetching surveys:', error);
       }
@@ -64,14 +67,11 @@ function SurveysPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {surveys.map((survey: Survey) => (
+              {Array.isArray(surveys) && surveys.map((survey: Survey) => (
                 <TableRow key={survey.id}>
                   <TableCell className="font-medium">{survey.title}</TableCell>
                   <TableCell>
-                    {survey.createdAt ? new Date(survey.createdAt).toLocaleDateString() : 'N/A'}
-                  </TableCell>
-                  <TableCell>
-                    {survey.status === SurveyStatus.IN_PROGRESS ? (
+                    {survey.status === SurveyStatus.ACTIVE ? (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
                     ) : (
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Inactive</span>
@@ -80,7 +80,7 @@ function SurveysPage() {
                   <TableCell>
                     <div className="flex items-center">
                       <Users className="mr-2 h-4 w-4" />
-                      {survey.responseCount}
+                      {survey.responses?.length || 0}
                     </div>
                   </TableCell>
                   <TableCell>

@@ -1,53 +1,51 @@
 export type Company = {
-  id: string;
+  id : number;
   name: string;
   location: string;
   website: string;
   iconUrl?: string;
   phone: string;
   logo: string;
-  established: string;
+  established: Date;
   web_validity?: boolean;
   capabilities?: string;
   fb_handle?: string;
   residential?: boolean;
   commercial?: boolean;
-  descriptions: Description[];
+  descriptions?: Description[];
   badge: string;
   rating: number;
-  reviews: number;
+  reviews?: number;
 };
 
 export type Description = {
-  id: string;
+  id : number;
   language: string;
   text: string;
 };
 
 export type Review = {
-  id: string;
-  userId: string;
-  companyId: string;
+  id : number;
+  userId: number;
+  companyId: number;
   rating: number;
   comment?: string;
-  createdAt: Date;
-  updatedAt: Date;
   user: User;
 };
 
 export type User = {
-  id: string;
+  id : number;
+  uid: string;
   name: string;
   email: string;
   role: string;
+  avatar?: string;
   profilePictureUrl?: string;
   phone?: string;
-  createdAt: Date;
-  updatedAt: Date;
 };
 
 export type PVPanel = {
-  id: string;
+  id : number;
   manufacturer: string;
   modelNumber: string;
   description: string;
@@ -62,20 +60,31 @@ export type PVPanel = {
   weight: number;
   performanceWarranty: string;
   productWarranty: string;
+  length: number;
+  width: number;
+  height: number;
+  efficiency: number;
+  price: number;
 };
 
 export type Inverter = {
-  id: string;
+  id : number;
   manufacturer: string;
   modelNumber: string;
   description: string;
   phaseType: string;
   outputVoltage: number;
-  maxContinuousCurrent: number;
-  maxContinuousPower: number;
+  maxCurrent: number;
+  maxPower: number;
+  efficiency: number; // Efficiency percentage  
+  inputVoltage: { min: number; max: number };
+  warranty: number;
+  price: number;
+  phases: number;
 };
 
-export type ProjectData = {
+export type SolarProject = {
+  id : number;
   address: string;
   coordinates: { lat: number; lng: number };
   dcSystemSize: number;
@@ -84,12 +93,25 @@ export type ProjectData = {
   tilt: number;
   azimuth: number;
   bifacial: boolean;
-  selectedPanelId: string;
+  selectedPanelId: number;
   pvPanelQuantity: number;
-  selectedInverterId: string;
+  selectedInverterId: number;
   inverterQuantity: number;
   mountingType: string;
-  roofMaterial: string;
+  roofMaterial?: string;
+  roofSlope?: number;
+  roofOrientation?: string;
+  roofArea?: number;
+  roofLoadCapacity?: number;
+  groundArea?: number;
+  groundSlope?: number;
+  groundOrientation?: string;
+  groundLoadCapacity?: number;
+  trackingType?: string;
+  trackingSlope?: number;
+  trackingOrientation?: string;
+  trackingLoadCapacity?: number;
+
   derivedEquipment: {
     fuses: number;
     dcSurgeProtector: number;
@@ -107,42 +129,148 @@ export type ProjectData = {
   };
 };
 
-export enum SurveyStatus {
-  DRAFT = 'DRAFT',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETED = 'COMPLETED',
-  ON_HOLD = 'ON_HOLD'
-}
-
 export interface Survey {
-  id: string;
+  id : number;
   title: string;
   description: string;
   surveyJson: string;
-  status?: SurveyStatus;
+  status: SurveyStatus;
   targetResponses: number;
-  userId:     string;
-  expiresAt?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  userId: number;
+  expiresAt?: Date;
   responses?: SurveyResponse[];
-  responseCount?: number;
 }
 
+export enum SurveyStatus {
+  DRAFT = 'DRAFT',
+  ACTIVE = 'ACTIVE',
+  COMPLETED = 'COMPLETED',
+  ARCHIVED = 'ARCHIVED',
+}
 export interface CreateSurveyParams {
   title: string;
   description: string;
   active: boolean;
+  userId: number;
   surveyJson: string;
   responseCount: number;
   targetResponses: number;
 }
 
 export interface SurveyResponse {
-    id: string;
-    surveyid: string;
-    responseJson: string;
-    userId:     string;
-    createdAt: string;
-    updatedAt: string;
+  id : number;
+  surveyId: number;
+  responseJson: string;
+  userId: number;
 }
+
+export enum ProjectStatus {
+  NOT_STARTED = 'NOT_STARTED',
+  PLANNING = 'PLANNING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  ON_HOLD = 'ON_HOLD',
+}
+
+export enum TaskStatus {
+  NOT_STARTED = 'NOT_STARTED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  ON_HOLD = 'ON_HOLD'
+}
+
+export enum TaskPriority {
+  URGENT = 'URGENT',
+  HIGH = 'HIGH',
+  MEDIUM = 'MEDIUM',
+  LOW = 'LOW'
+}
+
+export interface Project {
+  id : number;
+  name: string;
+  description: string | null;
+  status: ProjectStatus;
+  startDate: Date;
+  endDate: Date;
+  tasks: Task[];
+  members: User[];
+}
+
+export interface Task {
+  id : number;
+  title: string;
+  description: string | null;
+  status: TaskStatus;
+  priority: TaskPriority;
+  dueDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  projectId: number;
+  project: Project;
+  assignedToId: number;
+  assignedTo?: User;
+}
+
+export interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
+export interface Equipment {
+  id: number;
+  manufacturer: string;
+  modelNumber: string;
+  quantity: number;
+}
+
+import { z } from 'zod';
+export const projectValidationSchema = z.object({
+  id: z.number(),
+  address: z.string().min(1, 'Address is required'),
+  coordinates: z.object({
+    lat: z.number().min(-90).max(90),
+    lng: z.number().min(-180).max(180),
+  }),
+  dcSystemSize: z.number().min(0),
+  arrayType: z.string(),
+  systemLosses: z.number().min(0).max(100),
+  tilt: z.number().min(0).max(90),
+  azimuth: z.number().min(0).max(360),
+  bifacial: z.boolean(),
+  selectedPanelId: z.number().min(1, 'PV Panel selection is required'),
+  pvPanelQuantity: z.number().min(1, 'At least one panel is required'),
+  selectedInverterId: z.number().min(1, 'Inverter selection is required'),
+  inverterQuantity: z.number().min(1, 'At least one inverter is required'),
+  mountingType: z.string(),
+  roofMaterial: z.string().optional(),
+  roofSlope: z.number().optional(),
+  roofOrientation: z.string().optional(),
+  roofArea: z.number().optional(),
+  roofLoadCapacity: z.number().optional(),
+  groundArea: z.number().optional(),
+  groundSlope: z.number().optional(),
+  groundOrientation: z.string().optional(),
+  groundLoadCapacity: z.number().optional(),
+  trackingType: z.string().optional(),
+  trackingSlope: z.number().optional(),
+  trackingOrientation: z.string().optional(),
+  trackingLoadCapacity: z.number().optional(),
+  derivedEquipment: z.object({
+    fuses: z.number(),
+    dcSurgeProtector: z.number(),
+    dcDisconnectSwitches: z.number(),
+    acSurgeProtector: z.number(),
+    generalDisconnectSwitch: z.number(),
+    residualCurrentBreaker: z.number(),
+    generalCircuitBreaker: z.number(),
+    dcCableLength: z.number(),
+    acCableLength: z.number(),
+    earthingCableLength: z.number(),
+    mc4ConnectorPairs: z.number(),
+    splitters: z.number(),
+    cableTrayLength: z.number(),
+  })
+});
+
+

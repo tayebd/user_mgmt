@@ -12,14 +12,18 @@ const UserManagement = () => {
     setNewUser({});
   };
 
-  const handleUpdateUser = async () => {
-    if (editingUser) {
-      await updateUser(editingUser.id!, editingUser);
-      setEditingUser(null);
+  const handleUpdateUser = async (user: User) => {
+    if (!user.id) {
+      throw new Error('User ID is required');
     }
+    await updateUser(user.id, user);
+    setEditingUser(null);
   };
 
-  const handleDeleteUser = async (userId: string) => {
+  const handleDeleteUser = async (userId: number | undefined) => {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
     await deleteUser(userId);
   };
 
@@ -73,7 +77,7 @@ const UserManagement = () => {
             value={editingUser.name || ''}
             onChange={(e) => setEditingUser({ ...editingUser, name: e.target.value })}
           />
-          <button onClick={handleUpdateUser}>Update User</button>
+          <button onClick={() => handleUpdateUser(editingUser as User)}>Update User</button>
           <button onClick={() => setEditingUser(null)}>Cancel</button>
         </div>
       )}

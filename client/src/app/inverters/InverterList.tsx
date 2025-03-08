@@ -48,8 +48,8 @@ const InverterList = () => {
                 <td className="py-4 px-6 text-sm text-gray-500">{inverter.description}</td>
                 <td className="py-4 px-6 text-sm text-gray-500">{inverter.phaseType}</td>
                 <td className="py-4 px-6 text-sm text-gray-500">{inverter.outputVoltage}</td>
-                <td className="py-4 px-6 text-sm text-gray-500">{inverter.maxContinuousCurrent}</td>
-                <td className="py-4 px-6 text-sm text-gray-500">{inverter.maxContinuousPower}</td>
+                <td className="py-4 px-6 text-sm text-gray-500">{inverter.maxCurrent}</td>
+                <td className="py-4 px-6 text-sm text-gray-500">{inverter.maxPower}</td>
               </tr>
             ))}
           </tbody>

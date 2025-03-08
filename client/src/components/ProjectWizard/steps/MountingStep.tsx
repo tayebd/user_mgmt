@@ -2,8 +2,7 @@ import { StepProps } from './types';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { ProjectData } from '@/types/project';
+import { SolarProject } from '@/types';
 
 const ROOF_MATERIALS = [
   'Asphalt Shingle',
@@ -15,7 +14,7 @@ const ROOF_MATERIALS = [
   'PVC'
 ];
 
-export function MountingStep({ form, projectData, setProjectData }: StepProps) {
+export function MountingStep({ form, projectData, setSolarProject }: StepProps) {
   const { register, setValue, watch } = form;
   const mountingType = watch('mountingType');
 
@@ -27,7 +26,7 @@ export function MountingStep({ form, projectData, setProjectData }: StepProps) {
           <div className="space-y-2">
             <Label>Mounting Type</Label>
             <Select
-              onValueChange={(value) => setValue('mountingType', value as ProjectData['mountingType'])}
+              onValueChange={(value) => setValue('mountingType', value as SolarProject['mountingType'])}
               defaultValue={mountingType}
             >
               <SelectTrigger>

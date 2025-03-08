@@ -7,7 +7,7 @@ import { auth } from "@/lib/firebase";
 import useStore from "@/state";
 import { GlobalState } from "@/state";
 import { signOut } from "firebase/auth";
-import { Menu, Moon, Search, Settings, Sun } from "lucide-react";
+import { Moon, Search, Settings, Sun } from "lucide-react";
 
 const Navbar = () => {
   const pathname = usePathname();

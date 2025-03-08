@@ -21,7 +21,7 @@ export const getSurvey = async (req: Request, res: Response) => {
   const { surveyId } = req.params;
   try {
     const survey = await prisma.survey.findUnique({
-      where: { id: surveyId },
+      where: { id: Number(surveyId) },
       include: {
         // // title: true,
         // description: true,
@@ -39,13 +39,14 @@ export const getSurvey = async (req: Request, res: Response) => {
 };
 
 export const createSurvey = async (req: Request, res: Response) => {
-  const { title, description, surveyJson} = req.body;
+  const { title, description, surveyJson, userId } = req.body;
   try {
     const survey = await prisma.survey.create({
       data: {
         title,
         description,
         surveyJson,
+        userId: Number(userId),
       },
     });
     res.status(201).json(survey);
@@ -60,7 +61,7 @@ export const updateSurvey = async (req: Request, res: Response) => {
   const { title, description, surveyJson} = req.body;
   try {
     const survey = await prisma.survey.update({
-      where: { id: surveyId },
+      where: { id: Number(surveyId) },
       data: {
         title,
         description,
@@ -78,7 +79,7 @@ export const deleteSurvey = async (req: Request, res: Response) => {
   const { surveyId } = req.params;
   try {
     await prisma.survey.delete({
-      where: { id: surveyId },
+      where: { id: Number(surveyId) },
     });
     res.status(204).send();
   } catch (error) {
@@ -121,9 +122,9 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
     
     const surveyResponse = await prisma.surveyResponse.create({
       data: {
-        surveyId,
+        surveyId: Number(surveyId),
         responseJson: parsedResponse,
-        userId,
+        userId: Number(userId),
       },
     });
     res.status(201).json(surveyResponse);
@@ -141,7 +142,7 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
     const { surveyId } = req.params;
     try {
       const reviews = await prisma.surveyResponse.findMany({
-        where: { surveyId },
+        where: { surveyId: Number(surveyId) },
         include: {
           // responseJson: true,
         },
@@ -158,7 +159,7 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
     const { responseJson } = req.body;
     try {
       const review = await prisma.surveyResponse.update({
-        where: { id: responseId },
+        where: { id: Number(responseId) },
         data: {
           responseJson,
         },
@@ -174,7 +175,7 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
     const { responseId } = req.params;
     try {
       await prisma.surveyResponse.delete({
-        where: { id: responseId },
+        where: { id: Number(responseId) },
       });
       res.status(204).send();
     } catch (error) {

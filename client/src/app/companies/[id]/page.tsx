@@ -7,7 +7,10 @@ import { Company } from '@/types';
 
 const CompanyDetailPage = () => {
   const params = useParams();
-  const id = params?.id as string;
+  const id = Number(params?.id);
+  if (isNaN(id)) {
+    throw new Error('Invalid company ID');
+  }  
   const { companies } = useApiStore();
   const [company, setCompany] = useState<Company | null>(null);
 

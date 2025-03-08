@@ -8,7 +8,7 @@ import { PVPanel } from '@/types';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export function PVPanelStep({ form, projectData, setProjectData }: StepProps) {
+export function PVPanelStep({ form, projectData, setSolarProject }: StepProps) {
   const [panels, setPanels] = useState<PVPanel[]>([]);
   const [loading, setLoading] = useState(true);
   const { register, setValue, watch, formState: { errors } } = form;
@@ -44,22 +44,22 @@ export function PVPanelStep({ form, projectData, setProjectData }: StepProps) {
         <div className="space-y-2">
           <Label>Select PV Panel Model</Label>
           <Select
-            onValueChange={(value) => setValue('selectedPanelId', value, { shouldValidate: true })}
-            defaultValue={selectedPanelId}
+            onValueChange={(value) => setValue('selectedPanelId', Number(value), { shouldValidate: true })}
+            defaultValue={selectedPanelId.toString()} 
           >
             <SelectTrigger>
               <SelectValue placeholder="Select a panel model" />
             </SelectTrigger>
             <SelectContent>
               {panels.map(panel => (
-                <SelectItem key={panel.id} value={panel.id}>
+                <SelectItem key={panel.id} value={panel.id.toString()}>
                   {panel.manufacturer} - {panel.modelNumber} ({panel.power}W)
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          {errors.selectedPanelId && (
-            <p className="text-sm text-red-500">{errors.selectedPanelId.message}</p>
+          {errors.selectedPanelId?.message && (
+            <p className="text-sm text-red-500">{String(errors.selectedPanelId.message)}</p>
           )}
         </div>
 
@@ -72,13 +72,9 @@ export function PVPanelStep({ form, projectData, setProjectData }: StepProps) {
                 <span className="ml-2">{selectedPanel.power}W</span>
               </div>
               <div>
-                <span className="text-muted-foreground">Efficiency:</span>
-                <span className="ml-2">{selectedPanel.efficiency}%</span>
-              </div>
-              <div>
                 <span className="text-muted-foreground">Dimensions:</span>
                 <span className="ml-2">
-                  {selectedPanel.dimensions.length} × {selectedPanel.dimensions.width} × {selectedPanel.dimensions.height}mm
+                  {selectedPanel.length} × {selectedPanel.width} × {selectedPanel.height}mm
                 </span>
               </div>
               <div>
@@ -87,7 +83,7 @@ export function PVPanelStep({ form, projectData, setProjectData }: StepProps) {
               </div>
               <div>
                 <span className="text-muted-foreground">Warranty:</span>
-                <span className="ml-2">{selectedPanel.warranty} years</span>
+                <span className="ml-2">{selectedPanel.productWarranty} years</span>
               </div>
               <div>
                 <span className="text-muted-foreground">Price:</span>
@@ -109,8 +105,8 @@ export function PVPanelStep({ form, projectData, setProjectData }: StepProps) {
               {...register('pvPanelQuantity', { valueAsNumber: true })}
               className={errors.pvPanelQuantity ? 'border-red-500' : ''}
             />
-            {errors.pvPanelQuantity && (
-              <p className="text-sm text-red-500">{errors.pvPanelQuantity.message}</p>
+            {errors.pvPanelQuantity?.message && (
+              <p className="text-sm text-red-500">{String(errors.pvPanelQuantity.message)}</p>
             )}
           </div>
 

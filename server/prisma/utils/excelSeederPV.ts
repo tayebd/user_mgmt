@@ -33,8 +33,8 @@ const fieldMappings: Record<ModelName, ExcelMapping[]> = {
     { excelField: 'Description', modelField: 'description' },
     { excelField: 'Phase', modelField: 'phaseType' },
     { excelField: 'Output Voltage', modelField: 'outputVoltage', transform: (v) => parseFloat(v) },
-    { excelField: 'Max Continuous Current', modelField: 'maxContinuousCurrent', transform: (v) => parseFloat(v) },
-    { excelField: 'Max Continuous Power', modelField: 'maxContinuousPower', transform: (v) => parseFloat(v) },
+    { excelField: 'Max Continuous Current', modelField: 'maxCurrent', transform: (v) => parseFloat(v) },
+    { excelField: 'Max Continuous Power', modelField: 'maxPower', transform: (v) => parseFloat(v) },
   ],
   pVPanel: [
     { excelField: 'Manufacturer', modelField: 'manufacturer', required: true },

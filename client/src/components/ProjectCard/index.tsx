@@ -2,9 +2,9 @@ import { Project } from "@/types";
 import React, { useState } from "react";
 import Link from "next/link";
 import { Calendar, Clock, Edit2, Trash2 } from "lucide-react";
-import { useDeleteProjectMutation } from "@/state/api";
 import { useRouter } from "next/navigation";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useApiStore } from "@/state/api";
 
 type Props = {
   project: Project;
@@ -12,8 +12,8 @@ type Props = {
 
 const ProjectCard = ({ project }: Props) => {
   const router = useRouter();
-  const [deleteProject] = useDeleteProjectMutation();
   const [isDeleting, setIsDeleting] = useState(false);
+  const { deleteProject } = useApiStore();
 
   const handleEdit = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -24,7 +24,7 @@ const ProjectCard = ({ project }: Props) => {
     e.preventDefault();
     try {
       setIsDeleting(true);
-      await deleteProject(project.id).unwrap();
+      await deleteProject(project.id);
       router.refresh();
     } catch (error) {
       console.error('Failed to delete project:', error);

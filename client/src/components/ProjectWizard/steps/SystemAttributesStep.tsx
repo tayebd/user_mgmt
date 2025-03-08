@@ -2,10 +2,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { ProjectData } from '@/types/project';
+import { SolarProject } from '@/types';
 import { StepProps } from './types';
 
-export function SystemAttributesStep({ form, projectData, setProjectData }: StepProps) {
+export function SystemAttributesStep({ form, projectData, setSolarProject }: StepProps) {
   const { register, setValue, watch } = form;
   const bifacial = watch('bifacial');
 
@@ -24,7 +24,7 @@ export function SystemAttributesStep({ form, projectData, setProjectData }: Step
       <div className="space-y-2">
         <Label htmlFor="arrayType">Array Type</Label>
         <Select
-          onValueChange={(value) => setValue('arrayType', value as ProjectData['arrayType'])}
+          onValueChange={(value) => setValue('arrayType', value as SolarProject['arrayType'])}
           defaultValue={watch('arrayType')}
         >
           <SelectTrigger>

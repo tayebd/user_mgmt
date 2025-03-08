@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Model } from 'survey-core';
 import { Survey } from '@/types';
 import SurveyDisplay from '@/components/surveys/SurveyDisplay'; 
@@ -10,7 +9,7 @@ import { useApiStore } from '@/state/api';
 
 export default function RespondPage() {
   const [survey, setSurvey] = useState<Survey | null>(null);
-  const [surveyId, setsurveyId] = useState('');
+  const [surveyId, setsurveyId] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +22,7 @@ export default function RespondPage() {
       try {
         const url = `${pathname}?${searchParams}`
         const parts = url.split('/');
-        const surveyId = parts[2];
+        const surveyId = Number(parts[2]);
         console.log(surveyId)
         setsurveyId(surveyId);
 
@@ -49,8 +48,8 @@ export default function RespondPage() {
       // Get the survey results as a string
       const resultAsStr = JSON.stringify(surveyModel.data);
       console.log(resultAsStr);
-      const userId = 'user-1';
-      const newSurveyResponse = await createSurveyResponse (
+      const userId = 1;
+      await createSurveyResponse (
         surveyId,
         resultAsStr,
         userId,

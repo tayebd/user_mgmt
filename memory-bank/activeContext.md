@@ -30,7 +30,7 @@
 - The object in the Prisma schema is called `pVPanel`.
 - Pagination parameters are set to default to page 1 and limit 50 entries per page.
 - The PVPanel data is displayed in a table format with the specified fields: `manufacturer`, `modelNumber`, `description`, and `power`.
-- The Inverter data is displayed in a table format with the specified fields: `manufacturer`, `modelNumber`, `description`, `phaseType`, `outputVoltage`, `maxContinuousCurrent`, and `maxContinuousPower`.
+- The Inverter data is displayed in a table format with the specified fields: `manufacturer`, `modelNumber`, `description`, `phaseType`, `outputVoltage`, `maxCurrent`, and `maxPower`.
 - The `excelSeederPV.ts` script is used to seed the inverter data.
 - The wizard structure and inverter selection step are reviewed and understood.
 - The `ProjectWizard.tsx` file is updated to include access to the Project object and the `api.ts` file to include the necessary API calls for fetching, creating, and updating project data.

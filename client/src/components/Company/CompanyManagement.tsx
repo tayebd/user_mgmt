@@ -14,24 +14,42 @@ const CompanyManagement = () => {
     setNewCompany({});
   };
 
-  const handleUpdateCompany = async () => {
-    if (editingCompany) {
-      await updateCompany(editingCompany.id!, editingCompany);
-      setEditingCompany(null);
+  const handleUpdateCompany = async (companyId: number | undefined, company: Partial<Company>) => {
+    if (!companyId) {
+      throw new Error('Company ID is required');
     }
+    if (!company.name) {
+      throw new Error('Company name is required');
+    }
+    const updatedCompany: Company = {
+      id: companyId,
+      name: company.name,
+      location: company.location || '',
+      website: company.website || '',
+      descriptions: company.descriptions || [],
+      phone: company.phone || '',
+      logo: company.logo || '',
+      established: company.established || new Date(),
+      badge: company.badge || '',
+      rating: company.rating || 0,
+    };
+    await updateCompany(companyId, updatedCompany);
   };
 
-  const handleDeleteCompany = async (companyId: string) => {
+  const handleDeleteCompany = async (companyId: number | undefined) => {
+    if (!companyId) {
+      throw new Error('Company ID is required');
+    }
     await deleteCompany(companyId);
   };
 
-  const handleCreateReview = async (companyId: string) => {
+  const handleCreateReview = async (companyId: number) => {
     await createReview(companyId, newReview);
     setNewReview({ rating: 0, comment: '' });
     fetchCompanyReviews(companyId);
   };
 
-  const fetchCompanyReviews = async (companyId: string) => {
+  const fetchCompanyReviews = async (companyId: number) => {
     const data = await fetchReviews(companyId);
     setReviews(data);
   };
@@ -94,7 +112,7 @@ const CompanyManagement = () => {
             </div>
           ))}
           <button onClick={() => {
-            setNewCompany({ ...newCompany, descriptions: [...(newCompany.descriptions || []), { id: crypto.randomUUID(), language: '', text: '' }] });
+            setNewCompany({ ...newCompany, descriptions: [...(newCompany.descriptions || []), { id: Date.now(), language: '', text: '' }] });
           }}>Add Description</button>
         </div>
         <input
@@ -176,10 +194,10 @@ const CompanyManagement = () => {
               </div>
             ))}
             <button onClick={() => {
-              setEditingCompany({ ...editingCompany, descriptions: [...(editingCompany.descriptions || []), { id: crypto.randomUUID(), language: '', text: '' }] });
+              setEditingCompany({ ...editingCompany, descriptions: [...(editingCompany.descriptions || []), { id: Date.now(), language: '', text: '' }] });
             }}>Add Description</button>
           </div>
-          <button onClick={handleUpdateCompany}>Update Company</button>
+          <button onClick={() => handleUpdateCompany(editingCompany?.id, editingCompany)}>Update Company</button>
           <button onClick={() => setEditingCompany(null)}>Cancel</button>
         </div>
       )}
@@ -211,7 +229,7 @@ const CompanyManagement = () => {
           value={newReview.comment || ''}
           onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
         />
-        <button onClick={() => handleCreateReview(editingCompany?.id || '')}>Add Review</button>
+        <button onClick={() => handleCreateReview(editingCompany?.id || 0)}>Add Review</button>
       </div>
     </div>
   );

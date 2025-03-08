@@ -8,7 +8,7 @@ import { Inverter } from '@/types';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export function InverterStep({ form, projectData, setProjectData }: StepProps) {
+export function InverterStep({ form, projectData, setSolarProject }: StepProps) {
   const [inverters, setInverters] = useState<Inverter[]>([]);
   const [loading, setLoading] = useState(true);
   const { register, setValue, watch, formState: { errors } } = form;
@@ -44,22 +44,22 @@ export function InverterStep({ form, projectData, setProjectData }: StepProps) {
         <div className="space-y-2">
           <Label>Select Inverter Model</Label>
           <Select
-            onValueChange={(value) => setValue('selectedInverterId', value, { shouldValidate: true })}
-            defaultValue={selectedInverterId}
+            onValueChange={(value) => setValue('selectedInverterId', Number(value), { shouldValidate: true })}
+            defaultValue={selectedInverterId.toString()}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select an inverter model" />
             </SelectTrigger>
             <SelectContent>
               {inverters.map(inverter => (
-                <SelectItem key={inverter.id} value={inverter.id}>
-                  {inverter.manufacturer} - {inverter.modelNumber} ({inverter.power/1000}kW)
+                <SelectItem key={inverter.id} value={inverter.id.toString()}>
+                  {inverter.manufacturer} - {inverter.modelNumber} ({inverter.maxPower/1000}kW)
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          {errors.selectedInverterId && (
-            <p className="text-sm text-red-500">{errors.selectedInverterId.message}</p>
+          {errors.selectedInverterId?.message && (
+            <p className="text-sm text-red-500">{String(errors.selectedInverterId.message)}</p>
           )}
         </div>
 
@@ -69,7 +69,7 @@ export function InverterStep({ form, projectData, setProjectData }: StepProps) {
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
               <div>
                 <span className="text-muted-foreground">Power Output:</span>
-                <span className="ml-2">{selectedInverter.power/1000}kW</span>
+                <span className="ml-2">{selectedInverter.maxPower/1000}kW</span>
               </div>
               <div>
                 <span className="text-muted-foreground">Efficiency:</span>
@@ -84,10 +84,6 @@ export function InverterStep({ form, projectData, setProjectData }: StepProps) {
               <div>
                 <span className="text-muted-foreground">Output Voltage:</span>
                 <span className="ml-2">{selectedInverter.outputVoltage}V AC</span>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Phases:</span>
-                <span className="ml-2">{selectedInverter.phases}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">Warranty:</span>
@@ -113,8 +109,8 @@ export function InverterStep({ form, projectData, setProjectData }: StepProps) {
               {...register('inverterQuantity', { valueAsNumber: true })}
               className={errors.inverterQuantity ? 'border-red-500' : ''}
             />
-            {errors.inverterQuantity && (
-              <p className="text-sm text-red-500">{errors.inverterQuantity.message}</p>
+            {errors.inverterQuantity?.message && (
+              <p className="text-sm text-red-500">{String(errors.inverterQuantity.message)}</p>
             )}
           </div>
 
@@ -123,7 +119,7 @@ export function InverterStep({ form, projectData, setProjectData }: StepProps) {
               <Label>Total Power</Label>
               <Input
                 type="text"
-                value={`${((watch('inverterQuantity') || 0) * selectedInverter.power/1000).toFixed(1)}kW`}
+                value={`${((watch('inverterQuantity') || 0) * selectedInverter.maxPower/1000).toFixed(1)}kW`}
                 readOnly
               />
             </div>

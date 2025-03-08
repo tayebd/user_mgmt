@@ -7,7 +7,7 @@ async function seed() {
     // Create a test user
     const user = await prisma.user.create({
       data: {
-        id: 'test-user-id', // Hardcoded ID for testing
+        uid: 'test-user-id', // Hardcoded ID for testing
         email: 'test@example.com',
         name: 'Test User',
         role: UserRole.ADMIN

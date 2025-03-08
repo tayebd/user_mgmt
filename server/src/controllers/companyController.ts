@@ -24,7 +24,7 @@ export const getCompany = async (req: Request, res: Response) => {
   const { companyId } = req.params;
   try {
     const company = await prisma.company.findUnique({
-      where: { id: companyId },
+      where: { id: Number(companyId) },
       include: {
         descriptions: true,
         reviews: true,
@@ -102,7 +102,7 @@ export const updateCompany = async (req: Request, res: Response) => {
   const { name, location, website, iconUrl, descriptions, projects, certifications, partnerships, services } = req.body;
   try {
     const company = await prisma.company.update({
-      where: { id: companyId },
+      where: { id: Number(companyId) },
       data: {
         name,
         location,
@@ -116,7 +116,6 @@ export const updateCompany = async (req: Request, res: Response) => {
           })),
         },
         projects: {
-          deleteMany: {},
           create: projects.map((project: any) => ({
             name: project.name,
             description: project.description,
@@ -161,7 +160,7 @@ export const deleteCompany = async (req: Request, res: Response) => {
   const { companyId } = req.params;
   try {
     await prisma.company.delete({
-      where: { id: companyId },
+      where: { id: Number(companyId) },
     });
     res.status(204).send();
   } catch (error) {
@@ -176,8 +175,8 @@ export const createReview = async (req: Request, res: Response) => {
   try {
     const review = await prisma.review.create({
       data: {
-        userId,
-        companyId,
+        userId: Number(userId),
+        companyId: Number(companyId),
         rating,
         comment,
       },
@@ -193,7 +192,7 @@ export const getReviews = async (req: Request, res: Response) => {
   const { companyId } = req.params;
   try {
     const reviews = await prisma.review.findMany({
-      where: { companyId },
+      where: { companyId: Number(companyId) },
       include: {
         user: true,
       },
@@ -210,7 +209,7 @@ export const updateReview = async (req: Request, res: Response) => {
   const { rating, comment } = req.body;
   try {
     const review = await prisma.review.update({
-      where: { id: reviewId },
+      where: { id: Number(reviewId) },
       data: {
         rating,
         comment,
@@ -227,7 +226,7 @@ export const deleteReview = async (req: Request, res: Response) => {
   const { reviewId } = req.params;
   try {
     await prisma.review.delete({
-      where: { id: reviewId },
+      where: { id: Number(reviewId) },
     });
     res.status(204).send();
   } catch (error) {

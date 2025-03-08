@@ -16,8 +16,8 @@ export const getInverters = async (req: Request, res: Response) => {
         modelNumber: true,
         description: true,
         outputVoltage: true,
-        maxContinuousCurrent: true,
-        maxContinuousPower: true,
+        maxCurrent: true,
+        maxPower: true,
       },
     });
     res.status(200).json(inverters);
@@ -31,15 +31,15 @@ export const getInverter = async (req: Request, res: Response) => {
   const { inverterId } = req.params;
   try {
     const inverter = await prisma.inverter.findUnique({
-      where: { id: inverterId },
+      where: { id: parseInt(inverterId) },
       select: {
         id: true,
         manufacturer: true,
         modelNumber: true,
         description: true,
         outputVoltage: true,
-        maxContinuousCurrent: true,
-        maxContinuousPower: true,
+        maxCurrent: true,
+        maxPower: true,
       },
     });
     if (!inverter) {
@@ -53,7 +53,7 @@ export const getInverter = async (req: Request, res: Response) => {
 };
 
 export const createInverter = async (req: Request, res: Response) => {
-  const { manufacturer, modelNumber, description, outputVoltage, maxContinuousCurrent, maxContinuousPower } = req.body;
+  const { manufacturer, modelNumber, description, outputVoltage, maxCurrent, maxPower } = req.body;
   try {
     const inverter = await prisma.inverter.create({
       data: {
@@ -61,8 +61,8 @@ export const createInverter = async (req: Request, res: Response) => {
         modelNumber,
         description,
         outputVoltage,
-        maxContinuousCurrent,
-        maxContinuousPower,
+        maxCurrent,
+        maxPower,
       },
     });
     res.status(201).json(inverter);
@@ -74,17 +74,17 @@ export const createInverter = async (req: Request, res: Response) => {
 
 export const updateInverter = async (req: Request, res: Response) => {
   const { inverterId } = req.params;
-  const { manufacturer, modelNumber, description, outputVoltage, maxContinuousCurrent, maxContinuousPower } = req.body;
+  const { manufacturer, modelNumber, description, outputVoltage, maxCurrent, maxPower } = req.body;
   try {
     const inverter = await prisma.inverter.update({
-      where: { id: inverterId },
+      where: { id: parseInt(inverterId) },
       data: {
         manufacturer,
         modelNumber,
         description,
         outputVoltage,
-        maxContinuousCurrent,
-        maxContinuousPower,
+        maxCurrent,
+        maxPower,
       },
     });
     res.status(200).json(inverter);
@@ -98,7 +98,7 @@ export const deleteInverter = async (req: Request, res: Response) => {
   const { inverterId } = req.params;
   try {
     await prisma.inverter.delete({
-      where: { id: inverterId },
+      where: { id: parseInt(inverterId) },
     });
     res.status(204).send();
   } catch (error) {
