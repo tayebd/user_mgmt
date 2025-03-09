@@ -460,13 +460,24 @@ const apiStore = create<ApiState>((set) => ({
   },
 
   fetchCompanies: async () => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-    const data = await response.json();
-    set({ companies: data });
-    return data;
+    try {
+      console.log('Fetching companies from client...');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json();
+      console.log(`Received ${data.length} companies from API`);
+      set({ companies: data });
+      return data;
+    } catch (error) {
+      console.error('Error fetching companies:', error);
+      set({ companies: [] });
+      return [];
+    }
   },
   createCompany: async (company: Partial<Company>) => {
     const token = await getAuthToken();

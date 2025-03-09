@@ -5,6 +5,7 @@ import { Switch } from '@/components/ui/switch';
 import { SolarProject } from '@/types';
 import { StepProps } from './types';
 
+// eslint-disable-next-line no-unused-vars
 export function SystemAttributesStep({ form, projectData, setSolarProject }: StepProps) {
   const { register, setValue, watch } = form;
   const bifacial = watch('bifacial');

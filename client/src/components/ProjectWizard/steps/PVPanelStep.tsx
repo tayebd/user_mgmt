@@ -8,6 +8,7 @@ import { PVPanel } from '@/types';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
+// eslint-disable-next-line no-unused-vars
 export function PVPanelStep({ form, projectData, setSolarProject }: StepProps) {
   const [panels, setPanels] = useState<PVPanel[]>([]);
   const [loading, setLoading] = useState(true);

@@ -13,14 +13,14 @@ import {
 
 const router = express.Router();
 
-router.get('/companies', getCompanies);
-router.get('/companies/:companyId', getCompany);
-router.post('/companies', createCompany);
-router.put('/companies/:companyId', updateCompany);
-router.delete('/companies/:companyId', deleteCompany);
+router.get('/', getCompanies);
+router.get('/:companyId', getCompany);
+router.post('/', createCompany);
+router.put('/:companyId', updateCompany);
+router.delete('/:companyId', deleteCompany);
 
-router.post('/companies/:companyId/reviews', createReview);
-router.get('/companies/:companyId/reviews', getReviews);
+router.post('/:companyId/reviews', createReview);
+router.get('/:companyId/reviews', getReviews);
 router.put('/reviews/:reviewId', updateReview);
 router.delete('/reviews/:reviewId', deleteReview);
 

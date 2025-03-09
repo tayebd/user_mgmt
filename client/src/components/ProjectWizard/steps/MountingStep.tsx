@@ -14,8 +14,9 @@ const ROOF_MATERIALS = [
   'PVC'
 ];
 
+// eslint-disable-next-line no-unused-vars
 export function MountingStep({ form, projectData, setSolarProject }: StepProps) {
-  const { register, setValue, watch } = form;
+  const { setValue, watch } = form;
   const mountingType = watch('mountingType');
 
   return (

@@ -28,7 +28,7 @@ const MiscEquipment: React.FC = () => {
         }
         const data: MiscEquipment[] = await response.json();
         setMiscEquipment(data);
-      } catch (err) {
+      } catch (error) {
         setError('Failed to load misc-equipment');
       } finally {
         setLoading(false);

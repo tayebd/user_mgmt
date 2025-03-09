@@ -1,4 +1,4 @@
-import { fetchInverters, fetchPVPanels } from '../state/api';
+// import { fetchInverters, fetchPVPanels } from '../state/api';
 
 import { PVPanel, Inverter } from '@/types';
 

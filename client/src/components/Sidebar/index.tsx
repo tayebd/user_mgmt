@@ -30,6 +30,7 @@ const Sidebar = () => {
   const isSidebarCollapsed = useStore((state: GlobalState) => state.isSidebarCollapsed);
   const setIsSidebarCollapsed = useStore((state: GlobalState) => state.setIsSidebarCollapsed);
 
+  // eslint-disable-next-line no-unused-vars
   const handleSignOut = async () => {
     try {
       await signOut();

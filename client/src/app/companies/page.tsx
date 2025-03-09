@@ -12,7 +12,7 @@ import { useApiStore } from '@/state/api';
 import { Company } from '@/types';
 
 const CompaniesPage = () => {
-  const { companies, fetchCompanies }: { companies: Company[]; fetchCompanies: () => void } = useApiStore();
+  const { companies, fetchCompanies } = useApiStore();
 
   useEffect(() => {
     fetchCompanies();
@@ -32,7 +32,7 @@ const CompaniesPage = () => {
                 <div className="grid grid-cols-8 gap-4 items-center">
                   {/* Column 1: Logo (1/8) */}
                   <div className="col-span-1 flex justify-center">
-                    <Image
+                    <img
                       src={company.iconUrl || company.logo}
                       alt={`${company.name} logo`}
                       className="w-full h-full object-contain p-1 "
@@ -53,7 +53,7 @@ const CompaniesPage = () => {
                     <div className="flex gap-2 text-sm text-gray-600">
                       <span>{company.location}</span>
                       <span>•</span>
-                      <span>Est. {company.established.toDateString()}</span>
+                      <span>Est. {company.established?.toDateString()}</span>
                     </div>
                     <p className="text-sm text-gray-700 mt-1">
                       {company.descriptions?.find((desc) => desc.language === 'en')?.text}

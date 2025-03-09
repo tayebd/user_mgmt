@@ -62,7 +62,7 @@ const MountingCost: React.FC = () => {
     const RAIL_LENGTH = 172;
     const MIN_GROUND_SCREWS = 3;
     const PANELS_PER_STRUCTURE = 4;
-    const RAILS_PER_PANEL = 2;
+    // const RAILS_PER_PANEL = 2;
     const BEAM_SIZE = 1.5;
 
     const totalPanelWidth = inputs.numberOfPanels * inputs.panelWidth;

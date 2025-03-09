@@ -8,6 +8,7 @@ import { Inverter } from '@/types';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
+// eslint-disable-next-line no-unused-vars
 export function InverterStep({ form, projectData, setSolarProject }: StepProps) {
   const [inverters, setInverters] = useState<Inverter[]>([]);
   const [loading, setLoading] = useState(true);

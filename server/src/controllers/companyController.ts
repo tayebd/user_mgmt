@@ -2,21 +2,21 @@ import { Request, Response } from 'express';
 import { prisma } from '../config/db';
 
 export const getCompanies = async (req: Request, res: Response) => {
+  console.log('Fetching companies...');
   try {
     const companies = await prisma.company.findMany({
-      include: {
-        descriptions: true,
-        reviews: true,
-        projects: true,
-        certifications: true,
-        partnerships: true,
-        services: true,
-      },
+      // select: {
+      //   id: true,
+      //   name: true,
+      //   address: true,
+      //   phone: true
+      // }
     });
+    console.log(`Found ${companies.length} companies`);
     res.status(200).json(companies);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching companies:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ error: 'Failed to fetch companies', details: error?.message || 'Unknown error' });
   }
 };
 
@@ -38,7 +38,7 @@ export const getCompany = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Company not found' });
     }
     res.status(200).json(company);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching company:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -91,7 +91,7 @@ export const createCompany = async (req: Request, res: Response) => {
       },
     });
     res.status(201).json(company);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating company:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -150,7 +150,7 @@ export const updateCompany = async (req: Request, res: Response) => {
       },
     });
     res.status(200).json(company);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating company:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -163,7 +163,7 @@ export const deleteCompany = async (req: Request, res: Response) => {
       where: { id: Number(companyId) },
     });
     res.status(204).send();
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error deleting company:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -182,7 +182,7 @@ export const createReview = async (req: Request, res: Response) => {
       },
     });
     res.status(201).json(review);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating review:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -198,7 +198,7 @@ export const getReviews = async (req: Request, res: Response) => {
       },
     });
     res.status(200).json(reviews);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error fetching reviews:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -216,7 +216,7 @@ export const updateReview = async (req: Request, res: Response) => {
       },
     });
     res.status(200).json(review);
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating review:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
@@ -229,7 +229,7 @@ export const deleteReview = async (req: Request, res: Response) => {
       where: { id: Number(reviewId) },
     });
     res.status(204).send();
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error deleting review:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
