@@ -138,6 +138,7 @@ interface ApiState {
   updateSolarProject: (projectId: number, project: Partial<SolarProject>) => Promise<void>;
 
   fetchCompanies: () => Promise<Company[]>;
+  fetchCompanyById: (companyId: number) => Promise<Company>;
   createCompany: (company: Partial<Company>) => Promise<Company>;
   updateCompany: (companyId: number, company: Partial<Company>) => Promise<void>;
   deleteCompany: (companyId: number) => Promise<void>;
@@ -477,6 +478,23 @@ const apiStore = create<ApiState>((set) => ({
       console.error('Error fetching companies:', error);
       set({ companies: [] });
       return [];
+    }
+  },
+  fetchCompanyById: async (companyId: number) => {
+    try {
+      console.log(`Fetching company with ID ${companyId}...`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies/${companyId}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error(`Error fetching company with ID ${companyId}:`, error);
+      throw error;
     }
   },
   createCompany: async (company: Partial<Company>) => {

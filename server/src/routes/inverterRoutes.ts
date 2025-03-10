@@ -9,10 +9,10 @@ import {
 
 const router = express.Router();
 
-router.get('/inverters', getInverters);
-router.get('/inverters/:inverterId', getInverter);
-router.post('/inverters', createInverter);
-router.put('/inverters/:inverterId', updateInverter);
-router.delete('/inverters/:inverterId', deleteInverter);
+router.get('/', getInverters);
+router.get('/:inverterId', getInverter);
+router.post('/', createInverter);
+router.put('/:inverterId', updateInverter);
+router.delete('/:inverterId', deleteInverter);
 
 export default router;

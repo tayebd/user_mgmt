@@ -39,20 +39,60 @@ export const getSurvey = async (req: Request, res: Response) => {
 };
 
 export const createSurvey = async (req: Request, res: Response) => {
-  const { title, description, surveyJson, userId } = req.body;
   try {
+    // Extract fields from request body
+    const { 
+      title, 
+      description, 
+      surveyJson, 
+      userId,
+      targetResponses = 0,
+      // Ignore fields that don't exist in our schema
+      active, // Not in schema, ignore
+      responseCount // Not in schema, ignore
+    } = req.body;
+    
+    // Validate required fields
+    if (!title || !description || !surveyJson || !userId) {
+      return res.status(400).json({ 
+        message: 'Missing required fields: title, description, surveyJson, and userId are required',
+        receivedBody: {
+          title: !!title,
+          description: !!description,
+          surveyJson: !!surveyJson,
+          userId: !!userId
+        }
+      });
+    }
+
+    // Log the request for debugging
+    console.log('Creating survey with:', {
+      title,
+      description: description?.substring(0, 30) + '...',
+      jsonLength: surveyJson?.length,
+      userId
+    });
+    
+    // Create the survey
     const survey = await prisma.survey.create({
       data: {
         title,
         description,
         surveyJson,
         userId: Number(userId),
+        targetResponses: Number(targetResponses) || 0,
+        // status will default to DRAFT as defined in the schema
       },
     });
+    
     res.status(201).json(survey);
   } catch (error) {
     console.error('Error creating survey:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    // Return more detailed error information
+    res.status(500).json({ 
+      message: 'Internal server error', 
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
 };
 

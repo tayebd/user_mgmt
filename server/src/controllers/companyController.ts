@@ -45,52 +45,72 @@ export const getCompany = async (req: Request, res: Response) => {
 };
 
 export const createCompany = async (req: Request, res: Response) => {
-  const { name, location, website, iconUrl, descriptions, projects, certifications, partnerships, services } = req.body;
+  const { name, address, website, iconUrl, descriptions = [], projects = [], certifications = [], partnerships = [], services = [] } = req.body;
   try {
+    // First create the company without the project
     const company = await prisma.company.create({
       data: {
         name,
-        location,
+        address,
         website,
         iconUrl,
-        descriptions: {
+        descriptions: descriptions.length > 0 ? {
           create: descriptions.map((desc: any) => ({
             language: desc.language,
             text: desc.text,
           })),
-        },
-        projects: {
-          create: projects.map((project: any) => ({
-            name: project.name,
-            description: project.description,
-            location: project.location,
-            latitude: project.latitude,
-            longitude: project.longitude,
-            capacityKw: project.capacityKw,
-            completedAt: project.completedAt,
-          })),
-        },
-        certifications: {
+        } : undefined,
+        certifications: certifications.length > 0 ? {
           create: certifications.map((cert: any) => ({
             name: cert.name,
             issuedBy: cert.issuedBy,
             issuedYear: cert.issuedYear,
           })),
-        },
-        partnerships: {
+        } : undefined,
+        partnerships: partnerships.length > 0 ? {
           create: partnerships.map((partnership: any) => ({
             name: partnership.name,
             type: partnership.type,
           })),
-        },
-        services: {
+        } : undefined,
+        services: services.length > 0 ? {
           create: services.map((service: any) => ({
             type: service.type,
           })),
-        },
+        } : undefined,
       },
     });
-    res.status(201).json(company);
+
+    // Then create the project separately if provided
+    if (projects.length > 0) {
+      const project = projects[0]; // Since it's a one-to-one relationship, only use the first project
+      await prisma.companyProject.create({
+        data: {
+          name: project.name,
+          description: project.description,
+          address: project.address,
+          latitude: project.latitude,
+          longitude: project.longitude,
+          capacityKw: project.capacityKw,
+          completedAt: project.completedAt,
+          companyId: company.id
+        }
+      });
+    }
+
+    // Fetch the company with all relations
+    const createdCompany = await prisma.company.findUnique({
+      where: { id: company.id },
+      include: {
+        descriptions: true,
+        projects: true,
+        certifications: true,
+        partnerships: true,
+        services: true
+      }
+    });
+
+    res.status(201).json(createdCompany);
   } catch (error: any) {
     console.error('Error creating company:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -99,57 +119,97 @@ export const createCompany = async (req: Request, res: Response) => {
 
 export const updateCompany = async (req: Request, res: Response) => {
   const { companyId } = req.params;
-  const { name, location, website, iconUrl, descriptions, projects, certifications, partnerships, services } = req.body;
+  const { name, address, website, iconUrl, descriptions = [], projects = [], certifications = [], partnerships = [], services = [] } = req.body;
   try {
+    // First, handle the company update without the projects relationship
     const company = await prisma.company.update({
       where: { id: Number(companyId) },
       data: {
         name,
-        location,
+        address,
         website,
         iconUrl,
-        descriptions: {
+        descriptions: descriptions.length > 0 ? {
           deleteMany: {},
           create: descriptions.map((desc: any) => ({
             language: desc.language,
             text: desc.text,
           })),
-        },
-        projects: {
-          create: projects.map((project: any) => ({
-            name: project.name,
-            description: project.description,
-            location: project.location,
-            latitude: project.latitude,
-            longitude: project.longitude,
-            capacityKw: project.capacityKw,
-            completedAt: project.completedAt,
-          })),
-        },
-        certifications: {
+        } : undefined,
+        certifications: certifications.length > 0 ? {
           deleteMany: {},
           create: certifications.map((cert: any) => ({
             name: cert.name,
             issuedBy: cert.issuedBy,
             issuedYear: cert.issuedYear,
           })),
-        },
-        partnerships: {
+        } : undefined,
+        partnerships: partnerships.length > 0 ? {
           deleteMany: {},
           create: partnerships.map((partnership: any) => ({
             name: partnership.name,
             type: partnership.type,
           })),
-        },
-        services: {
+        } : undefined,
+        services: services.length > 0 ? {
           deleteMany: {},
           create: services.map((service: any) => ({
             type: service.type,
           })),
-        },
+        } : undefined,
       },
+      include: {
+        projects: true
+      }
     });
-    res.status(200).json(company);
+
+    // Handle the project separately since it's a one-to-one relationship
+    if (projects.length > 0) {
+      const project = projects[0];
+      if (company.projects) {
+        // Update existing project
+        await prisma.companyProject.update({
+          where: { id: company.projects[0].id },
+          data: {
+            name: project.name,
+            description: project.description,
+            address: project.address,
+            latitude: project.latitude,
+            longitude: project.longitude,
+            capacityKw: project.capacityKw,
+            completedAt: project.completedAt,
+          }
+        });
+      } else {
+        // Create new project
+        await prisma.companyProject.create({
+          data: {
+            name: project.name,
+            description: project.description,
+            address: project.address,
+            latitude: project.latitude,
+            longitude: project.longitude,
+            capacityKw: project.capacityKw,
+            completedAt: project.completedAt,
+            companyId: company.id
+          }
+        });
+      }
+    }
+
+    // Fetch the updated company with all relations
+    const updatedCompany = await prisma.company.findUnique({
+      where: { id: Number(companyId) },
+      include: {
+        descriptions: true,
+        projects: true,
+        certifications: true,
+        partnerships: true,
+        services: true
+      }
+    });
+
+    res.status(200).json(updatedCompany);
   } catch (error: any) {
     console.error('Error updating company:', error);
     res.status(500).json({ message: 'Internal server error' });

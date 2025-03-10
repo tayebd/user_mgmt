@@ -6,9 +6,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useApiStore } from '@/state/api';
-import { Model } from "survey-core";  
+import { Model, FunctionFactory } from "survey-core";  
 import { Survey } from 'survey-react-ui';
 import { toast } from 'sonner';
+import { ArrowLeft, Upload, FileText } from 'lucide-react';
+import Sidebar from '@/components/Sidebar';
+function validateIndustry (params: any[]) {
+  const value = params[0];
+  return value.indexOf("survey");
+}
+
+FunctionFactory.Instance.register("validateIndustry", validateIndustry);
 
 export default function LoadSurveyPage() {
   const router = useRouter();
@@ -69,23 +77,45 @@ export default function LoadSurveyPage() {
     
     try {
       setIsSubmitting(true);
+      let createdSurvey;
       
-      // Parse the survey JSON to validate it
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const surveyModel = new Model(JSON.parse(surveyJson));
-      
-      console.log('upload survey:', { title, description, surveyJson });
-      const newSurvey = await createSurvey({
+      try {
+        // Parse the survey JSON to validate it
+        const parsedJson = JSON.parse(surveyJson);
+        
+        // Create a new model instance for validation only
+        const surveyModel = new Model(parsedJson);
+        
+        // Add validation logic
+        surveyModel.onValidateQuestion.add((survey, options) => {
+          if (options.name === "industry") {
+            if (options.value && options.value.indexOf("survey") === -1) {
+              options.error = 'Your answer must contain the word "survey"'
+            }
+          }
+        });
+        
+        // Log what we're about to send - but only the string version of the JSON
+        console.log('upload survey:', { title, description, jsonLength: surveyJson.length });
+        
+        // Send the original JSON string, not the model instance
+        createdSurvey = await createSurvey({
           title,
           description,
-          surveyJson,
-          userId: 28,
+          surveyJson, // This is already a string
+          userId: 1,
           active: false,
           responseCount: 0,
           targetResponses: 100,
-      });
+        });
+      } catch (parseError) {
+        console.error('Error parsing survey JSON:', parseError);
+        throw new Error('Invalid survey JSON format');
+      }
       
-      router.push(`/surveys/${newSurvey.id}/respond`);
+      if (createdSurvey) {
+        router.push(`/surveys/${createdSurvey.id}/respond`);
+      }
     } catch (error: unknown) {
       console.error('Failed to create survey:', error);
       alert('Failed to create survey. Please check your JSON and try again.');
@@ -95,62 +125,112 @@ export default function LoadSurveyPage() {
   };
   
   return (
-    <div className="container mx-auto py-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Create New Survey from JSON</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label htmlFor="title" className="text-sm font-medium">Survey Title</label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
+    <div className="flex">
+      <Sidebar />
+      <div className="flex-1 p-4 ml-64">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold">Upload Survey</h1>
+            <p className="text-gray-600 mt-2">Create a new survey from a JSON file</p>
+          </div>
+          <Button 
+            onClick={() => router.back()}
+            variant="outline"
+            className="border-blue-600 text-blue-600 hover:bg-blue-50"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Surveys
+          </Button>
+        </div>
+
+        <Card className="bg-blue-50 hover:shadow-lg transition-shadow duration-200">
+          <CardHeader>
+            <CardTitle className="flex items-center text-blue-700">
+              <Upload className="mr-2 h-5 w-5" />
+              Upload Survey JSON
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="space-y-2">
+                <label htmlFor="title" className="text-sm font-medium text-gray-700">Survey Title</label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                  className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                  placeholder="Enter survey title"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="description" className="text-sm font-medium text-gray-700">Description</label>
+                <Input
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                  placeholder="Enter survey description"
+                />
+              </div>
             </div>
             
             <div className="space-y-2">
-              <label htmlFor="description" className="text-sm font-medium">Description</label>
-              <Input
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="jsonUpload" className="text-sm font-medium">Upload Survey JSON</label>
-              <Input
-                id="jsonUpload"
-                type="file"
-                accept=".json"
-                onChange={handleFileUpload}
-              />
+              <label htmlFor="jsonUpload" className="text-sm font-medium text-gray-700">Upload Survey JSON</label>
+              <div className="flex items-center space-x-2">
+                <Input
+                  id="jsonUpload"
+                  type="file"
+                  accept=".json"
+                  onChange={handleFileUpload}
+                  className="border-blue-200 focus:border-blue-400 focus:ring-blue-400"
+                />
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  className="border-blue-600 text-blue-600 hover:bg-blue-50 whitespace-nowrap"
+                  onClick={() => document.getElementById('jsonUpload')?.click()}
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Choose File
+                </Button>
+              </div>
             </div>
             
             {surveyJson && (
-              <div className="border rounded-md p-4">
-                <h3 className="text-sm font-medium mb-4">Uploaded Survey JSON</h3>
-                <pre className="text-xs bg-gray-100 p-2 rounded overflow-x-auto">
+              <div className="border border-blue-200 rounded-md p-4 bg-white mt-6">
+                <h3 className="text-sm font-medium mb-4 text-blue-700">Uploaded Survey JSON</h3>
+                <pre className="text-xs bg-blue-50 p-4 rounded overflow-x-auto border border-blue-100">
                   {JSON.stringify(JSON.parse(surveyJson), null, 2)}
                 </pre>
               </div>
             )}
             
-            {surveyPreview}
+            {surveyPreview && (
+              <div className="border border-blue-200 rounded-md p-4 bg-white mt-6">
+                <h3 className="text-sm font-medium mb-4 text-blue-700">Survey Preview</h3>
+                <div className="bg-blue-50 p-4 rounded border border-blue-100">
+                  {surveyPreview}
+                </div>
+              </div>
+            )}
             
-            <Button 
-              type="submit" 
-              disabled={isSubmitting || !surveyJson}
-            >
-              {isSubmitting ? 'Creating...' : 'Create Survey'}
-            </Button>
+            <div className="flex justify-end mt-6">
+              <Button 
+                type="submit" 
+                disabled={isSubmitting || !surveyJson}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                {isSubmitting ? 'Creating...' : 'Create Survey'}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

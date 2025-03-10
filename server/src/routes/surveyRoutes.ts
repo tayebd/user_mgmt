@@ -13,15 +13,15 @@ import {
 
 const router = express.Router();
 
-router.get('/surveys', getSurveys);
-router.get('/surveys/:surveyId', getSurvey);
-router.post('/surveys', createSurvey);
-router.put('/surveys/:surveyId', updateSurvey);
-router.delete('/surveys/:surveyId', deleteSurvey);
+router.get('/', getSurveys);
+router.get('/:surveyId', getSurvey);
+router.post('/', createSurvey);
+router.put('/:surveyId', updateSurvey);
+router.delete('/:surveyId', deleteSurvey);
 
 
-router.post('/surveys/:surveyId/surveyResponses', createSurveyResponse);
-router.get('/surveys/:surveyId/surveyResponses', getSurveyResponses);
+router.post('/:surveyId/surveyResponses', createSurveyResponse);
+router.get('/:surveyId/surveyResponses', getSurveyResponses);
 router.put('/surveyResponses/:surveyResponseId', updateSurveyResponse);
 router.delete('/surveyResponses/:surveyResponseId', deleteSurveyResponse);
 

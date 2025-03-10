@@ -112,7 +112,7 @@ const company2 = await prisma.company.create({
   console.log({ company1, company2, companyProject1, companyProject2, companyProject3 });
 }
 */
-  await seedFromExcel();
+  // await seedFromExcel();
 }
 
 main()

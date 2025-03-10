@@ -72,7 +72,7 @@ const SearchPage = () => {
               {searchResults.companies?.map((company) => (
                 <tr key={company.id} className="hover:bg-gray-50">
                   <td className="py-2 px-4">{company.name}</td>
-                  <td className="py-2 px-4">{company.location}</td>
+                  <td className="py-2 px-4">{company.address}</td>
                   <td className="py-2 px-4">{company.rating}</td>
                 </tr>
               ))}

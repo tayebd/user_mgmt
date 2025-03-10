@@ -24,7 +24,7 @@ const CompanyManagement = () => {
     const updatedCompany: Company = {
       id: companyId,
       name: company.name,
-      location: company.location || '',
+      address: company.address || '',
       website: company.website || '',
       descriptions: company.descriptions || [],
       phone: company.phone || '',
@@ -71,9 +71,9 @@ const CompanyManagement = () => {
         />
         <input
           type="text"
-          placeholder="Location"
-          value={newCompany.location || ''}
-          onChange={(e) => setNewCompany({ ...newCompany, location: e.target.value })}
+          placeholder="Address"
+          value={newCompany.address || ''}
+          onChange={(e) => setNewCompany({ ...newCompany, address: e.target.value })}
         />
         <input
           type="text"
@@ -128,7 +128,7 @@ const CompanyManagement = () => {
         <ul>
           {companies.map((company) => (
             <li key={company.id}>
-              {company.name} ({company.location})
+              {company.name} ({company.address})
               <button onClick={() => setEditingCompany(company)}>Edit</button>
               <button onClick={() => handleDeleteCompany(company.id)}>Delete</button>
               <button onClick={() => fetchCompanyReviews(company.id)}>View Reviews</button>
@@ -147,9 +147,9 @@ const CompanyManagement = () => {
           />
           <input
             type="text"
-            placeholder="Location"
-            value={editingCompany.location || ''}
-            onChange={(e) => setEditingCompany({ ...editingCompany, location: e.target.value })}
+            placeholder="Address"
+            value={editingCompany.address || ''}
+            onChange={(e) => setEditingCompany({ ...editingCompany, address: e.target.value })}
           />
           <input
             type="text"

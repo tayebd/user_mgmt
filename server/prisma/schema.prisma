@@ -34,8 +34,7 @@ model Country {
 }
 
 model Company {
-  name           String
-  location       String?
+  name           String          @unique
   website        String?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
@@ -50,7 +49,6 @@ model Company {
   phone          String?
   serviceAreas   String[]
   state          String?
-  zipCode        String?
   capabilities   String?
   commercial     Boolean?
   fb_handle      String?
@@ -58,26 +56,37 @@ model Company {
   web_validity   Boolean?
   distributor    Boolean?
   id             Int             @id @default(autoincrement())
+  fax            String?
+  industryId     Int             @default(72)
+  postalCode     String?
   certifications Certification[]
-  projects       CompanyProject?
+  industry       Industry        @relation(fields: [industryId], references: [id])
+  projects       CompanyProject[]
   descriptions   Description[]
   partnerships   Partnership[]
   reviews        Review[]
   services       Service[]
 }
 
+model Industry {
+  name        String
+  description String
+  id          Int       @id @default(autoincrement())
+  companies   Company[]
+}
+
 model CompanyProject {
-  id          Int            @id @default(autoincrement())
   name        String
   description String?
-  location    String?
+  address    String?
   latitude    Float?
   longitude   Float?
   capacityKw  Float?
   completedAt DateTime?
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
-  companyId   Int
+  id          Int            @id @default(autoincrement())
+  companyId   Int            @unique
   company     Company        @relation(fields: [companyId], references: [id])
   photos      ProjectPhoto[]
 }

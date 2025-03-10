@@ -1,8 +1,9 @@
-import { Router } from "express";
+import express from 'express';
 import { search } from "../controllers/searchController";
 import { authenticateToken } from "../middleware/auth";
 
-const router = Router();
+const router = express.Router();
+
 
 // Apply authentication middleware
 router.use(authenticateToken);

@@ -30,12 +30,28 @@ export default function CreateSurveyPage() {
     
     try {
       setIsSubmitting(true);
-      console.log('create survey:', { title, description, surveyJson });
+      
+      // Only log metadata to avoid large console output
+      console.log('Creating survey:', { 
+        title, 
+        description, 
+        jsonLength: surveyJson.length 
+      });
 
+      // Validate that the JSON is parseable before sending
+      try {
+        // Just parse to validate, we don't need to use the result
+        JSON.parse(surveyJson);
+      } catch (parseError) {
+        console.error('Invalid survey JSON:', parseError);
+        throw new Error('The survey contains invalid JSON. Please check the format.');
+      }
+
+      // Create the survey with the string JSON
       const newSurvey = await createSurvey({
         title,
         description,
-        surveyJson,
+        surveyJson, // This is already a string
         active: false,
         responseCount: 0,
         targetResponses: 0,
@@ -45,6 +61,7 @@ export default function CreateSurveyPage() {
       router.push(`/surveys/${newSurvey.id}`);
     } catch (error: unknown) {
       console.error('Failed to create survey:', error);
+      alert('Failed to create survey: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       setIsSubmitting(false);
     }

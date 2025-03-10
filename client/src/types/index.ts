@@ -1,10 +1,11 @@
 export type Company = {
   id : number;
   name: string;
-  location: string;
+  address: string;
   website: string;
   iconUrl?: string;
   phone: string;
+  email?: string;
   logo: string;
   established: Date;
   web_validity?: boolean;

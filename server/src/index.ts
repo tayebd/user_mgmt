@@ -51,9 +51,9 @@ app.get("/", (req, res) => {
 app.use("/api/search", searchRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/companies", companyRoutes);
-app.use('/api', pvPanelRoutes);
-app.use('/api', surveyRoutes);
-app.use('/api', inverterRoutes);
+app.use('/api/pvpanels', pvPanelRoutes);
+app.use('/api/surveys', surveyRoutes);
+app.use('/api/inverters', inverterRoutes);
 
 /* ERROR HANDLING */
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -72,16 +72,24 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 /* SERVER */
 const port = Number(process.env.PORT) || 5000;
-const server = app.listen(port, "0.0.0.0", () => {
-  console.log(`Server running on port ${port}`);
-  console.log(`Health check available at http://localhost:${port}/health`);
-});
 
-// Handle server shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
+// Create the server but don't start listening yet
+const server = app.listen();
+server.close(); // Close immediately to prevent actual listening
+
+// Only start the server if this file is being run directly (not being imported for tests)
+if (require.main === module) {
+  server.listen(port, "0.0.0.0", () => {
+    console.log(`Server running on port ${port}`);
+    console.log(`Health check available at http://localhost:${port}/health`);
   });
-});
+  
+  // Handle server shutdown
+  process.on('SIGTERM', () => {
+    console.log('SIGTERM received. Shutting down gracefully...');
+    server.close(() => {
+      console.log('Server closed');
+      process.exit(0);
+    });
+  });
+}

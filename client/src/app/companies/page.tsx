@@ -4,7 +4,6 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star } from 'lucide-react';
-import Image from 'next/image';
 
 import Sidebar from '@/components/Sidebar';
 // import CompanyManagement from '@/components/Company/CompanyManagement';
@@ -22,7 +21,7 @@ const CompaniesPage = () => {
     <div className="flex">
       <Sidebar />
       <div className="flex-1 p-4 ml-64">
-        <h1 className="text-3xl font-bold mb-6">The best Atlanta, GA solar companies in 2025</h1>
+        <h1 className="text-3xl font-bold mb-6">Solar Companies</h1>
 
 
         <div className="space-y-4">
@@ -51,7 +50,7 @@ const CompaniesPage = () => {
                       </Link>
                     </h2>
                     <div className="flex gap-2 text-sm text-gray-600">
-                      <span>{company.location}</span>
+                      <span>{company.address}</span>
                       <span>•</span>
                       <span>Est. {company.established?.toDateString()}</span>
                     </div>

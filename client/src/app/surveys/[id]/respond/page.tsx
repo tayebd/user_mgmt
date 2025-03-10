@@ -70,9 +70,22 @@ export default function RespondPage() {
   if (error) {
     return <div className="container mx-auto py-6 text-red-500">{error}</div>;
   }
-  if ( survey ) {
-    const surveyModel = new Model(JSON.parse(survey.surveyJson));
-  return (
+  if (survey) {
+    // Check if surveyJson exists and is not null/undefined before parsing
+    if (!survey.surveyJson) {
+      return <div className="container mx-auto py-6 text-red-500">Survey data is missing or invalid.</div>;
+    }
+    
+    // Try to safely parse the JSON
+    let surveyModel;
+    try {
+      surveyModel = new Model(JSON.parse(survey.surveyJson));
+    } catch (parseError) {
+      console.error('Error parsing survey JSON:', parseError);
+      return <div className="container mx-auto py-6 text-red-500">Error parsing survey data. Please contact support.</div>;
+    }
+    
+    return (
     <div className="container mx-auto py-6">
       {survey && (
         <>
