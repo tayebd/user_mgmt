@@ -367,7 +367,7 @@ export default function SurveyResultsComponent({ surveyId }: SurveyResultsCompon
     });
 
     responses.forEach((response, index) => {
-      let parsedResponse: Record<string, any>;
+      let parsedResponse: Record<string, unknown>;
       try {
         // Handle both string and object JSON formats
         parsedResponse = typeof response.responseJson === 'string' 

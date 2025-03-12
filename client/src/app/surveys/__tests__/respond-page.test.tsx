@@ -1,5 +1,3 @@
-/// <reference types="@testing-library/jest-dom" />
-
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -39,7 +37,7 @@ jest.mock('sonner', () => ({
 }));
 
 // Import the actual component after mocks are set up
-const RespondPage = require('../[id]/respond/page').default;
+import RespondPage from '../[id]/respond/page';
 
 // Sample survey data
 const mockSurvey = {
