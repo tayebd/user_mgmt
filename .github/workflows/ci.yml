@@ -18,12 +18,31 @@ jobs:
       with:
         node-version: '18'
         
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 10.6.2
+        
+    - name: Get pnpm store directory
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      id: pnpm-cache
+        
+    - name: Setup pnpm cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+        
     - name: Install dependencies
       run: |
         cd client
-        npm install
+        pnpm install --frozen-lockfile
         
     - name: Type check
       run: |
         cd client
-        npm run type-check || npm run tsc
+        pnpm exec tsc --noEmit

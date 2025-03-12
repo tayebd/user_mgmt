@@ -50,7 +50,7 @@ jobs:
     - name: Run TypeScript Check
       run: |
         cd client
-        pnpm run type-check || pnpm run tsc
+        pnpm exec tsc --noEmit
         
     - name: Run Tests
       run: |
