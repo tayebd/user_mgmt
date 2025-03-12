@@ -226,6 +226,7 @@ describe('MetricCalculationService', () => {
           id: 1,
           surveyId: 1,
           userId: 1,
+          companyId: 1,
           responseJson: '{}',
           processedMetrics: {
             timestamp: new Date(),
@@ -286,6 +287,7 @@ describe('MetricCalculationService', () => {
           id: 1,
           surveyId: 1,
           userId: 1,
+          companyId: 1,
           responseJson: '{}'
         }
       ];

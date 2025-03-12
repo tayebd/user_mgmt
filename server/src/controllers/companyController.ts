@@ -166,7 +166,7 @@ export const updateCompany = async (req: Request, res: Response) => {
     // Handle the project separately since it's a one-to-one relationship
     if (projects.length > 0) {
       const project = projects[0];
-      if (company.projects) {
+      if (company.projects && company.projects.length > 0) {
         // Update existing project
         await prisma.companyProject.update({
           where: { id: company.projects[0].id },

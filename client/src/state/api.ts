@@ -580,7 +580,7 @@ const apiStore = create<ApiState>((set) => ({
     const data = await response.json();
     return data;
   },
-  createSurveyResponse: async (surveyId: number, surveyResponse: string, userId: number): Promise<EnhancedSurveyResponse> => {
+  createSurveyResponse: async (surveyId: number, surveyResponse: string, userId: number): Promise<SurveyResponse> => {
     try {
       // Validate input parameters
       if (!surveyId || !surveyResponse || !userId) {
@@ -599,12 +599,16 @@ const apiStore = create<ApiState>((set) => ({
         throw new Error('Invalid survey response format');
       }
 
+      // Ensure companyId exists in the parsed response
+      const companyId = parsedResponse.companyId || 1; // Default to 1 if not provided
+
       // Process metrics from survey response
       const processedResponse = SurveyMetricService.processSurveyResponse({
         id: 0, // Temporary ID
         surveyId,
         responseJson: surveyResponse,
-        userId
+        userId,
+        companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 263)
       });
 
       // Get auth token
@@ -624,8 +628,11 @@ const apiStore = create<ApiState>((set) => ({
           },
           body: JSON.stringify({
             userId,
-            responseJson: surveyResponse,
-            processedMetrics: processedResponse.processedMetrics
+            companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 263),
+            // Ensure responseJson is a valid JSON string
+            responseJson: typeof surveyResponse === 'string' ? surveyResponse : JSON.stringify(surveyResponse),
+            // Properly serialize processedMetrics to ensure it's stored correctly in the database
+            processedMetrics: JSON.parse(JSON.stringify(processedResponse.processedMetrics))
           }),
           credentials: 'include'
         }
@@ -634,6 +641,7 @@ const apiStore = create<ApiState>((set) => ({
       // Handle non-200 responses
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.error('Server error response:', errorData);
         throw new Error(errorData.message || `Failed to save survey response: ${response.status}`);
       }
 
@@ -646,11 +654,17 @@ const apiStore = create<ApiState>((set) => ({
       console.log('Survey response processed successfully:', {
         surveyId,
         userId,
+        companyId,
         hasMetrics: !!data.processedMetrics,
         timestamp: new Date().toISOString()
       });
 
-      return data as EnhancedSurveyResponse;
+      // Ensure the returned data has a companyId (required by SurveyResponse interface)
+      if (!data.companyId && data.companyId !== 0) {
+        data.companyId = parsedResponse.companyId || 263;
+      }
+      
+      return data as SurveyResponse;
     } catch (error) {
       // Log error details for debugging
       console.error('Survey response creation error:', {

@@ -1,10 +1,11 @@
 'use client';
 
 import { Survey, SurveyResponse } from '@/types';
+import { ProcessedMetrics, DashboardMetrics } from '@/types/metrics';
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Model } from 'survey-core';
-import { BarChart, PieChart } from 'lucide-react';
+import { BarChart, PieChart, Activity, Server, Users, Lightbulb } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
 import { useRouter } from 'next/navigation';
 import { useApiStore } from '@/state/api';
@@ -13,6 +14,264 @@ import { toast } from 'sonner';
 interface SurveyResultsComponentProps {
   surveyId: string;
 }
+
+// Helper functions for metrics data extraction
+const getAverageMetricScore = (responses: SurveyResponse[], category: string): number => {
+  let totalScore = 0;
+  let count = 0;
+  
+  try {
+    responses.forEach(response => {
+      if (response.processedMetrics) {
+        // Handle both string and object formats for processedMetrics
+        let metrics: ProcessedMetrics;
+        if (typeof response.processedMetrics === 'string') {
+          try {
+            metrics = JSON.parse(response.processedMetrics) as ProcessedMetrics;
+          } catch (e) {
+            console.warn('Failed to parse processedMetrics string:', e);
+            return; // Skip this response
+          }
+        } else {
+          metrics = response.processedMetrics as unknown as ProcessedMetrics;
+        }
+        
+        if (metrics && metrics.metrics) {
+          switch (category) {
+            case 'technology':
+              if (metrics.metrics.technologyMetrics?.maturityScore) {
+                totalScore += metrics.metrics.technologyMetrics.maturityScore;
+                count++;
+              }
+              break;
+            case 'process':
+              if (metrics.metrics.processMetrics?.digitizationLevel) {
+                totalScore += metrics.metrics.processMetrics.digitizationLevel;
+                count++;
+              }
+              break;
+            case 'personnel':
+              if (metrics.metrics.personnelMetrics?.avgProficiency) {
+                totalScore += metrics.metrics.personnelMetrics.avgProficiency * 20; // Convert to 0-100 scale
+                count++;
+              }
+              break;
+            case 'strategy':
+              if (metrics.metrics.strategyMetrics?.implementationProgress) {
+                totalScore += metrics.metrics.strategyMetrics.implementationProgress * 100; // Convert to 0-100 scale
+                count++;
+              }
+              break;
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error calculating average metric score:', error);
+  }
+  
+  return count > 0 ? Math.round(totalScore / count) : 0;
+};
+
+// Helper function to get implemented technologies from responses
+const getImplementedTechnologies = (responses: SurveyResponse[]): string[] => {
+  const technologies = new Set<string>();
+  
+  try {
+    responses.forEach(response => {
+      if (response.processedMetrics) {
+        // Handle both string and object formats for processedMetrics
+        let metrics: ProcessedMetrics;
+        if (typeof response.processedMetrics === 'string') {
+          try {
+            metrics = JSON.parse(response.processedMetrics) as ProcessedMetrics;
+          } catch (e) {
+            console.warn('Failed to parse processedMetrics string:', e);
+            return; // Skip this response
+          }
+        } else {
+          metrics = response.processedMetrics as unknown as ProcessedMetrics;
+        }
+        
+        if (metrics?.metrics?.technologyMetrics?.implementedTechnologies) {
+          metrics.metrics.technologyMetrics.implementedTechnologies.forEach(tech => {
+            if (tech && typeof tech === 'string') {
+              technologies.add(tech);
+            }
+          });
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error extracting implemented technologies:', error);
+  }
+  
+  return Array.from(technologies);
+};
+
+// Helper function to get process areas from responses
+const getProcessAreas = (responses: SurveyResponse[]): string[] => {
+  const areas = new Set<string>();
+  
+  try {
+    responses.forEach(response => {
+      if (response.processedMetrics) {
+        // Handle both string and object formats for processedMetrics
+        let metrics: ProcessedMetrics;
+        if (typeof response.processedMetrics === 'string') {
+          try {
+            metrics = JSON.parse(response.processedMetrics) as ProcessedMetrics;
+          } catch (e) {
+            console.warn('Failed to parse processedMetrics string:', e);
+            return; // Skip this response
+          }
+        } else {
+          metrics = response.processedMetrics as unknown as ProcessedMetrics;
+        }
+        
+        if (metrics?.metrics?.processMetrics?.processAreas) {
+          metrics.metrics.processMetrics.processAreas.forEach(area => {
+            if (area && typeof area === 'string') {
+              areas.add(area);
+            }
+          });
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error extracting process areas:', error);
+  }
+  
+  return Array.from(areas);
+};
+
+// Helper component for displaying metric cards
+interface MetricCardProps {
+  icon: React.ReactNode;
+  title: string;
+  value: number;
+  description: string;
+}
+
+function MetricCard({ icon, title, value, description }: MetricCardProps) {
+  return (
+    <Card className="bg-white hover:shadow-md transition-shadow duration-200">
+      <CardContent className="pt-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-sm font-medium text-gray-500">{title}</p>
+            <h3 className="text-2xl font-bold mt-1">{value}</h3>
+            <p className="text-xs text-gray-500 mt-1">{description}</p>
+          </div>
+          <div className="p-2 rounded-full bg-gray-50">
+            {icon}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Helper component for displaying technology metrics
+function TechnologyMetricsCard({ responses }: { responses: SurveyResponse[] }) {
+  const technologies = getImplementedTechnologies(responses);
+  
+  return (
+    <Card className="bg-white hover:shadow-md transition-shadow duration-200">
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Server className="mr-2 h-5 w-5 text-blue-500" />
+          Technology Implementation
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <h4 className="font-medium mb-2">Implemented Technologies</h4>
+        {technologies.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {technologies.map(tech => (
+              <span key={tech} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                {tech}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 text-sm">No technology data available</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// Helper component for displaying process metrics
+function ProcessMetricsCard({ responses }: { responses: SurveyResponse[] }) {
+  const processAreas = getProcessAreas(responses);
+  
+  return (
+    <Card className="bg-white hover:shadow-md transition-shadow duration-200">
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Activity className="mr-2 h-5 w-5 text-green-500" />
+          Process Digitization
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <h4 className="font-medium mb-2">Digitized Process Areas</h4>
+        {processAreas.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {processAreas.map(area => (
+              <span key={area} className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
+                {area}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 text-sm">No process data available</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// Helper function to get average confidence score from responses
+const getAverageConfidenceScore = (responses: SurveyResponse[], category: string): number => {
+  let totalScore = 0;
+  let count = 0;
+  
+  try {
+    responses.forEach(response => {
+      if (response.processedMetrics) {
+        // Handle both string and object formats for processedMetrics
+        let metrics: ProcessedMetrics;
+        if (typeof response.processedMetrics === 'string') {
+          try {
+            metrics = JSON.parse(response.processedMetrics) as ProcessedMetrics;
+          } catch (e) {
+            return; // Skip this response
+          }
+        } else {
+          metrics = response.processedMetrics as unknown as ProcessedMetrics;
+        }
+        
+        if (metrics?.confidenceScores && metrics.confidenceScores[category] !== undefined) {
+          totalScore += metrics.confidenceScores[category] * 100; // Convert to percentage
+          count++;
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error calculating confidence score:', error);
+  }
+  
+  return count > 0 ? Math.round(totalScore / count) : 0;
+};
+
+// Helper function to get color based on confidence score
+const getConfidenceColor = (score: number): string => {
+  if (score >= 80) return '#10b981'; // Green
+  if (score >= 60) return '#3b82f6'; // Blue
+  if (score >= 40) return '#f59e0b'; // Yellow
+  return '#ef4444'; // Red
+};
 
 export default function SurveyResultsComponent({ surveyId }: SurveyResultsComponentProps) {
   const router = useRouter();
@@ -94,6 +353,8 @@ export default function SurveyResultsComponent({ surveyId }: SurveyResultsCompon
     fetchResults();
   }, [surveyId, fetchSurveyById, fetchSurveyResponses]);
 
+  // The helper functions are now defined at the top of the file
+
   const calculateStatistics = () => {
     if (!survey || !responses.length || !surveyModel) return {};
 
@@ -106,7 +367,7 @@ export default function SurveyResultsComponent({ surveyId }: SurveyResultsCompon
     });
 
     responses.forEach((response, index) => {
-      let parsedResponse;
+      let parsedResponse: Record<string, any>;
       try {
         // Handle both string and object JSON formats
         parsedResponse = typeof response.responseJson === 'string' 
@@ -238,6 +499,98 @@ export default function SurveyResultsComponent({ surveyId }: SurveyResultsCompon
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Metrics Dashboard Section */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold mb-4">Metrics Dashboard</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {responses.length > 0 && responses.some(r => r.processedMetrics) ? (
+              <>
+                <MetricCard 
+                  icon={<Server className="h-8 w-8 text-blue-500" />}
+                  title="Technology" 
+                  value={getAverageMetricScore(responses, 'technology')}
+                  description="Technology maturity score"
+                />
+                <MetricCard 
+                  icon={<Activity className="h-8 w-8 text-green-500" />}
+                  title="Process" 
+                  value={getAverageMetricScore(responses, 'process')}
+                  description="Process digitization level"
+                />
+                <MetricCard 
+                  icon={<Users className="h-8 w-8 text-purple-500" />}
+                  title="Personnel" 
+                  value={getAverageMetricScore(responses, 'personnel')}
+                  description="Team skill proficiency"
+                />
+                <MetricCard 
+                  icon={<Lightbulb className="h-8 w-8 text-yellow-500" />}
+                  title="Strategy" 
+                  value={getAverageMetricScore(responses, 'strategy')}
+                  description="Strategy implementation progress"
+                />
+              </>
+            ) : (
+              <div className="col-span-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <p className="text-gray-500 text-center">No metrics data available for these responses</p>
+              </div>
+            )}
+          </div>
+
+          {/* Detailed Metrics Section */}
+          {responses.length > 0 && responses.some(r => r.processedMetrics) && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <TechnologyMetricsCard responses={responses} />
+                <ProcessMetricsCard responses={responses} />
+              </div>
+              
+              {/* Confidence Scores Section */}
+              <div className="mb-6">
+                <h3 className="text-xl font-bold mb-3">Confidence Scores</h3>
+                <Card className="bg-white hover:shadow-md transition-shadow duration-200">
+                  <CardContent className="pt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      {['technology', 'process', 'personnel', 'strategy'].map(category => {
+                        const confidenceScore = getAverageConfidenceScore(responses, category);
+                        return (
+                          <div key={category} className="flex flex-col items-center">
+                            <div className="relative h-24 w-24 mb-2">
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <span className="text-xl font-bold">{confidenceScore}%</span>
+                              </div>
+                              <svg className="h-24 w-24" viewBox="0 0 36 36">
+                                <path
+                                  d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  fill="none"
+                                  stroke="#eee"
+                                  strokeWidth="3"
+                                />
+                                <path
+                                  d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                                  fill="none"
+                                  stroke={getConfidenceColor(confidenceScore)}
+                                  strokeWidth="3"
+                                  strokeDasharray={`${confidenceScore}, 100`}
+                                />
+                              </svg>
+                            </div>
+                            <span className="text-sm font-medium capitalize">{category}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

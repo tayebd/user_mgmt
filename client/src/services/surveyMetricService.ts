@@ -327,6 +327,7 @@ export class SurveyMetricService {
   }
 
   static processSurveyResponse(response: EnhancedSurveyResponse | null): EnhancedSurveyResponse {
+    // Create a properly structured empty metrics object with all required fields
     const emptyMetrics: ProcessedMetrics = {
       timestamp: new Date(),
       confidenceScores: {
@@ -366,27 +367,25 @@ export class SurveyMetricService {
       }
     };
 
-    if (!response || !response.responseJson || typeof response.responseJson !== 'object') {
+    // Handle null or invalid response cases
+    if (!response) {
       return {
         id: 0,
         userId: 0,
         surveyId: 0,
+        companyId: 1, // Default company ID
         responseJson: '{}',
         processedMetrics: emptyMetrics
       };
     }
 
     try {
-      if (!response || !response.responseJson || typeof response.responseJson !== 'object') {
-        throw new Error('Invalid survey response: missing or invalid response data');
-      }
-
       // Parse response JSON if it's a string
       let responseData: Record<string, unknown>;
       try {
         responseData = typeof response.responseJson === 'string'
           ? JSON.parse(response.responseJson)
-          : response.responseJson;
+          : response.responseJson as Record<string, unknown>;
       } catch (e: unknown) {
         const errorMessage = e instanceof Error ? e.message : 'Unknown error';
         throw new Error(`Failed to parse response JSON: ${errorMessage}`);
@@ -407,7 +406,7 @@ export class SurveyMetricService {
         throw new Error('Invalid metrics: MetricCalculationService returned invalid data');
       }
 
-      // Ensure all required metric properties exist
+      // Ensure all required metric properties exist with proper structure
       if (!processedMetrics.metrics.technologyMetrics) {
         processedMetrics.metrics.technologyMetrics = {
           implementationCount: 0,
@@ -415,6 +414,20 @@ export class SurveyMetricService {
           implementedTechnologies: [],
           maturityScore: 0,
           implementationDetails: {
+            systemTypes: [],
+            integrationLevel: 0,
+            analyticsCapabilities: { level: 'basic', capabilities: [] },
+            automationStatus: { level: 'low', automatedProcesses: [] }
+          }
+        };
+      } else {
+        // Ensure the technologyMetrics object has all required properties
+        processedMetrics.metrics.technologyMetrics = {
+          implementationCount: processedMetrics.metrics.technologyMetrics.implementationCount || 0,
+          averageMaturity: processedMetrics.metrics.technologyMetrics.averageMaturity || 0,
+          implementedTechnologies: processedMetrics.metrics.technologyMetrics.implementedTechnologies || [],
+          maturityScore: processedMetrics.metrics.technologyMetrics.maturityScore || 0,
+          implementationDetails: processedMetrics.metrics.technologyMetrics.implementationDetails || {
             systemTypes: [],
             integrationLevel: 0,
             analyticsCapabilities: { level: 'basic', capabilities: [] },
@@ -429,21 +442,48 @@ export class SurveyMetricService {
       // Extract implementation details
       const implementationDetails = this.extractImplementationDetails(responseData);
 
+      // Create a complete response object with all required fields
       const updatedResponse: EnhancedSurveyResponse = {
-        ...response,
+        id: response.id || 0,
+        surveyId: response.surveyId || 0,
+        userId: response.userId || 0,
+        companyId: response.companyId !== undefined ? response.companyId : 1, // Always ensure a valid companyId
+        responseJson: response.responseJson,
         processedMetrics: {
-          ...processedMetrics,
+          timestamp: processedMetrics.timestamp || new Date(),
+          confidenceScores: processedMetrics.confidenceScores || {
+            technology: 1,
+            process: 1,
+            personnel: 1,
+            strategy: 1
+          },
           metrics: {
-            ...processedMetrics.metrics,
             technologyMetrics: {
               ...processedMetrics.metrics.technologyMetrics,
               maturityScore: technologyScore,
               implementationDetails
+            },
+            processMetrics: processedMetrics.metrics.processMetrics || {
+              digitizationLevel: 0,
+              automationLevel: 0,
+              processAreas: []
+            },
+            personnelMetrics: processedMetrics.metrics.personnelMetrics || {
+              totalSkilled: 0,
+              avgProficiency: 0,
+              skillDistribution: {}
+            },
+            strategyMetrics: processedMetrics.metrics.strategyMetrics || {
+              strategyMaturity: 0,
+              implementationProgress: 0,
+              keyMilestones: []
             }
           }
         }
       };
-      return updatedResponse;
+      
+      // Ensure the processedMetrics is properly serializable
+      return JSON.parse(JSON.stringify(updatedResponse)) as EnhancedSurveyResponse;
     } catch (error) {
       console.error('Error processing survey response:', error);
       if (error instanceof Error) {

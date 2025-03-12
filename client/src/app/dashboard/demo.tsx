@@ -80,7 +80,7 @@ const IndustryDashboardDemo = () => {
     {
       title: "Strategy Implementation",
       value: `${((metrics.strategyMetrics.implementationProgress ?? 0) * 100).toFixed(1)}%`,
-      change: `Maturity: ${metrics.strategyMetrics.maturityLevel ?? 0}/5`,
+      change: `Maturity: ${metrics.strategyMetrics.strategyMaturity ?? 0}/5`,
       trend: (metrics.strategyMetrics.implementationProgress ?? 0) > 0.5 ? "up" : "down"
     }
   ] : [];

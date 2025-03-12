@@ -165,6 +165,7 @@ export interface SurveyResponse {
   surveyId: number;
   responseJson: string;
   userId: number;
+  companyId: number;
   processedMetrics?: ProcessedMetrics;
 }
 

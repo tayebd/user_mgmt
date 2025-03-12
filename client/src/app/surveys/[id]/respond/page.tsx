@@ -10,16 +10,18 @@ import { useApiStore } from '@/state/api';
 import { toast } from 'sonner';
 
 // import "survey-core/survey-core.min.css";
-import { themeJson } from "./theme";
+import { themeJson, customCss } from "./theme";
 
 interface PageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 /**
  * Survey response page that handles survey completion and score calculation
  */
-export default function RespondPage({ params }: PageProps) {
+export default function RespondPage({ params: rawParams }: PageProps) {
+  // Unwrap params Promise with proper type safety
+  const { id } = React.use(rawParams) as { id: string };
   const [survey, setSurvey] = useState<Survey | null>(null);
   const [surveyId, setsurveyId] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -31,14 +33,14 @@ export default function RespondPage({ params }: PageProps) {
   useEffect(() => {
     const fetchSurvey = async () => {
       try {
-        // Extract and validate survey ID from params
-        if (!params.id) {
+        // Extract and validate survey ID
+        if (!id) {
           throw new Error('Survey ID is missing');
         }
 
-        const surveyId = Number(params.id);
+        const surveyId = Number(id);
         if (isNaN(surveyId) || surveyId <= 0) {
-          throw new Error(`Invalid survey ID: ${params.id}`);
+          throw new Error(`Invalid survey ID: ${id}`);
         }
 
         setsurveyId(surveyId);
@@ -66,8 +68,9 @@ export default function RespondPage({ params }: PageProps) {
 
           // Create survey model to validate structure
           const surveyModel = new Model(jsonData);
-          surveyModel.applyTheme(themeJson);
-
+          // Cast the theme to any to avoid type errors with the SurveyJS library
+          surveyModel.applyTheme(themeJson as any);
+          surveyModel.customCss = customCss;
         } catch (jsonError) {
           console.error('Survey JSON validation error:', jsonError);
           throw new Error('Invalid survey format');
@@ -80,7 +83,7 @@ export default function RespondPage({ params }: PageProps) {
         console.error('Survey loading error:', {
           error: error instanceof Error ? error.message : 'Unknown error',
           type: error?.constructor?.name,
-          surveyId: params.id,
+          surveyId: id,
           timestamp: new Date().toISOString()
         });
       } finally {
@@ -89,7 +92,7 @@ export default function RespondPage({ params }: PageProps) {
     };
 
     fetchSurvey();
-  }, [params.id, fetchSurveyById]);
+  }, [id, fetchSurveyById]);
 
   const handleSurveyComplete = async (surveyModel: Model) => {
     // Calculate total score from survey data safely
@@ -125,10 +128,20 @@ export default function RespondPage({ params }: PageProps) {
         throw new Error('Invalid response format');
       }
 
+      // Get companyId from localStorage or use a default value
+      // In a real application, this would come from user authentication or context
+      const companyId = localStorage.getItem('companyId') || '263';
+      
+      // Add companyId to the survey data for metrics processing
+      cleanData.companyId = parseInt(companyId, 10);
+      
+      // Convert the cleaned data back to a JSON string
+      const responseJsonString = JSON.stringify(cleanData);
+
       // Save survey response with metrics processing
       const response = await createSurveyResponse(
         surveyId,
-        JSON.stringify(cleanData),
+        responseJsonString,
         1 // TODO: Get actual user ID from session/auth when available
       );
 
@@ -184,8 +197,9 @@ export default function RespondPage({ params }: PageProps) {
     let surveyModel;
     try {
       surveyModel = new Model(JSON.parse(survey.surveyJson));
-      surveyModel.applyTheme(themeJson);
-
+      // Cast the theme to any to avoid type errors with the SurveyJS library
+      surveyModel.applyTheme(themeJson as any);
+      surveyModel.customCss = customCss;
       // Helper function to safely get score from a choice
       const getChoiceScore = (choice: { value: string; score?: number }): number => {
         const score = choice?.score;
@@ -213,7 +227,7 @@ export default function RespondPage({ params }: PageProps) {
         console.error('Error calculating max score:', {
           error: error instanceof Error ? error.message : 'Unknown error',
           type: error?.constructor?.name,
-          surveyId: params.id,
+          surveyId: id,
           timestamp: new Date().toISOString()
         });
         maxScore = 0; // Fallback to 0 if calculation fails

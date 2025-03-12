@@ -1,22 +1,33 @@
+const nextJest = require('next/jest')
+
+// Providing the path to your Next.js app which will enable loading next.config.js and .env files
+const createJestConfig = nextJest({
+  dir: './'
+})
+
 /** @type {import('jest').Config} */
-module.exports = {
-  preset: 'ts-jest',
+const customJestConfig = {
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1'
-  },
-  transform: {
-    '^.+\.tsx?$': ['ts-jest', {
-      tsconfig: 'tsconfig.json'
-    }]
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    // Explicitly map the dynamic routes
+    '@/app/surveys/\[id\]/respond/theme': '<rootDir>/src/app/surveys/[id]/respond/theme.ts',
+    '@/app/surveys/\[id\]/respond/page': '<rootDir>/src/app/surveys/[id]/respond/page.tsx'
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
-  globals: {
-    'ts-jest': {
-      isolatedModules: true,
-      useESM: true
-    }
-  }
+  transformIgnorePatterns: [
+    '/node_modules/(?!survey-core|survey-react-ui)/'
+  ],
+  testEnvironmentOptions: {
+    customExportConditions: ['react-jsx']
+  },
+  moduleDirectories: ['node_modules', '<rootDir>/src'],
+  testPathIgnorePatterns: ['/node_modules/', '/src/app/surveys/\[id\]/'],
+  modulePathIgnorePatterns: ['<rootDir>/.next/']
 }
+
+// createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async
+module.exports = createJestConfig(customJestConfig)

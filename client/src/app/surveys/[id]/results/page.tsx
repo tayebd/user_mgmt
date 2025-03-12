@@ -2,10 +2,6 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import SurveyResultsComponent from './SurveyResultsComponent';
 
-type PageProps = {
-  params: { id: string }
-}
-
 /**
  * Validates survey ID from params
  */
@@ -28,7 +24,7 @@ async function validateSurveyId(id: string): Promise<string> {
  * Survey results page component.
  * Handles displaying survey results with proper async param validation.
  */
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params }: { params: { id: string } }) {
   try {
     // Validate and sanitize ID parameter
     const surveyId = await validateSurveyId(params.id);

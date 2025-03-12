@@ -5,7 +5,7 @@ import SurveysPage from '../page';
 import { useRouter } from 'next/navigation';
 import { useApiStore } from '@/state/api';
 import { SurveyStatus } from '@/types';
-import { describe, beforeEach, test, expect, jest} from '@jest/globals';
+// Using Jest globals from the environment instead of importing from @jest/globals
 
 // Mock the next/navigation module
 jest.mock('next/navigation', () => ({
@@ -33,7 +33,7 @@ describe('SurveysPage Component', () => {
     {
       id: '2',
       title: 'Employee Feedback Survey',
-      status: SurveyStatus.INACTIVE,
+      status: SurveyStatus.ACTIVE, // Using ACTIVE as INACTIVE doesn't exist in the enum
       responses: [],
       createdAt: '2025-03-05T14:30:00Z',
     },
@@ -46,7 +46,8 @@ describe('SurveysPage Component', () => {
     
     // Setup mocks
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
-    (useApiStore as jest.Mock).mockReturnValue({
+    // Cast to unknown first to avoid type errors
+    (useApiStore as unknown as jest.Mock).mockReturnValue({
       surveys: mockSurveys,
       fetchSurveysByUserId: mockFetchSurveysByUserId,
     });
@@ -173,7 +174,7 @@ describe('SurveysPage Component', () => {
     
     // Mock the API to throw an error
     const mockError = new Error('Failed to fetch surveys');
-    (useApiStore as jest.Mock).mockReturnValue({
+    (useApiStore as unknown as jest.Mock).mockReturnValue({
       surveys: [],
       fetchSurveysByUserId: jest.fn().mockRejectedValue(mockError),
     });
@@ -189,7 +190,7 @@ describe('SurveysPage Component', () => {
   });
 
   test('handles empty surveys array', () => {
-    (useApiStore as jest.Mock).mockReturnValue({
+    (useApiStore as unknown as jest.Mock).mockReturnValue({
       surveys: [],
       fetchSurveysByUserId: mockFetchSurveysByUserId,
     });
@@ -207,7 +208,7 @@ describe('SurveysPage Component', () => {
     console.error = jest.fn();
     
     // Mock the API to return non-array data
-    (useApiStore as jest.Mock).mockReturnValue({
+    (useApiStore as unknown as jest.Mock).mockReturnValue({
       surveys: null,
       fetchSurveysByUserId: jest.fn().mockResolvedValue(null),
     });

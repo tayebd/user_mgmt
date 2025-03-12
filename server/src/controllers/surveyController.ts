@@ -1,8 +1,29 @@
 import { Request, Response } from 'express';
 import { prisma } from '../config/db';
+import { MetricSyncService } from '../services/metricSyncService';
+import { ProcessedMetrics } from '../types/metrics';
+import { Prisma, SurveyResponse } from '@prisma/client';
+
+const CURRENT_METRICS_VERSION = '1.0.0';
 
 export const getSurveys = async (req: Request, res: Response) => {
   try {
+    type SurveyWithResponses = Prisma.SurveyGetPayload<{
+      include: {
+        responses: {
+          select: {
+            id: true;
+            responseJson: true;
+            processedMetrics: true;
+            createdAt: true;
+            companyId: true;
+            metricsVersion: true;
+            lastMetricsUpdate: true;
+          };
+        };
+      };
+    }>;
+
     const surveys = await prisma.survey.findMany({
       include: {
         responses: {
@@ -10,7 +31,10 @@ export const getSurveys = async (req: Request, res: Response) => {
             id: true,
             responseJson: true,
             processedMetrics: true,
-            createdAt: true
+            createdAt: true,
+            companyId: true,
+            metricsVersion: true,
+            lastMetricsUpdate: true
           }
         }
       },
@@ -19,12 +43,28 @@ export const getSurveys = async (req: Request, res: Response) => {
       }
     });
 
-    // Format response to include response count
-    const formattedSurveys = surveys.map(survey => ({
-      ...survey,
-      responseCount: survey.responses?.length || 0,
-      responses: undefined // Don't send full responses in survey list
-    }));
+    // Format response to include response count and validate JSON
+    const formattedSurveys = (surveys as SurveyWithResponses[]).map(survey => {
+      const validResponses = survey.responses.filter(response => {
+        try {
+          const json = response.responseJson;
+          return json !== null && 
+                 (typeof json === 'object' || typeof json === 'string');
+        } catch (e) {
+          console.warn(
+            'Invalid response JSON:', 
+            { surveyId: survey.id, responseId: response.id, error: e }
+          );
+          return false;
+        }
+      });
+
+      return {
+        ...survey,
+        responseCount: validResponses.length,
+        responses: undefined // Don't send full responses in survey list
+      };
+    });
 
     res.status(200).json(formattedSurveys);
   } catch (error) {
@@ -154,8 +194,14 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
   const { surveyId } = req.params;
   console.log('Request body received:', req.body);
   
-  const { responseJson, userId } = req.body;
-  console.log('Extracted values:', { surveyId, responseJson: !!responseJson, userId });
+  const { responseJson, userId, companyId, processedMetrics } = req.body;
+  console.log('Extracted values:', { 
+    surveyId, 
+    responseJson: !!responseJson, 
+    userId,
+    companyId,
+    hasMetrics: !!processedMetrics
+  });
   
   if (!responseJson) {
     return res.status(400).json({ 
@@ -171,30 +217,86 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
     });
   }
 
+  if (!companyId) {
+    return res.status(400).json({ 
+      message: 'companyId is required for dashboard integration',
+      receivedBody: req.body
+    });
+  }
+
   try {
-    let parsedResponse;
+    // Validate and parse response JSON
+    let parsedResponse: Record<string, unknown>;
     try {
-      parsedResponse = typeof responseJson === 'string' ? JSON.parse(responseJson) : responseJson;
+      const tempResponse = typeof responseJson === 'string' ? JSON.parse(responseJson) : responseJson;
+      if (!tempResponse || typeof tempResponse !== 'object' || Array.isArray(tempResponse)) {
+        throw new Error('Response must be a valid object');
+      }
+      parsedResponse = tempResponse;
     } catch (parseError) {
       return res.status(400).json({ 
         message: 'Invalid JSON in responseJson',
-        error: parseError
+        error: parseError instanceof Error ? parseError.message : 'Parse error'
       });
     }
-    
+
+    // Validate processed metrics if provided
+    let validatedMetrics: ProcessedMetrics | undefined;
+    if (processedMetrics) {
+      try {
+        if (!processedMetrics.timestamp || !processedMetrics.metrics || !processedMetrics.confidenceScores) {
+          throw new Error('Invalid metrics format');
+        }
+        validatedMetrics = processedMetrics as ProcessedMetrics;
+      } catch (metricsError) {
+        return res.status(400).json({
+          message: 'Invalid metrics format',
+          error: metricsError instanceof Error ? metricsError.message : 'Validation error'
+        });
+      }
+    }
+
+    // Create survey response with validated data
     const surveyResponse = await prisma.surveyResponse.create({
       data: {
         surveyId: Number(surveyId),
-        responseJson: parsedResponse,
+        responseJson: parsedResponse as Prisma.InputJsonValue,
         userId: Number(userId),
+        companyId: Number(companyId),
+        metricsVersion: validatedMetrics ? CURRENT_METRICS_VERSION : null,
+        lastMetricsUpdate: validatedMetrics ? new Date() : null,
+        processedMetrics: validatedMetrics ? (validatedMetrics as unknown as Prisma.InputJsonValue) : Prisma.JsonNull
       },
+      include: {
+        survey: true,
+        user: true,
+        company: true
+      }
     });
+
+    // If metrics were provided and validated, sync them with dashboard tables
+    if (validatedMetrics) {
+      try {
+        await MetricSyncService.syncMetricsWithDashboard(
+          surveyResponse.id,
+          validatedMetrics,
+          Number(companyId)
+        );
+      } catch (syncError) {
+        console.error('Error syncing metrics with dashboard:', syncError);
+        // Don't fail the response creation if sync fails, but log it
+        if (process.env.NODE_ENV === 'development') {
+          console.error('Sync error details:', syncError);
+        }
+      }
+    }
+
     res.status(201).json(surveyResponse);
   } catch (error) {
     console.error('Error creating survey response:', error);
     res.status(500).json({ 
       message: 'Internal server error',
-      error: error,
+      error: error instanceof Error ? error.message : 'Unknown error',
       stack: process.env.NODE_ENV === 'development' ? error : undefined
     });
   }
@@ -203,15 +305,35 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
   export const getSurveyResponses = async (req: Request, res: Response) => {
     const { surveyId } = req.params;
     try {
-      const reviews = await prisma.surveyResponse.findMany({
+      // Validate surveyId
+      if (!surveyId || isNaN(Number(surveyId))) {
+        return res.status(400).json({ message: 'Invalid survey ID' });
+      }
+
+      const surveyResponses = await prisma.surveyResponse.findMany({
         where: { surveyId: Number(surveyId) },
-        include: {
-          // responseJson: true,
+        select: {
+          id: true,
+          surveyId: true,
+          userId: true,
+          companyId: true,
+          responseJson: true,
+          processedMetrics: true,
+          createdAt: true,
+          metricsVersion: true,
+          lastMetricsUpdate: true
         },
+        orderBy: {
+          createdAt: 'desc'
+        }
       });
-      res.status(200).json(reviews);
+
+      // Log the number of responses found
+      console.log(`Found ${surveyResponses.length} responses for survey ${surveyId}`);
+      
+      res.status(200).json(surveyResponses);
     } catch (error) {
-      console.error('Error fetching reviews:', error);
+      console.error('Error fetching survey responses:', error);
       res.status(500).json({ message: 'Internal server error' });
     }
   };

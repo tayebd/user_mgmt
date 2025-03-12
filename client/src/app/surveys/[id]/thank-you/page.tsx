@@ -10,15 +10,11 @@ import { useApiStore } from '@/state/api';
 import { Survey } from '@/types';
 import { themeConfig } from './theme';
 
-interface PageProps {
-  params: { id: string };
-}
-
 /**
  * Thank you page displayed after survey completion
  * Shows a success message and provides navigation options
  */
-export default function ThankYouPage({ params }: PageProps): JSX.Element {
+export default function ThankYouPage({ params }: { params: { id: string } }): JSX.Element {
   const [survey, setSurvey] = useState<Survey | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
