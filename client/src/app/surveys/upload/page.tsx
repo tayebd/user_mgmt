@@ -11,7 +11,8 @@ import { Survey } from 'survey-react-ui';
 import { toast } from 'sonner';
 import { ArrowLeft, Upload, FileText } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
-function validateIndustry (params: any[]) {
+
+function validateIndustry (params: string[]) {
   const value = params[0];
   return value.indexOf("survey");
 }
@@ -45,10 +46,59 @@ export default function LoadSurveyPage() {
           
           // Create a preview of the survey
           const surveyModel = new Model(text);
+          // Configure the survey model to fit container width
+          surveyModel.width = '100%';
+          // Configure survey model for responsive layout
+          Object.assign(surveyModel, {
+            width: '100%',
+            questionsOnPageMode: 'singlePage',
+            showProgressBar: 'top',
+            checkErrorsMode: 'onValueChanged'
+          });
+
+          // Handle survey rendering and ensure proper width constraints
+          surveyModel.onAfterRenderSurvey.add(() => {
+            try {
+              const surveyContainer = document.querySelector('.sv_main') as HTMLElement | null;
+              if (!surveyContainer) return;
+
+              // Apply container styles
+              Object.assign(surveyContainer.style, {
+                width: '100%',
+                maxWidth: '100%',
+                overflowX: 'hidden',
+                position: 'relative'
+              });
+
+              // Style all child elements for proper width handling
+              const elements = surveyContainer.getElementsByTagName('*');
+              Array.from(elements).forEach(el => {
+                if (el instanceof HTMLElement) {
+                  Object.assign(el.style, {
+                    maxWidth: '100%',
+                    overflowWrap: 'break-word',
+                    boxSizing: 'border-box'
+                  });
+
+                  // Special handling for specific survey elements
+                  if (el.classList.contains('sv_q_title')) {
+                    el.style.wordBreak = 'break-word';
+                  }
+                  if (el.classList.contains('sv_row')) {
+                    el.style.width = '100%';
+                  }
+                }
+              });
+            } catch (error) {
+              console.error('Error applying survey styles:', error);
+            }
+          });
           setSurveyPreview(
-            <div className="mt-4">
+            <div className="mt-4 w-full">
               <h4 className="text-sm font-medium mb-2">Survey Preview</h4>
-              <Survey model={surveyModel} />
+              <div className="max-w-full overflow-hidden">
+                <Survey model={surveyModel} />
+              </div>
             </div>
           );
         }
@@ -125,9 +175,10 @@ export default function LoadSurveyPage() {
   };
   
   return (
-    <div className="flex">
+    <div className="flex h-screen overflow-hidden w-full">
       <Sidebar />
-      <div className="flex-1 p-4 ml-64">
+      <main className="flex-1 p-4 ml-64 overflow-y-auto overflow-x-hidden relative w-[calc(100%-16rem)]">
+        <div className="max-w-[calc(100vw-17rem)] mx-auto">
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold">Upload Survey</h1>
@@ -151,7 +202,7 @@ export default function LoadSurveyPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6 max-w-full">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               <div className="space-y-2">
                 <label htmlFor="title" className="text-sm font-medium text-gray-700">Survey Title</label>
@@ -202,35 +253,44 @@ export default function LoadSurveyPage() {
             {surveyJson && (
               <div className="border border-blue-200 rounded-md p-4 bg-white mt-6">
                 <h3 className="text-sm font-medium mb-4 text-blue-700">Uploaded Survey JSON</h3>
-                <pre className="text-xs bg-blue-50 p-4 rounded overflow-x-auto border border-blue-100">
-                  {JSON.stringify(JSON.parse(surveyJson), null, 2)}
-                </pre>
+                <div className="overflow-x-auto max-w-full">
+                  <pre className="text-xs bg-blue-50 p-4 rounded border border-blue-100 max-h-60 whitespace-pre-wrap break-all overflow-x-hidden">
+                    {JSON.stringify(JSON.parse(surveyJson), null, 2)}
+                  </pre>
+                </div>
               </div>
             )}
             
             {surveyPreview && (
               <div className="border border-blue-200 rounded-md p-4 bg-white mt-6">
                 <h3 className="text-sm font-medium mb-4 text-blue-700">Survey Preview</h3>
-                <div className="bg-blue-50 p-4 rounded border border-blue-100">
-                  {surveyPreview}
+                <div className="bg-blue-50 p-4 rounded border border-blue-100 overflow-y-auto max-h-[60vh] overflow-x-hidden">
+                  <div className="max-w-full overflow-hidden">
+                    <div className="survey-container w-full mx-auto px-4" style={{ maxWidth: 'min(100%, 800px)' }}>
+                      {surveyPreview}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
             
-            <div className="flex justify-end mt-6">
-              <Button 
-                type="submit" 
-                disabled={isSubmitting || !surveyJson}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                {isSubmitting ? 'Creating...' : 'Create Survey'}
-              </Button>
+            <div className="sticky bottom-0 bg-white py-4 border-t mt-6">
+              <div className="flex justify-end">
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting || !surveyJson}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  {isSubmitting ? 'Creating...' : 'Create Survey'}
+                </Button>
+              </div>
             </div>
           </form>
         </CardContent>
       </Card>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }

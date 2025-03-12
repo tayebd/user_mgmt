@@ -8,7 +8,7 @@ const router = express.Router();
 // Apply authentication middleware
 router.use(authenticateToken);
 
-// Search across projects, tasks, and users
+// Search across projects, tasks, companies, reviews, and users
 router.get("/", search);
 
 export default router;

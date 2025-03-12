@@ -6,7 +6,7 @@ import { Calendar, User, Edit2, Trash2 } from 'lucide-react';
 import { Task, TaskStatus, TaskPriority } from '@/types';
 import { useRouter } from 'next/navigation';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import EditTaskModal from '@/components/EditTaskModal';
+import EditTaskModal from '@/components/TaskCard/EditTaskModal';
 import { useApiStore } from '@/state/api';
 
 interface TaskCardProps {

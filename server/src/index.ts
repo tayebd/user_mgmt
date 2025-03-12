@@ -51,7 +51,7 @@ app.get("/", (req, res) => {
 app.use("/api/search", searchRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/companies", companyRoutes);
-app.use('/api/pvpanels', pvPanelRoutes);
+app.use('/api/pv-panels', pvPanelRoutes);
 app.use('/api/surveys', surveyRoutes);
 app.use('/api/inverters', inverterRoutes);
 

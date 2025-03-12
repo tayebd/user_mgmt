@@ -18,7 +18,7 @@ function SurveysPage() {
   useEffect(() => {
     const fetchSurveys = async () => {
       try {
-        const data = await fetchSurveysByUserId(11);
+        const data = await fetchSurveysByUserId(1);
         if (Array.isArray(data)) {
           const surveysWithResponseCounts = data.map(survey => ({
             ...survey,

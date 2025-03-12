@@ -27,7 +27,7 @@ export default function HomePage() {
       try {
         setLoading(true);
         // Fetch recent surveys - use a default ID if user ID is not available
-        const userId = 11; // Default user ID as fallback
+        const userId = 1; // Default user ID as fallback
         const surveys = await fetchSurveysByUserId(userId);
         if (Array.isArray(surveys)) {
           setRecentSurveys(surveys.slice(0, 5)); // Get 5 most recent surveys

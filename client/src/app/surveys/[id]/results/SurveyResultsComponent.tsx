@@ -26,35 +26,66 @@ export default function SurveyResultsComponent({ surveyId }: SurveyResultsCompon
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        // Parse the survey ID
+        // Validate survey ID
+        if (!surveyId) {
+          throw new Error('Survey ID is required');
+        }
+
         const parsedSurveyId = parseInt(surveyId, 10);
-        if (isNaN(parsedSurveyId)) {
-          throw new Error('Invalid survey ID');
+        if (isNaN(parsedSurveyId) || parsedSurveyId <= 0) {
+          throw new Error('Invalid survey ID format');
         }
-        
-        console.log('Fetching survey with ID:', parsedSurveyId);
-        
-        // Use the ApiStore to fetch survey and responses
+
+        // Fetch survey data
         const surveyData = await fetchSurveyById(parsedSurveyId);
-        const responsesData = await fetchSurveyResponses(parsedSurveyId);
-        
-        setSurvey(surveyData);
-        setResponses(responsesData);
-        
-        // Create survey model from the survey JSON
-        if (surveyData && surveyData.surveyJson) {
-          try {
-            const model = new Model(JSON.parse(surveyData.surveyJson));
-            setSurveyModel(model);
-          } catch (parseError) {
-            console.error('Error parsing survey JSON:', parseError);
-            toast.error('Error parsing survey definition');
-          }
+        if (!surveyData) {
+          throw new Error('Survey not found');
         }
-      } catch (err) {
-        setError('Failed to load survey results');
-        console.error(err);
-        toast.error('Failed to load survey results');
+
+        // Validate survey JSON
+        if (!surveyData.surveyJson) {
+          throw new Error('Survey definition is missing');
+        }
+
+        let parsedSurveyJson;
+        try {
+          // Handle both string and object JSON formats
+          parsedSurveyJson = typeof surveyData.surveyJson === 'string' 
+            ? JSON.parse(surveyData.surveyJson)
+            : surveyData.surveyJson;
+        } catch (jsonError) {
+          console.error('Error parsing survey JSON:', jsonError);
+          throw new Error('Invalid survey definition format');
+        }
+
+        // Create and validate survey model
+        const model = new Model(parsedSurveyJson);
+        if (!model.getAllQuestions().length) {
+          throw new Error('Survey has no questions defined');
+        }
+
+        // Set survey data and model
+        setSurvey(surveyData);
+        setSurveyModel(model);
+
+        // Fetch and validate responses
+        const responsesData = await fetchSurveyResponses(parsedSurveyId);
+        if (Array.isArray(responsesData)) {
+          setResponses(responsesData);
+        } else {
+          console.warn('Unexpected response data format:', responsesData);
+          setResponses([]);
+        }
+
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to load survey results';
+        setError(errorMessage);
+        console.error('Survey results error:', {
+          error,
+          surveyId,
+          timestamp: new Date().toISOString()
+        });
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -67,37 +98,71 @@ export default function SurveyResultsComponent({ surveyId }: SurveyResultsCompon
     if (!survey || !responses.length || !surveyModel) return {};
 
     const stats: Record<string, Record<string, number>> = {};
+    let invalidResponseCount = 0;
 
-    responses.forEach(response => {
+    // Initialize stats for all questions
+    surveyModel.getAllQuestions().forEach(question => {
+      stats[question.name] = {};
+    });
+
+    responses.forEach((response, index) => {
       let parsedResponse;
       try {
-        // Check if responseJson is already an object or needs parsing
+        // Handle both string and object JSON formats
         parsedResponse = typeof response.responseJson === 'string' 
           ? JSON.parse(response.responseJson)
           : response.responseJson;
 
-        console.log('Parsed response:', parsedResponse);
+        if (!parsedResponse || typeof parsedResponse !== 'object') {
+          throw new Error('Invalid response data format');
+        }
+
       } catch (error) {
-        console.error('Error parsing response:', error);
-        return; // Skip this response if parsing fails
+        console.error(`Error parsing response ${index}:`, {
+          error,
+          responseId: response.id,
+          timestamp: new Date().toISOString()
+        });
+        invalidResponseCount++;
+        return; // Skip invalid response
       }
 
       surveyModel.getAllQuestions().forEach(question => {
         const questionName = question.name;
         const answer = parsedResponse[questionName];
 
-        if (answer !== undefined) {
-          // Initialize statistics for this question
+        // Handle different types of answers
+        if (answer !== undefined && answer !== null) {
           if (!stats[questionName]) {
             stats[questionName] = {};
           }
 
-          // Handle different question types
-          const answerKey = Array.isArray(answer) ? answer.join(', ') : String(answer);
+          let answerKey;
+          if (Array.isArray(answer)) {
+            // Handle multi-select answers
+            answerKey = answer.length ? answer.join(', ') : 'No selection';
+          } else if (typeof answer === 'object') {
+            // Handle complex answer types
+            answerKey = JSON.stringify(answer);
+          } else {
+            // Handle simple answer types
+            answerKey = String(answer).trim() || 'No answer';
+          }
+
           stats[questionName][answerKey] = (stats[questionName][answerKey] || 0) + 1;
+        } else {
+          // Track missing answers
+          const noAnswerKey = 'No answer';
+          stats[questionName][noAnswerKey] = (stats[questionName][noAnswerKey] || 0) + 1;
         }
       });
     });
+
+    // Log statistics about invalid responses
+    if (invalidResponseCount > 0) {
+      console.warn(`Found ${invalidResponseCount} invalid responses out of ${responses.length} total responses`);
+      toast.warning(`${invalidResponseCount} responses were invalid and excluded from the results`);
+    }
 
     return stats;
   };

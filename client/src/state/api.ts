@@ -146,11 +146,14 @@ interface ApiState {
   
   fetchSurveys: () => Promise<Survey[]>;
   createSurvey: (project: CreateSurveyParams) => Promise<Survey>;
+  fetchSurveyById: (surveyId: number) => Promise<Survey>;
+  updateSurvey: (surveyId: number, survey: Partial<Survey>) => Promise<void>;
+
   createSurveyResponse:   (surveyId: number, replyJson: string, userId: number) => Promise<SurveyResponse>;
+  
   fetchReviews: (companyId: number) => Promise<Review[]>;
   fetchSurveyResponses: (surveyId: number) => Promise<SurveyResponse[]>;
   fetchSurveysByUserId: (userId: number) => Promise<Survey[]>;
-  fetchSurveyById: (userId: number) => Promise<Survey>;
 
   fetchUsers: () => Promise<User[]>;
   createUser: (user: Partial<User>) => Promise<User>;
@@ -576,29 +579,114 @@ const apiStore = create<ApiState>((set) => ({
     return data;
   },
   createSurveyResponse: async (surveyId: number, surveyResponse: string, userId: number) => {
-    const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys/${surveyId}/surveyResponses`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        userId: userId,
-        responseJson: surveyResponse, 
-      }),
-      credentials: 'include',
-    });
-    const data = await response.json();
-    return data;
+    try {
+      // Validate input parameters
+      if (!surveyId || !surveyResponse || !userId) {
+        throw new Error('Missing required parameters for survey response');
+      }
+
+      // Validate JSON format
+      let parsedResponse;
+      try {
+        parsedResponse = JSON.parse(surveyResponse);
+        if (!parsedResponse || typeof parsedResponse !== 'object') {
+          throw new Error('Invalid response data format');
+        }
+      } catch (jsonError) {
+        console.error('JSON validation error:', jsonError);
+        throw new Error('Invalid survey response format');
+      }
+
+      // Get auth token
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      // Make API request
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys/${surveyId}/surveyResponses`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            userId,
+            responseJson: surveyResponse,
+          }),
+          credentials: 'include',
+        }
+      );
+
+      // Handle non-200 responses
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to save survey response: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (!data) {
+        throw new Error('No response data received');
+      }
+
+      return data;
+    } catch (error) {
+      // Log error details for debugging
+      console.error('Survey response creation error:', {
+        error,
+        surveyId,
+        userId,
+        timestamp: new Date().toISOString(),
+      });
+      throw error; // Re-throw to let components handle the error
+    }
   },
   fetchSurveyResponses: async (surveyId: number) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys/${surveyId}/surveyResponses`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-    const data = await response.json();
-    return data;
+    try {
+      // Validate survey ID
+      if (!surveyId || isNaN(surveyId) || surveyId <= 0) {
+        throw new Error('Invalid survey ID');
+      }
+
+      // Make API request
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys/${surveyId}/surveyResponses`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        }
+      );
+
+      // Handle non-200 responses
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to fetch survey responses: ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid response format: expected array of survey responses');
+      }
+
+      // Validate response data structure
+      data.forEach((response, index) => {
+        if (!response.id || !response.responseJson) {
+          console.warn(`Invalid response data at index ${index}:`, response);
+        }
+      });
+
+      return data;
+    } catch (error) {
+      // Log error details for debugging
+      console.error('Survey responses fetch error:', {
+        error,
+        surveyId,
+        timestamp: new Date().toISOString(),
+      });
+      throw error; // Re-throw to let components handle the error
+    }
   },
 }));
 

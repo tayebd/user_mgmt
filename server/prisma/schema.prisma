@@ -66,6 +66,13 @@ model Company {
   partnerships   Partnership[]
   reviews        Review[]
   services       Service[]
+
+// New relations for I4.0
+  technologyImplementations TechnologyImplementation[]
+  digitalProcesses         DigitalProcess[]
+  personnelSkills         PersonnelSkill[]
+  strategyAssessments     StrategyAssessment[]
+  productInnovations      ProductInnovation[]
 }
 
 model Industry {
@@ -363,6 +370,151 @@ model SurveyResponse {
   @@index([surveyId])
   @@map("responses")
 }
+
+
+// New models for I4.0 Analytics
+
+model TechnologyType {
+  id          Int       @id @default(autoincrement())
+  name        String
+  category    String    // Enum: IoT, AI, Robotics, Cloud, etc.
+  description String
+  createdAt   DateTime  @default(now())
+  implementations TechnologyImplementation[]
+}
+
+model TechnologyImplementation {
+  id                Int           @id @default(autoincrement())
+  company          Company       @relation(fields: [companyId], references: [id])
+  companyId        Int
+  technologyType   TechnologyType @relation(fields: [technologyTypeId], references: [id])
+  technologyTypeId Int
+  implementationDate DateTime
+  maturityLevel    Int           // 1-4
+  status          String        // Enum: Planning, InProgress, Completed
+  investmentAmount Decimal
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model ProcessType {
+  id          Int       @id @default(autoincrement())
+  name        String
+  category    String    // Enum: Production, HR, Marketing, Accounting
+  description String
+  createdAt   DateTime  @default(now())
+  processes   DigitalProcess[]
+}
+
+model DigitalProcess {
+  id                Int           @id @default(autoincrement())
+  company          Company       @relation(fields: [companyId], references: [id])
+  companyId        Int
+  processType      ProcessType   @relation(fields: [processTypeId], references: [id])
+  processTypeId    Int
+  digitizationLevel Int          // 1-5
+  automationLevel  Int          // 1-5
+  implementationDate DateTime
+  lastAssessmentDate DateTime
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Skill {
+  id          Int       @id @default(autoincrement())
+  name        String
+  category    String    // Enum: Technical, Management, Operation
+  i40Relevance Boolean
+  description String
+  createdAt   DateTime  @default(now())
+  personnelSkills PersonnelSkill[]
+}
+
+model PersonnelSkill {
+  id                Int           @id @default(autoincrement())
+  company          Company       @relation(fields: [companyId], references: [id])
+  companyId        Int
+  skill           Skill         @relation(fields: [skillId], references: [id])
+  skillId         Int
+  numberOfPersonnel Int
+  proficiencyLevel Int          // 1-5
+  assessmentDate   DateTime
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model StrategyAssessment {
+  id                Int           @id @default(autoincrement())
+  company          Company       @relation(fields: [companyId], references: [id])
+  companyId        Int
+  assessmentDate   DateTime
+  hasI40Strategy   Boolean
+  strategyMaturity Int          // 1-5
+  implementationProgress Int    // 0-100
+  nextReviewDate   DateTime
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model ProductInnovation {
+  id                Int           @id @default(autoincrement())
+  company          Company       @relation(fields: [companyId], references: [id])
+  companyId        Int
+  smartFeaturesCount Int
+  customizationLevel Int         // 1-5
+  innovationDate   DateTime
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+// Analytics Fact Tables
+model TechnologyImplementationFact {
+  id                Int           @id @default(autoincrement())
+  date             DateTime
+  companyId        Int
+  sectorId         Int
+  technologyCount  Int
+  avgMaturityLevel Decimal
+  totalInvestment  Decimal
+  implementationStatusCounts Json
+  createdAt       DateTime      @default(now())
+}
+
+model ProcessDigitizationFact {
+  id                Int           @id @default(autoincrement())
+  date             DateTime
+  companyId        Int
+  sectorId         Int
+  processId        Int
+  avgDigitizationLevel Decimal
+  avgAutomationLevel Decimal
+  processCount     Int
+  createdAt       DateTime      @default(now())
+}
+
+model PersonnelSkillsFact {
+  id                Int           @id @default(autoincrement())
+  date             DateTime
+  companyId        Int
+  sectorId         Int
+  skillCategory    String
+  totalSkilledPersonnel Int
+  avgProficiencyLevel Decimal
+  createdAt       DateTime      @default(now())
+}
+
+model StrategyImplementationFact {
+  id                Int           @id @default(autoincrement())
+  date             DateTime
+  companyId        Int
+  sectorId         Int
+  companiesWithStrategy Int
+  avgStrategyMaturity Decimal
+  avgImplementationProgress Decimal
+  createdAt       DateTime      @default(now())
+}
+
+
 
 enum UserRole {
   ADMIN
