@@ -1,0 +1,208 @@
+{
+  "title": "Industry 4.0 Adoption Survey",
+  "description": "This survey collects data on the adoption of Industry 4.0 technologies and solutions in your organization.",
+  "logoPosition": "right",
+  "pages": [
+    {
+      "name": "companyInfo",
+      "title": "Company Information",
+      "description": "Please provide basic information about your organization.",
+      "elements": [
+        {
+          "type": "text",
+          "name": "companyName",
+          "title": "Company Name",
+          "isRequired": true
+        },
+        {
+          "type": "dropdown",
+          "name": "companySize",
+          "title": "Company Size (Number of Employees)",
+          "isRequired": true,
+          "choices": [
+            { "value": "micro", "text": "Micro (1-9 employees)" },
+            { "value": "small", "text": "Small (10-49 employees)" },
+            { "value": "medium", "text": "Medium (50-249 employees)" },
+            { "value": "large", "text": "Large (250+ employees)" }
+          ]
+        },
+        {
+          "type": "dropdown",
+          "name": "industrySector",
+          "title": "Industry Sector",
+          "isRequired": true,
+          "choices": [
+            { "value": "manufacturing", "text": "Manufacturing" },
+            { "value": "automotive", "text": "Automotive" },
+            { "value": "aerospace", "text": "Aerospace & Defense" },
+            { "value": "energy", "text": "Energy & Utilities" },
+            { "value": "healthcare", "text": "Healthcare & Pharmaceuticals" },
+            { "value": "retail", "text": "Retail & Consumer Goods" },
+            { "value": "logistics", "text": "Logistics & Transportation" },
+            { "value": "technology", "text": "Technology & Electronics" },
+            { "value": "chemicals", "text": "Chemicals & Materials" },
+            { "value": "food", "text": "Food & Beverage" },
+            { "value": "other", "text": "Other" }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "otherIndustry",
+          "title": "Please specify your industry",
+          "visibleIf": "{industrySector} = 'other'"
+        },
+        {
+          "type": "dropdown",
+          "name": "region",
+          "title": "Geographic Region",
+          "isRequired": true,
+          "choices": [
+            { "value": "northAmerica", "text": "North America" },
+            { "value": "southAmerica", "text": "South America" },
+            { "value": "europe", "text": "Europe" },
+            { "value": "middleEast", "text": "Middle East" },
+            { "value": "africa", "text": "Africa" },
+            { "value": "asia", "text": "Asia" },
+            { "value": "oceania", "text": "Oceania" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "i40Adoption",
+      "title": "Industry 4.0 Technology Adoption",
+      "description": "Please indicate which Industry 4.0 technologies your organization has implemented.",
+      "elements": [
+        {
+          "type": "checkbox",
+          "name": "implementedTechnologies",
+          "title": "Which of the following Industry 4.0 technologies has your organization implemented?",
+          "description": "Select all that apply",
+          "isRequired": true,
+          "choices": [
+            { "value": "iot", "text": "Internet of Things (IoT)" },
+            { "value": "cloud", "text": "Cloud Computing" },
+            { "value": "bigData", "text": "Big Data Analytics" },
+            { "value": "ai", "text": "Artificial Intelligence/Machine Learning" },
+            { "value": "ar", "text": "Augmented Reality/Virtual Reality" },
+            { "value": "robotics", "text": "Advanced Robotics/Cobots" },
+            { "value": "additive", "text": "Additive Manufacturing (3D Printing)" },
+            { "value": "digital", "text": "Digital Twin" },
+            { "value": "blockchain", "text": "Blockchain" },
+            { "value": "cyber", "text": "Cybersecurity Solutions" },
+            { "value": "autonomous", "text": "Autonomous Vehicles/Systems" },
+            { "value": "none", "text": "None of the above" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "proposedTechnologies",
+          "title": "Which of the following Industry 4.0 technologies have been proposed but not yet implemented?",
+          "description": "Select all that apply",
+          "visibleIf": "{implementedTechnologies} notempty",
+          "choices": [
+            { "value": "iot", "text": "Internet of Things (IoT)" },
+            { "value": "cloud", "text": "Cloud Computing" },
+            { "value": "bigData", "text": "Big Data Analytics" },
+            { "value": "ai", "text": "Artificial Intelligence/Machine Learning" },
+            { "value": "ar", "text": "Augmented Reality/Virtual Reality" },
+            { "value": "robotics", "text": "Advanced Robotics/Cobots" },
+            { "value": "additive", "text": "Additive Manufacturing (3D Printing)" },
+            { "value": "digital", "text": "Digital Twin" },
+            { "value": "blockchain", "text": "Blockchain" },
+            { "value": "cyber", "text": "Cybersecurity Solutions" },
+            { "value": "autonomous", "text": "Autonomous Vehicles/Systems" },
+            { "value": "none", "text": "None of the above" }
+          ]
+        },
+        {
+          "type": "matrix",
+          "name": "implementationTimeline",
+          "title": "When did you implement the following technologies?",
+          "visibleIf": "{implementedTechnologies} notempty and {implementedTechnologies} != ['none']",
+          "columns": [
+            { "value": "lessThanYear", "text": "Less than 1 year ago" },
+            { "value": "1to2", "text": "1-2 years ago" },
+            { "value": "3to5", "text": "3-5 years ago" },
+            { "value": "moreThan5", "text": "More than 5 years ago" }
+          ],
+          "rows": [
+            { "value": "iot", "text": "Internet of Things (IoT)", "visibleIf": "{implementedTechnologies} contains 'iot'" },
+            { "value": "cloud", "text": "Cloud Computing", "visibleIf": "{implementedTechnologies} contains 'cloud'" },
+            { "value": "bigData", "text": "Big Data Analytics", "visibleIf": "{implementedTechnologies} contains 'bigData'" },
+            { "value": "ai", "text": "AI/Machine Learning", "visibleIf": "{implementedTechnologies} contains 'ai'" },
+            { "value": "ar", "text": "AR/VR", "visibleIf": "{implementedTechnologies} contains 'ar'" },
+            { "value": "robotics", "text": "Advanced Robotics", "visibleIf": "{implementedTechnologies} contains 'robotics'" },
+            { "value": "additive", "text": "3D Printing", "visibleIf": "{implementedTechnologies} contains 'additive'" },
+            { "value": "digital", "text": "Digital Twin", "visibleIf": "{implementedTechnologies} contains 'digital'" },
+            { "value": "blockchain", "text": "Blockchain", "visibleIf": "{implementedTechnologies} contains 'blockchain'" },
+            { "value": "cyber", "text": "Cybersecurity", "visibleIf": "{implementedTechnologies} contains 'cyber'" },
+            { "value": "autonomous", "text": "Autonomous Systems", "visibleIf": "{implementedTechnologies} contains 'autonomous'" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "i40Strategy",
+      "title": "Industry 4.0 Strategy",
+      "description": "Please provide information about your organization's Industry 4.0 strategy.",
+      "elements": [
+        {
+          "type": "radiogroup",
+          "name": "hasI40Strategy",
+          "title": "Does your organization have a formal Industry 4.0 strategy?",
+          "isRequired": true,
+          "choices": [
+            { "value": "yes", "text": "Yes, we have a formal documented strategy" },
+            { "value": "partial", "text": "Partially, we have some elements of a strategy" },
+            { "value": "planning", "text": "No, but we are planning to develop one" },
+            { "value": "no", "text": "No, we do not have an Industry 4.0 strategy" }
+          ]
+        },
+        {
+          "type": "radiogroup",
+          "name": "strategyIntegration",
+          "title": "Is your Industry 4.0 strategy integrated into your overall business plan?",
+          "visibleIf": "{hasI40Strategy} = 'yes' or {hasI40Strategy} = 'partial'",
+          "isRequired": true,
+          "choices": [
+            { "value": "fully", "text": "Fully integrated" },
+            { "value": "partially", "text": "Partially integrated" },
+            { "value": "separate", "text": "Separate from overall business plan" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "strategicFocus",
+          "title": "Which areas does your Industry 4.0 strategy primarily focus on?",
+          "visibleIf": "{hasI40Strategy} = 'yes' or {hasI40Strategy} = 'partial'",
+          "isRequired": true,
+          "choices": [
+            { "value": "efficiency", "text": "Operational efficiency" },
+            { "value": "costReduction", "text": "Cost reduction" },
+            { "value": "customization", "text": "Product/service customization" },
+            { "value": "newBusiness", "text": "New business models" },
+            { "value": "customerExp", "text": "Customer experience" },
+            { "value": "supplyChain", "text": "Supply chain optimization" },
+            { "value": "workforce", "text": "Workforce transformation" },
+            { "value": "quality", "text": "Quality improvement" },
+            { "value": "sustainability", "text": "Sustainability" },
+            { "value": "other", "text": "Other" }
+          ]
+        },
+        {
+          "type": "radiogroup",
+          "name": "executiveCommitment",
+          "title": "What is the level of executive commitment to your Industry 4.0 strategy?",
+          "visibleIf": "{hasI40Strategy} = 'yes' or {hasI40Strategy} = 'partial'",
+          "isRequired": true,
+          "choices": [
+            { "value": "high", "text": "High - C-suite is actively involved" },
+            { "value": "medium", "text": "Medium - Some executive sponsorship" },
+            { "value": "low", "text": "Low - Limited executive involvement" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -5,15 +5,37 @@ export const getSurveys = async (req: Request, res: Response) => {
   try {
     const surveys = await prisma.survey.findMany({
       include: {
-        // title: true,
-        // description: true,
-        // surveyJson: true,
+        responses: {
+          select: {
+            id: true,
+            responseJson: true,
+            processedMetrics: true,
+            createdAt: true
+          }
+        }
       },
+      orderBy: {
+        createdAt: 'desc'
+      }
     });
-    res.status(200).json(surveys);
+
+    // Format response to include response count
+    const formattedSurveys = surveys.map(survey => ({
+      ...survey,
+      responseCount: survey.responses?.length || 0,
+      responses: undefined // Don't send full responses in survey list
+    }));
+
+    res.status(200).json(formattedSurveys);
   } catch (error) {
-    console.error('Error fetching surveys:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('Error fetching surveys:', {
+      error,
+      timestamp: new Date().toISOString()
+    });
+    res.status(500).json({
+      message: 'Failed to fetch surveys',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
 };
 

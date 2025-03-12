@@ -1,0 +1,207 @@
+{
+  "title": "Industry 4.0 Process Digitization and Automation Survey",
+  "description": "This survey assesses the level of digitization and automation in your organization's production and support processes.",
+  "logoPosition": "right",
+  "pages": [
+    {
+      "name": "productionProcesses",
+      "title": "Production Process Digitization and Automation",
+      "description": "Please provide information about the digitization and automation of your production processes.",
+      "elements": [
+        {
+          "type": "text",
+          "name": "totalProductionProcesses",
+          "title": "Total number of distinct production processes in your organization:",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "text",
+          "name": "automatedProcesses",
+          "title": "Number of production processes that are fully or partially automated:",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "matrix",
+          "name": "automationByProcessType",
+          "title": "What is the level of automation for the following production process types?",
+          "isRequired": true,
+          "columns": [
+            { "value": "none", "text": "No Automation (0%)" },
+            { "value": "minimal", "text": "Minimal (1-25%)" },
+            { "value": "partial", "text": "Partial (26-50%)" },
+            { "value": "significant", "text": "Significant (51-75%)" },
+            { "value": "high", "text": "High (76-99%)" },
+            { "value": "full", "text": "Fully Automated (100%)" },
+            { "value": "na", "text": "Not Applicable" }
+          ],
+          "rows": [
+            { "value": "materialHandling", "text": "Material Handling/Movement" },
+            { "value": "assembly", "text": "Assembly Operations" },
+            { "value": "machining", "text": "Machining/Manufacturing" },
+            { "value": "finishing", "text": "Finishing Operations" },
+            { "value": "inspection", "text": "Quality Inspection/Testing" },
+            { "value": "packaging", "text": "Packaging" },
+            { "value": "maintenance", "text": "Maintenance Operations" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "automationTechnologies",
+          "title": "Which automation technologies are used in your production processes?",
+          "isRequired": true,
+          "choices": [
+            { "value": "plc", "text": "Programmable Logic Controllers (PLCs)" },
+            { "value": "robotics", "text": "Industrial Robots" },
+            { "value": "cobots", "text": "Collaborative Robots (Cobots)" },
+            { "value": "agv", "text": "Automated Guided Vehicles (AGVs)" },
+            { "value": "vision", "text": "Machine Vision Systems" },
+            { "value": "additive", "text": "Additive Manufacturing (3D Printing)" },
+            { "value": "cnc", "text": "CNC Machines" },
+            { "value": "scada", "text": "SCADA Systems" },
+            { "value": "mes", "text": "Manufacturing Execution Systems (MES)" },
+            { "value": "digital", "text": "Digital Twin Technology" },
+            { "value": "none", "text": "None of the above" }
+          ]
+        },
+        {
+          "type": "matrix",
+          "name": "automationImpact",
+          "title": "What impact has automation had on the following metrics?",
+          "isRequired": true,
+          "columns": [
+            { "value": "significant_negative", "text": "Significant Negative Impact" },
+            { "value": "moderate_negative", "text": "Moderate Negative Impact" },
+            { "value": "no_impact", "text": "No Impact" },
+            { "value": "moderate_positive", "text": "Moderate Positive Impact" },
+            { "value": "significant_positive", "text": "Significant Positive Impact" },
+            { "value": "not_measured", "text": "Not Measured" }
+          ],
+          "rows": [
+            { "value": "productivity", "text": "Productivity" },
+            { "value": "quality", "text": "Product Quality" },
+            { "value": "consistency", "text": "Process Consistency" },
+            { "value": "cycle", "text": "Cycle Time" },
+            { "value": "downtime", "text": "Unplanned Downtime" },
+            { "value": "costs", "text": "Operational Costs" },
+            { "value": "safety", "text": "Workplace Safety" },
+            { "value": "flexibility", "text": "Production Flexibility" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "supportProcesses",
+      "title": "Support Process Digitization",
+      "description": "Please provide information about the digitization of indirect/support processes in your organization.",
+      "elements": [
+        {
+          "type": "text",
+          "name": "totalSupportProcesses",
+          "title": "Total number of distinct indirect/support processes in your organization:",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "text",
+          "name": "digitizedSupportProcesses",
+          "title": "Number of indirect/support processes that are fully or partially digitized:",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "matrix",
+          "name": "digitizationByDepartment",
+          "title": "What is the level of digitization in the following departments?",
+          "isRequired": true,
+          "columns": [
+            { "value": "none", "text": "No Digitization (0%)" },
+            { "value": "minimal", "text": "Minimal (1-25%)" },
+            { "value": "partial", "text": "Partial (26-50%)" },
+            { "value": "significant", "text": "Significant (51-75%)" },
+            { "value": "high", "text": "High (76-99%)" },
+            { "value": "full", "text": "Fully Digitized (100%)" },
+            { "value": "na", "text": "Not Applicable" }
+          ],
+          "rows": [
+            { "value": "hr", "text": "Human Resources" },
+            { "value": "finance", "text": "Finance & Accounting" },
+            { "value": "procurement", "text": "Procurement & Purchasing" },
+            { "value": "sales", "text": "Sales & Marketing" },
+            { "value": "customerService", "text": "Customer Service" },
+            { "value": "r&d", "text": "Research & Development" },
+            { "value": "planning", "text": "Planning & Scheduling" },
+            { "value": "maintenance", "text": "Maintenance & Facilities" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "digitalTools",
+          "title": "Which digital tools are used for indirect/support processes?",
+          "isRequired": true,
+          "choices": [
+            { "value": "erp", "text": "Enterprise Resource Planning (ERP)" },
+            { "value": "crm", "text": "Customer Relationship Management (CRM)" },
+            { "value": "hcm", "text": "Human Capital Management (HCM)" },
+            { "value": "scm", "text": "Supply Chain Management (SCM)" },
+            { "value": "plm", "text": "Product Lifecycle Management (PLM)" },
+            { "value": "eam", "text": "Enterprise Asset Management (EAM)" },
+            { "value": "bi", "text": "Business Intelligence (BI) Tools" },
+            { "value": "rpa", "text": "Robotic Process Automation (RPA)" },
+            { "value": "km", "text": "Knowledge Management Systems" },
+            { "value": "collaboration", "text": "Digital Collaboration Tools" },
+            { "value": "workflow", "text": "Workflow Automation Tools" },
+            { "value": "none", "text": "None of the above" }
+          ]
+        },
+        {
+          "type": "matrix",
+          "name": "processIntegration",
+          "title": "How well are your digital support processes integrated with core production systems?",
+          "isRequired": true,
+          "columns": [
+            { "value": "not", "text": "Not Integrated" },
+            { "value": "manually", "text": "Manual Integration" },
+            { "value": "partially", "text": "Partially Automated Integration" },
+            { "value": "fully", "text": "Fully Automated Integration" },
+            { "value": "na", "text": "Not Applicable" }
+          ],
+          "rows": [
+            { "value": "hr", "text": "HR Systems" },
+            { "value": "finance", "text": "Finance Systems" },
+            { "value": "procurement", "text": "Procurement Systems" },
+            { "value": "sales", "text": "Sales & Marketing Systems" },
+            { "value": "customerService", "text": "Customer Service Systems" },
+            { "value": "r&d", "text": "R&D Systems" },
+            { "value": "maintenance", "text": "Maintenance Systems" }
+          ]
+        },
+        {
+          "type": "matrix",
+          "name": "digitizationImpact",
+          "title": "What impact has digitization of support processes had on the following metrics?",
+          "isRequired": true,
+          "columns": [
+            { "value": "significant_negative", "text": "Significant Negative Impact" },
+            { "value": "moderate_negative", "text": "Moderate Negative Impact" },
+            { "value": "no_impact", "text": "No Impact" },
+            { "value": "moderate_positive", "text": "Moderate Positive Impact" },
+            { "value": "significant_positive", "text": "Significant Positive Impact" },
+            { "value": "not_measured", "text": "Not Measured" }
+          ],
+          "rows": [
+            { "value": "efficiency", "text": "Process Efficiency" },
+            { "value": "costs", "text": "Administrative Costs" },
+            { "value": "accuracy", "text": "Data Accuracy" },
+            { "value": "decision", "text": "Decision-Making Speed" },
+            { "value": "collaboration", "text": "Cross-Functional Collaboration" },
+            { "value": "reporting", "text": "Reporting Capabilities" },
+            { "value": "employee", "text": "Employee Satisfaction" },
+            { "value": "customer", "text": "Customer Satisfaction" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -8,8 +8,8 @@ interface KPI {
   id: string;
   title: string;
   description: string;
-  value: number | null;
-  previousValue: number | null;
+  value: number;
+  previousValue: number;
   format: 'percentage' | 'number' | 'level' | 'rating';
   trend: 'up' | 'down' | 'neutral';
   category: 'adoption' | 'maturity' | 'integration' | 'personnel' | 'process' | 'technology';
@@ -24,30 +24,23 @@ interface KPICardProps {
 
 export const KPICard: React.FC<KPICardProps> = ({ kpi, isCustomizing, onToggleVisibility }) => {
   // Format the KPI value based on its type
-  const formatValue = (value: number | null, format: KPI['format']) => {
-    if (value === null) return 'N/A';
-    
-    // Format to one decimal place
-    const formattedValue = Number(value).toFixed(1);
-    
+  const formatValue = (value: number, format: KPI['format']) => {
     switch (format) {
       case 'percentage':
-        return `${formattedValue}%`;
+        return `${value}%`;
       case 'number':
-        return Number(formattedValue).toLocaleString();
+        return value.toLocaleString();
       case 'level':
-        return `${formattedValue}/4`; // Assuming 4 is the max level
+        return `${value}/4`; // Assuming 4 is the max level
       case 'rating':
-        return `${formattedValue}/5`; // Assuming 5 is the max rating
+        return `${value}/5`; // Assuming 5 is the max rating
       default:
-        return formattedValue;
+        return value.toString();
     }
   };
 
   // Calculate percent change
-  const percentChange = kpi.value !== null && kpi.previousValue !== null && kpi.previousValue !== 0
-    ? ((kpi.value - kpi.previousValue) / kpi.previousValue * 100).toFixed(1)
-    : null;
+  const percentChange = ((kpi.value - kpi.previousValue) / kpi.previousValue * 100).toFixed(1);
   
   // Determine background color based on category
   const getCategoryColor = (category: KPI['category']) => {
@@ -116,7 +109,7 @@ export const KPICard: React.FC<KPICardProps> = ({ kpi, isCustomizing, onToggleVi
           <div className="flex items-center space-x-1">
             <TrendIcon />
             <span className={`text-sm font-medium ${getTrendColor(kpi.trend)}`}>
-              {kpi.trend !== 'neutral' ? (percentChange !== null ? `${percentChange}%` : 'N/A') : 'No change'}
+              {kpi.trend !== 'neutral' ? `${percentChange}%` : 'No change'}
             </span>
           </div>
         </div>

@@ -34,45 +34,43 @@ model Country {
 }
 
 model Company {
-  name           String          @unique
-  website        String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  iconUrl        String?
-  address        String?
-  city           String?
-  country        String?
-  email          String?
-  foundedYear    Int?
-  latitude       Float?
-  longitude      Float?
-  phone          String?
-  serviceAreas   String[]
-  state          String?
-  capabilities   String?
-  commercial     Boolean?
-  fb_handle      String?
-  residential    Boolean?
-  web_validity   Boolean?
-  distributor    Boolean?
-  id             Int             @id @default(autoincrement())
-  fax            String?
-  industryId     Int             @default(72)
-  postalCode     String?
-  certifications Certification[]
-  industry       Industry        @relation(fields: [industryId], references: [id])
-  projects       CompanyProject[]
-  descriptions   Description[]
-  partnerships   Partnership[]
-  reviews        Review[]
-  services       Service[]
-
-// New relations for I4.0
+  name                      String                     @unique
+  website                   String?
+  createdAt                 DateTime                   @default(now())
+  updatedAt                 DateTime                   @updatedAt
+  iconUrl                   String?
+  address                   String?
+  city                      String?
+  country                   String?
+  email                     String?
+  foundedYear               Int?
+  latitude                  Float?
+  longitude                 Float?
+  phone                     String?
+  serviceAreas              String[]
+  state                     String?
+  capabilities              String?
+  commercial                Boolean?
+  fb_handle                 String?
+  residential               Boolean?
+  web_validity              Boolean?
+  distributor               Boolean?
+  id                        Int                        @id @default(autoincrement())
+  fax                       String?
+  industryId                Int                        @default(72)
+  postalCode                String?
+  certifications            Certification[]
+  industry                  Industry                   @relation(fields: [industryId], references: [id])
+  projects                  CompanyProject?
+  descriptions              Description[]
+  digitalProcesses          DigitalProcess[]
+  partnerships              Partnership[]
+  personnelSkills           PersonnelSkill[]
+  productInnovations        ProductInnovation[]
+  reviews                   Review[]
+  services                  Service[]
+  strategyAssessments       StrategyAssessment[]
   technologyImplementations TechnologyImplementation[]
-  digitalProcesses         DigitalProcess[]
-  personnelSkills         PersonnelSkill[]
-  strategyAssessments     StrategyAssessment[]
-  productInnovations      ProductInnovation[]
 }
 
 model Industry {
@@ -85,7 +83,6 @@ model Industry {
 model CompanyProject {
   name        String
   description String?
-  address    String?
   latitude    Float?
   longitude   Float?
   capacityKw  Float?
@@ -94,6 +91,7 @@ model CompanyProject {
   updatedAt   DateTime       @updatedAt
   id          Int            @id @default(autoincrement())
   companyId   Int            @unique
+  address     String?
   company     Company        @relation(fields: [companyId], references: [id])
   photos      ProjectPhoto[]
 }
@@ -353,168 +351,163 @@ model Survey {
   responses       SurveyResponse[]
   user            User             @relation("SurveyCreator", fields: [userId], references: [id])
 
-  @@index([userId])
+  @@index([userId, status])
   @@map("surveys")
 }
 
 model SurveyResponse {
-  createdAt    DateTime @default(now())
-  responseJson Json
-  updatedAt    DateTime @updatedAt
-  id           Int      @id @default(autoincrement())
-  surveyId     Int
-  userId       Int
-  survey       Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
-  user         User     @relation("SurveyResponseUser", fields: [userId], references: [id])
+  createdAt        DateTime @default(now())
+  responseJson     Json
+  updatedAt        DateTime @updatedAt
+  id               Int      @id @default(autoincrement())
+  surveyId         Int
+  userId           Int
+  processedMetrics Json?
+  survey           Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  user             User     @relation("SurveyResponseUser", fields: [userId], references: [id])
 
-  @@index([surveyId])
+  @@index([surveyId, userId])
   @@map("responses")
 }
 
-
-// New models for I4.0 Analytics
-
 model TechnologyType {
-  id          Int       @id @default(autoincrement())
-  name        String
-  category    String    // Enum: IoT, AI, Robotics, Cloud, etc.
-  description String
-  createdAt   DateTime  @default(now())
+  id              Int                        @id @default(autoincrement())
+  name            String
+  category        String
+  description     String
+  createdAt       DateTime                   @default(now())
   implementations TechnologyImplementation[]
 }
 
 model TechnologyImplementation {
-  id                Int           @id @default(autoincrement())
-  company          Company       @relation(fields: [companyId], references: [id])
-  companyId        Int
-  technologyType   TechnologyType @relation(fields: [technologyTypeId], references: [id])
-  technologyTypeId Int
+  id                 Int            @id @default(autoincrement())
+  companyId          Int
+  technologyTypeId   Int
   implementationDate DateTime
-  maturityLevel    Int           // 1-4
-  status          String        // Enum: Planning, InProgress, Completed
-  investmentAmount Decimal
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  maturityLevel      Int
+  status             String
+  investmentAmount   Decimal
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  company            Company        @relation(fields: [companyId], references: [id])
+  technologyType     TechnologyType @relation(fields: [technologyTypeId], references: [id])
 }
 
 model ProcessType {
-  id          Int       @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   name        String
-  category    String    // Enum: Production, HR, Marketing, Accounting
+  category    String
   description String
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime         @default(now())
   processes   DigitalProcess[]
 }
 
 model DigitalProcess {
-  id                Int           @id @default(autoincrement())
-  company          Company       @relation(fields: [companyId], references: [id])
-  companyId        Int
-  processType      ProcessType   @relation(fields: [processTypeId], references: [id])
-  processTypeId    Int
-  digitizationLevel Int          // 1-5
-  automationLevel  Int          // 1-5
+  id                 Int         @id @default(autoincrement())
+  companyId          Int
+  processTypeId      Int
+  digitizationLevel  Int
+  automationLevel    Int
   implementationDate DateTime
   lastAssessmentDate DateTime
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  company            Company     @relation(fields: [companyId], references: [id])
+  processType        ProcessType @relation(fields: [processTypeId], references: [id])
 }
 
 model Skill {
-  id          Int       @id @default(autoincrement())
-  name        String
-  category    String    // Enum: Technical, Management, Operation
-  i40Relevance Boolean
-  description String
-  createdAt   DateTime  @default(now())
+  id              Int              @id @default(autoincrement())
+  name            String
+  category        String
+  i40Relevance    Boolean
+  description     String
+  createdAt       DateTime         @default(now())
   personnelSkills PersonnelSkill[]
 }
 
 model PersonnelSkill {
-  id                Int           @id @default(autoincrement())
-  company          Company       @relation(fields: [companyId], references: [id])
-  companyId        Int
-  skill           Skill         @relation(fields: [skillId], references: [id])
-  skillId         Int
+  id                Int      @id @default(autoincrement())
+  companyId         Int
+  skillId           Int
   numberOfPersonnel Int
-  proficiencyLevel Int          // 1-5
-  assessmentDate   DateTime
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  proficiencyLevel  Int
+  assessmentDate    DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  company           Company  @relation(fields: [companyId], references: [id])
+  skill             Skill    @relation(fields: [skillId], references: [id])
 }
 
 model StrategyAssessment {
-  id                Int           @id @default(autoincrement())
-  company          Company       @relation(fields: [companyId], references: [id])
-  companyId        Int
-  assessmentDate   DateTime
-  hasI40Strategy   Boolean
-  strategyMaturity Int          // 1-5
-  implementationProgress Int    // 0-100
-  nextReviewDate   DateTime
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id                     Int      @id @default(autoincrement())
+  companyId              Int
+  assessmentDate         DateTime
+  hasI40Strategy         Boolean
+  strategyMaturity       Int
+  implementationProgress Int
+  nextReviewDate         DateTime
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  company                Company  @relation(fields: [companyId], references: [id])
 }
 
 model ProductInnovation {
-  id                Int           @id @default(autoincrement())
-  company          Company       @relation(fields: [companyId], references: [id])
-  companyId        Int
+  id                 Int      @id @default(autoincrement())
+  companyId          Int
   smartFeaturesCount Int
-  customizationLevel Int         // 1-5
-  innovationDate   DateTime
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  customizationLevel Int
+  innovationDate     DateTime
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  company            Company  @relation(fields: [companyId], references: [id])
 }
 
-// Analytics Fact Tables
 model TechnologyImplementationFact {
-  id                Int           @id @default(autoincrement())
-  date             DateTime
-  companyId        Int
-  sectorId         Int
-  technologyCount  Int
-  avgMaturityLevel Decimal
-  totalInvestment  Decimal
+  id                         Int      @id @default(autoincrement())
+  date                       DateTime
+  companyId                  Int
+  sectorId                   Int
+  technologyCount            Int
+  avgMaturityLevel           Decimal
+  totalInvestment            Decimal
   implementationStatusCounts Json
-  createdAt       DateTime      @default(now())
+  createdAt                  DateTime @default(now())
 }
 
 model ProcessDigitizationFact {
-  id                Int           @id @default(autoincrement())
-  date             DateTime
-  companyId        Int
-  sectorId         Int
-  processId        Int
+  id                   Int      @id @default(autoincrement())
+  date                 DateTime
+  companyId            Int
+  sectorId             Int
+  processId            Int
   avgDigitizationLevel Decimal
-  avgAutomationLevel Decimal
-  processCount     Int
-  createdAt       DateTime      @default(now())
+  avgAutomationLevel   Decimal
+  processCount         Int
+  createdAt            DateTime @default(now())
 }
 
 model PersonnelSkillsFact {
-  id                Int           @id @default(autoincrement())
-  date             DateTime
-  companyId        Int
-  sectorId         Int
-  skillCategory    String
+  id                    Int      @id @default(autoincrement())
+  date                  DateTime
+  companyId             Int
+  sectorId              Int
+  skillCategory         String
   totalSkilledPersonnel Int
-  avgProficiencyLevel Decimal
-  createdAt       DateTime      @default(now())
+  avgProficiencyLevel   Decimal
+  createdAt             DateTime @default(now())
 }
 
 model StrategyImplementationFact {
-  id                Int           @id @default(autoincrement())
-  date             DateTime
-  companyId        Int
-  sectorId         Int
-  companiesWithStrategy Int
-  avgStrategyMaturity Decimal
+  id                        Int      @id @default(autoincrement())
+  date                      DateTime
+  companyId                 Int
+  sectorId                  Int
+  companiesWithStrategy     Int
+  avgStrategyMaturity       Decimal
   avgImplementationProgress Decimal
-  createdAt       DateTime      @default(now())
+  createdAt                 DateTime @default(now())
 }
-
-
 
 enum UserRole {
   ADMIN

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Model } from 'survey-core';
 import { Survey } from '@/types';
+import { SurveyMetricService } from '@/services/surveyMetricService';
 import SurveyDisplay from '@/components/surveys/SurveyDisplay'; 
 import { useRouter } from 'next/navigation'
 import { useApiStore } from '@/state/api';
@@ -124,7 +125,7 @@ export default function RespondPage({ params }: PageProps) {
         throw new Error('Invalid response format');
       }
 
-      // Save survey response
+      // Save survey response with metrics processing
       const response = await createSurveyResponse(
         surveyId,
         JSON.stringify(cleanData),
@@ -133,6 +134,17 @@ export default function RespondPage({ params }: PageProps) {
 
       if (!response) {
         throw new Error('Failed to save survey response');
+      }
+
+      // Log metrics for monitoring and debugging
+      if (response.processedMetrics) {
+        console.log('Survey metrics processed:', {
+          confidence: response.processedMetrics.confidenceScores,
+          metrics: response.processedMetrics.metrics,
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        console.warn('Survey response saved but no metrics were processed');
       }
 
       // Show success message and redirect

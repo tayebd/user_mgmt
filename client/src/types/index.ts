@@ -158,11 +158,14 @@ export interface CreateSurveyParams {
   targetResponses: number;
 }
 
+import { ProcessedMetrics } from './metrics';
+
 export interface SurveyResponse {
-  id : number;
+  id: number;
   surveyId: number;
   responseJson: string;
   userId: number;
+  processedMetrics?: ProcessedMetrics;
 }
 
 export enum ProjectStatus {

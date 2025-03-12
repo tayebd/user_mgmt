@@ -1,0 +1,155 @@
+{
+  "title": "Industry 4.0 Digital Maturity and Skills Assessment",
+  "description": "This survey evaluates your organization's digital maturity level and the Industry 4.0 skills of your workforce.",
+  "logoPosition": "right",
+  "pages": [
+    {
+      "name": "digitalMaturity",
+      "title": "Digital Maturity Assessment",
+      "description": "Please assess your organization's maturity level across different Industry 4.0 dimensions.",
+      "elements": [
+        {
+          "type": "matrix",
+          "name": "maturityLevels",
+          "title": "Please rate your organization's digital maturity level in the following areas:",
+          "isRequired": true,
+          "columns": [
+            { "value": 1, "text": "Level 1: Initial/Ad-hoc" },
+            { "value": 2, "text": "Level 2: Managed" },
+            { "value": 3, "text": "Level 3: Defined" },
+            { "value": 4, "text": "Level 4: Quantitatively Managed" },
+            { "value": 5, "text": "Level 5: Optimizing" }
+          ],
+          "rows": [
+            { "value": "strategy", "text": "Digital Strategy and Leadership" },
+            { "value": "operations", "text": "Smart Operations and Production" },
+            { "value": "supplyChain", "text": "Connected Supply Chain" },
+            { "value": "customerExp", "text": "Customer Experience" },
+            { "value": "productDev", "text": "Smart Product Development" },
+            { "value": "dataAnalytics", "text": "Data and Analytics Capabilities" },
+            { "value": "technology", "text": "Technology and Infrastructure" },
+            { "value": "organization", "text": "Organization and Culture" }
+          ]
+        },
+        {
+          "type": "comment",
+          "name": "maturityEvidence",
+          "title": "Please provide examples or evidence for your highest rated areas of maturity:"
+        },
+        {
+          "type": "radiogroup",
+          "name": "comparisonToIndustry",
+          "title": "How would you rate your digital maturity compared to others in your industry?",
+          "isRequired": true,
+          "choices": [
+            { "value": "leader", "text": "Industry leader - significantly ahead of peers" },
+            { "value": "ahead", "text": "Ahead of most competitors" },
+            { "value": "average", "text": "About average for the industry" },
+            { "value": "behind", "text": "Somewhat behind competitors" },
+            { "value": "significantly", "text": "Significantly behind the industry" }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "maturityProgress",
+          "title": "What is your target maturity level to achieve within 2 years? (average across dimensions, 1-5)",
+          "inputType": "number",
+          "min": 1,
+          "max": 5
+        }
+      ]
+    },
+    {
+      "name": "workforce",
+      "title": "Workforce Industry 4.0 Skills",
+      "description": "Please provide information about your workforce's Industry 4.0 skills and capabilities.",
+      "elements": [
+        {
+          "type": "text",
+          "name": "totalEmployees",
+          "title": "Total number of employees in your organization:",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "text",
+          "name": "i40SkillsPersonnel",
+          "title": "Approximate number of employees with Industry 4.0 skills:",
+          "description": "Employees who can use and manage relevant Industry 4.0 technologies",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "matrix",
+          "name": "skillDistribution",
+          "title": "How would you rate your workforce's skills in the following areas?",
+          "isRequired": true,
+          "columns": [
+            { "value": "none", "text": "No Skills" },
+            { "value": "basic", "text": "Basic Skills" },
+            { "value": "intermediate", "text": "Intermediate Skills" },
+            { "value": "advanced", "text": "Advanced Skills" },
+            { "value": "expert", "text": "Expert Skills" }
+          ],
+          "rows": [
+            { "value": "dataAnalytics", "text": "Data Analytics and Visualization" },
+            { "value": "automation", "text": "Automation and Robotics" },
+            { "value": "iot", "text": "IoT and Connected Systems" },
+            { "value": "ai", "text": "Artificial Intelligence/Machine Learning" },
+            { "value": "cloud", "text": "Cloud Computing" },
+            { "value": "cybersecurity", "text": "Cybersecurity" },
+            { "value": "digital", "text": "Digital Design and Engineering" },
+            { "value": "agile", "text": "Agile/Lean Methods" }
+          ]
+        },
+        {
+          "type": "matrix",
+          "name": "departmentSkills",
+          "title": "How would you rate Industry 4.0 skills levels by department?",
+          "isRequired": true,
+          "columns": [
+            { "value": "none", "text": "No Skills" },
+            { "value": "basic", "text": "Basic Skills" },
+            { "value": "intermediate", "text": "Intermediate Skills" },
+            { "value": "advanced", "text": "Advanced Skills" },
+            { "value": "expert", "text": "Expert Skills" },
+            { "value": "na", "text": "Not Applicable" }
+          ],
+          "rows": [
+            { "value": "production", "text": "Production/Operations" },
+            { "value": "engineering", "text": "Engineering/R&D" },
+            { "value": "it", "text": "IT/Technology" },
+            { "value": "supplyChain", "text": "Supply Chain/Logistics" },
+            { "value": "sales", "text": "Sales/Marketing" },
+            { "value": "hr", "text": "Human Resources" },
+            { "value": "finance", "text": "Finance/Accounting" },
+            { "value": "executive", "text": "Executive Leadership" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "trainingMethods",
+          "title": "Which methods do you use to develop Industry 4.0 skills in your workforce?",
+          "isRequired": true,
+          "choices": [
+            { "value": "formal", "text": "Formal training courses" },
+            { "value": "online", "text": "Online learning platforms" },
+            { "value": "mentoring", "text": "Mentoring programs" },
+            { "value": "external", "text": "External certifications" },
+            { "value": "hiring", "text": "Hiring skilled personnel" },
+            { "value": "partners", "text": "Partnerships with educational institutions" },
+            { "value": "hackathons", "text": "Innovation workshops/hackathons" },
+            { "value": "none", "text": "No formal training methods" },
+            { "value": "other", "text": "Other" }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "trainingBudget",
+          "title": "Approximate annual budget allocated to Industry 4.0 skills development (USD):",
+          "inputType": "number"
+        }
+      ]
+    }
+  ]
+}

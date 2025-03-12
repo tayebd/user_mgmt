@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { Company, Review, PVPanel, Inverter, SolarProject, Project, Task,
          Survey, CreateSurveyParams, SurveyResponse, User, ProjectStatus, 
          SurveyStatus, TaskStatus, TaskPriority } from '@/types';
+import { ProcessedMetrics, EnhancedSurveyResponse } from '@/types/metrics';
+import { SurveyMetricService } from '@/services/surveyMetricService';
 import { auth } from '@/lib/firebase';
 
 export interface SearchResults {
@@ -578,7 +580,7 @@ const apiStore = create<ApiState>((set) => ({
     const data = await response.json();
     return data;
   },
-  createSurveyResponse: async (surveyId: number, surveyResponse: string, userId: number) => {
+  createSurveyResponse: async (surveyId: number, surveyResponse: string, userId: number): Promise<EnhancedSurveyResponse> => {
     try {
       // Validate input parameters
       if (!surveyId || !surveyResponse || !userId) {
@@ -597,6 +599,14 @@ const apiStore = create<ApiState>((set) => ({
         throw new Error('Invalid survey response format');
       }
 
+      // Process metrics from survey response
+      const processedResponse = SurveyMetricService.processSurveyResponse({
+        id: 0, // Temporary ID
+        surveyId,
+        responseJson: surveyResponse,
+        userId
+      });
+
       // Get auth token
       const token = await getAuthToken();
       if (!token) {
@@ -610,13 +620,14 @@ const apiStore = create<ApiState>((set) => ({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
             userId,
             responseJson: surveyResponse,
+            processedMetrics: processedResponse.processedMetrics
           }),
-          credentials: 'include',
+          credentials: 'include'
         }
       );
 
@@ -631,7 +642,15 @@ const apiStore = create<ApiState>((set) => ({
         throw new Error('No response data received');
       }
 
-      return data;
+      // Log successful metrics processing
+      console.log('Survey response processed successfully:', {
+        surveyId,
+        userId,
+        hasMetrics: !!data.processedMetrics,
+        timestamp: new Date().toISOString()
+      });
+
+      return data as EnhancedSurveyResponse;
     } catch (error) {
       // Log error details for debugging
       console.error('Survey response creation error:', {

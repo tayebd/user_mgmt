@@ -1,0 +1,527 @@
+{
+  "title": "Industry 4.0 Assessment: Data Management and Technological Maturity",
+  "description": "This survey evaluates your organization's capabilities in data management, analytics, and related technologies.",
+  "logoPosition": "right",
+  "pages": [
+    {
+      "name": "companyInfo",
+      "title": "Company Information",
+      "elements": [
+        {
+          "type": "dropdown",
+          "name": "industrySector",
+          "title": "Industry Sector",
+          "isRequired": true,
+          "choices": [
+            "Manufacturing", 
+            "Automotive", 
+            "Aerospace", 
+            "Electronics", 
+            "Consumer Goods",
+            "Healthcare", 
+            "Energy", 
+            "Chemical", 
+            "Other"
+          ]
+        },
+        {
+          "type": "dropdown",
+          "name": "companySize",
+          "title": "Company Size",
+          "isRequired": true,
+          "choices": [
+            "Small (1-50 employees)",
+            "Medium (51-250 employees)",
+            "Large (251-1000 employees)",
+            "Enterprise (1000+ employees)"
+          ]
+        },
+        {
+          "type": "dropdown",
+          "name": "region",
+          "title": "Geographic Region",
+          "isRequired": true,
+          "choices": [
+            "North America",
+            "South America",
+            "Europe",
+            "Asia-Pacific",
+            "Middle East & Africa"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dataCollection",
+      "title": "Data Collection and Storage",
+      "elements": [
+        {
+          "type": "checkbox",
+          "name": "dataTypes",
+          "title": "What types of data does your organization collect and manage?",
+          "isRequired": true,
+          "choices": [
+            "Production/operational data",
+            "Product performance data",
+            "Supply chain data",
+            "Customer data",
+            "Equipment/machine data",
+            "Environmental data",
+            "Quality control data",
+            "Employee/workforce data",
+            "Financial/business data"
+          ],
+          "hasOther": true,
+          "otherText": "Other (please specify)"
+        },
+        {
+          "type": "dropdown",
+          "name": "dataVolume",
+          "title": "What is the approximate volume of data your organization processes daily?",
+          "isRequired": true,
+          "choices": [
+            "Less than 1 GB",
+            "1-10 GB",
+            "10-100 GB",
+            "100 GB - 1 TB",
+            "1-10 TB",
+            "More than 10 TB"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "dataSources",
+          "title": "What are your primary data sources?",
+          "isRequired": true,
+          "choices": [
+            "IoT sensors/devices",
+            "Production machinery",
+            "Enterprise systems (ERP, CRM, etc.)",
+            "Customer interactions",
+            "Manual data entry",
+            "Third-party data sources",
+            "Web/social media",
+            "Mobile applications"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "dataStorage",
+          "title": "How is your data primarily stored?",
+          "isRequired": true,
+          "choices": [
+            "On-premise databases",
+            "Cloud storage",
+            "Data lakes",
+            "Data warehouses",
+            "Hybrid storage solutions",
+            "Edge storage devices",
+            "Distributed storage systems"
+          ]
+        },
+        {
+          "type": "rating",
+          "name": "realTimeData",
+          "title": "To what extent do you have real-time data collection capabilities?",
+          "isRequired": true,
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "No real-time capabilities",
+          "maxRateDescription": "Comprehensive real-time data across operations"
+        }
+      ]
+    },
+    {
+      "name": "dataIntegration",
+      "title": "Data Integration and Management",
+      "elements": [
+        {
+          "type": "dropdown",
+          "name": "dataIntegrationLevel",
+          "title": "How would you describe your level of data integration across systems?",
+          "isRequired": true,
+          "choices": [
+            "Siloed data with no integration",
+            "Limited integration between few systems",
+            "Moderate integration across main systems",
+            "High level of integration across most systems",
+            "Fully integrated data ecosystem across all systems"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "dataManagementTools",
+          "title": "Which data management tools/platforms do you use?",
+          "isRequired": true,
+          "choices": [
+            "Traditional database management systems",
+            "Big data platforms (Hadoop, Spark, etc.)",
+            "Data integration/ETL tools",
+            "Cloud data services",
+            "Master data management solutions",
+            "Data governance platforms",
+            "Data quality management tools",
+            "None"
+          ],
+          "hasOther": true,
+          "otherText": "Other (please specify)"
+        },
+        {
+          "type": "rating",
+          "name": "dataQuality",
+          "title": "How would you rate your organization's data quality practices?",
+          "isRequired": true,
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "No formal data quality measures",
+          "maxRateDescription": "Comprehensive data quality framework"
+        },
+        {
+          "type": "dropdown",
+          "name": "masterDataManagement",
+          "title": "What level of master data management have you implemented?",
+          "isRequired": true,
+          "choices": [
+            "No master data management",
+            "Basic data definitions and standards",
+            "Partial implementation for critical data domains",
+            "Comprehensive MDM across most data domains",
+            "Advanced MDM with governance across all domains"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "dataGovernanceElements",
+          "title": "Which data governance elements have you implemented?",
+          "isRequired": true,
+          "choices": [
+            "Data ownership definitions",
+            "Data quality standards",
+            "Data access policies",
+            "Data lifecycle management",
+            "Regulatory compliance procedures",
+            "Data cataloging",
+            "Metadata management",
+            "None"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dataAnalytics",
+      "title": "Data Analytics Capabilities",
+      "elements": [
+        {
+          "type": "dropdown",
+          "name": "analyticsSophistication",
+          "title": "What is the sophistication level of your data analytics?",
+          "isRequired": true,
+          "choices": [
+            "Basic reporting only",
+            "Standard business intelligence",
+            "Advanced analytics with some predictive capabilities",
+            "Comprehensive predictive and prescriptive analytics",
+            "AI/ML-driven analytics with autonomous decision support"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "analyticsTools",
+          "title": "Which analytics tools/technologies do you use?",
+          "isRequired": true,
+          "choices": [
+            "Basic reporting tools",
+            "Business intelligence platforms",
+            "Statistical analysis software",
+            "Data visualization tools",
+            "Predictive analytics solutions",
+            "Machine learning platforms",
+            "AI frameworks",
+            "Custom analytics solutions",
+            "None"
+          ]
+        },
+        {
+          "type": "text",
+          "name": "analyticsCoverage",
+          "title": "What percentage of your business processes are supported by analytics?",
+          "inputType": "number",
+          "min": 0,
+          "max": 100,
+          "isRequired": true
+        },
+        {
+          "type": "dropdown",
+          "name": "dataVisualization",
+          "title": "How advanced are your data visualization capabilities?",
+          "isRequired": true,
+          "choices": [
+            "Basic static reports and charts",
+            "Standard dashboards with limited interactivity",
+            "Interactive visualizations with drill-down capabilities",
+            "Advanced visualizations with real-time updates",
+            "Immersive visualizations (AR/VR) with predictive elements"
+          ]
+        },
+        {
+          "type": "rating",
+          "name": "dataDrivenDecisions",
+          "title": "To what extent are decisions in your organization data-driven?",
+          "isRequired": true,
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "Decisions rarely based on data",
+          "maxRateDescription": "Comprehensive data-driven decision making"
+        },
+        {
+          "type": "text",
+          "name": "dataUtilizationRate",
+          "title": "What percentage of your collected data is actually analyzed and utilized?",
+          "inputType": "number",
+          "min": 0,
+          "max": 100,
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "name": "advancedDataTechnologies",
+      "title": "Advanced Data Technologies",
+      "elements": [
+        {
+          "type": "checkbox",
+          "name": "aiApplications",
+          "title": "In which areas is your organization applying AI/ML technologies?",
+          "choices": [
+            "Predictive maintenance",
+            "Quality control",
+            "Demand forecasting",
+            "Process optimization",
+            "Product development",
+            "Customer service/engagement",
+            "Supply chain optimization",
+            "Decision support",
+            "Not currently using AI/ML"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "digitalTwinUsage",
+          "title": "How are you utilizing digital twin technology?",
+          "choices": [
+            "Product design and development",
+            "Manufacturing process simulation",
+            "Remote asset monitoring",
+            "Predictive maintenance",
+            "Performance optimization",
+            "Training and education",
+            "Not using digital twins"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "edgeComputing",
+          "title": "How are you implementing edge computing in your operations?",
+          "choices": [
+            "Real-time data processing",
+            "Local decision making",
+            "Reduced data transmission",
+            "Enhanced security/privacy",
+            "Remote operations support",
+            "Not implementing edge computing"
+          ]
+        },
+        {
+          "type": "rating",
+          "name": "advancedTechMaturity",
+          "title": "How would you rate your overall maturity in implementing advanced data technologies?",
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "Early experimental stage",
+          "maxRateDescription": "Advanced implementation at scale"
+        }
+      ]
+    },
+    {
+      "name": "dataSecurity",
+      "title": "Data Security and Privacy",
+      "elements": [
+        {
+          "type": "dropdown",
+          "name": "dataSecurityMaturity",
+          "title": "How mature is your data security framework?",
+          "isRequired": true,
+          "choices": [
+            "Basic security measures only",
+            "Standard security protocols with limited monitoring",
+            "Comprehensive security framework with regular audits",
+            "Advanced security with real-time monitoring and threat response",
+            "State-of-the-art security with predictive threat intelligence"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "securityMeasures",
+          "title": "Which data security measures have you implemented?",
+          "isRequired": true,
+          "choices": [
+            "Data encryption",
+            "Access control systems",
+            "Authentication protocols",
+            "Regular security audits",
+            "Intrusion detection systems",
+            "Data loss prevention tools",
+            "Employee security training",
+            "Third-party security assessments"
+          ]
+        },
+        {
+          "type": "text",
+          "name": "securityIncidents",
+          "title": "How many data security incidents has your organization experienced in the past 12 months?",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "dropdown",
+          "name": "privacyCompliance",
+          "title": "What is your level of data privacy compliance?",
+          "isRequired": true,
+          "choices": [
+            "Minimal compliance efforts",
+            "Basic compliance with main regulations",
+            "Comprehensive compliance program with regular updates",
+            "Advanced compliance with privacy by design principles",
+            "Industry-leading compliance with proactive measures"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dataStrategy",
+      "title": "Data Strategy and Organization",
+      "elements": [
+        {
+          "type": "dropdown",
+          "name": "formalDataStrategy",
+          "title": "Do you have a formal data strategy?",
+          "isRequired": true,
+          "choices": [
+            "No formal strategy",
+            "Basic strategy with limited scope",
+            "Comprehensive strategy but limited implementation",
+            "Well-developed strategy with significant implementation",
+            "Mature strategy fully integrated with business objectives"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "dataRoles",
+          "title": "Which specialized data roles exist in your organization?",
+          "isRequired": true,
+          "choices": [
+            "Chief Data Officer (CDO)",
+            "Data Scientists",
+            "Data Engineers",
+            "Data Analysts",
+            "Data Architects",
+            "Data Governance Specialists",
+            "AI/ML Specialists",
+            "None of the above"
+          ]
+        },
+        {
+          "type": "text",
+          "name": "dataStaffPercentage",
+          "title": "What percentage of your workforce is focused on data management and analytics?",
+          "inputType": "number",
+          "min": 0,
+          "max": 100,
+          "isRequired": true
+        },
+        {
+          "type": "rating",
+          "name": "dataLiteracy",
+          "title": "How would you rate the overall data literacy in your organization?",
+          "isRequired": true,
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "Very limited understanding of data",
+          "maxRateDescription": "High data literacy across organization"
+        },
+        {
+          "type": "text",
+          "name": "dataInvestment",
+          "title": "What percentage of your IT budget is allocated to data management and analytics?",
+          "inputType": "number",
+          "min": 0,
+          "max": 100,
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "name": "dataValueAndChallenges",
+      "title": "Data Value and Challenges",
+      "elements": [
+        {
+          "type": "rating",
+          "name": "dataValueCreation",
+          "title": "How effectively is your organization creating value from data?",
+          "isRequired": true,
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "Minimal value creation",
+          "maxRateDescription": "Significant value creation across organization"
+        },
+        {
+          "type": "checkbox",
+          "name": "dataValueAreas",
+          "title": "In which areas has data analytics created the most value?",
+          "isRequired": true,
+          "choices": [
+            "Cost reduction",
+            "Process efficiency",
+            "Product quality",
+            "Customer experience",
+            "New product development",
+            "Market insights",
+            "Predictive maintenance",
+            "Supply chain optimization",
+            "Revenue growth"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "dataChallenges",
+          "title": "What are your biggest challenges in data management?",
+          "isRequired": true,
+          "choices": [
+            "Data quality issues",
+            "Integration of disparate systems",
+            "Lack of specialized skills",
+            "Technology limitations",
+            "Budget constraints",
+            "Security/privacy concerns",
+            "Organizational resistance",
+            "Keeping pace with technology changes",
+            "Proving ROI of data initiatives"
+          ]
+        },
+        {
+          "type": "text",
+          "name": "dataROI",
+          "title": "What ROI (%) have you achieved on your data management investments?",
+          "inputType": "number"
+        },
+        {
+          "type": "comment",
+          "name": "additionalComments",
+          "title": "Please share any additional insights about your data management journey"
+        }
+      ]
+    }
+  ],
+  "showQuestionNumbers": "off",
+  "completedHtml": "<h4>Thank you for completing the Data Management and Technological Maturity assessment!</h4>"
+}

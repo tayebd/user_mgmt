@@ -1,0 +1,383 @@
+{
+  "title": "Industry 4.0 Assessment: Product Development and Customization",
+  "description": "This survey evaluates your organization's maturity in smart product development and customization capabilities.",
+  "logoPosition": "right",
+  "pages": [
+    {
+      "name": "companyInfo",
+      "title": "Company Information",
+      "elements": [
+        {
+          "type": "dropdown",
+          "name": "industrySector",
+          "title": "Industry Sector",
+          "isRequired": true,
+          "choices": [
+            "Manufacturing", 
+            "Automotive", 
+            "Aerospace", 
+            "Electronics", 
+            "Consumer Goods",
+            "Healthcare", 
+            "Energy", 
+            "Chemical", 
+            "Other"
+          ]
+        },
+        {
+          "type": "dropdown",
+          "name": "companySize",
+          "title": "Company Size",
+          "isRequired": true,
+          "choices": [
+            "Small (1-50 employees)",
+            "Medium (51-250 employees)",
+            "Large (251-1000 employees)",
+            "Enterprise (1000+ employees)"
+          ]
+        },
+        {
+          "type": "dropdown",
+          "name": "region",
+          "title": "Geographic Region",
+          "isRequired": true,
+          "choices": [
+            "North America",
+            "South America",
+            "Europe",
+            "Asia-Pacific",
+            "Middle East & Africa"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "productSmartification",
+      "title": "Product Smartification",
+      "description": "Assessment of intelligent technologies integration in your products",
+      "elements": [
+        {
+          "type": "dropdown",
+          "name": "primaryProductCategory",
+          "title": "Primary Product Category",
+          "isRequired": true,
+          "choices": [
+            "Industrial Equipment",
+            "Consumer Electronics",
+            "Vehicles/Transportation",
+            "Medical Devices",
+            "Home Appliances",
+            "Industrial Components",
+            "Other"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "smartTechnologies",
+          "title": "Which smart technologies are integrated into your products?",
+          "isRequired": true,
+          "choices": [
+            "Sensors/IoT Connectivity",
+            "Embedded Software",
+            "Mobile App Connection",
+            "Data Collection Capabilities",
+            "Remote Monitoring",
+            "Predictive Maintenance Features",
+            "AI/Machine Learning Capabilities",
+            "Cloud Connectivity",
+            "None of the above"
+          ]
+        },
+        {
+          "type": "rating",
+          "name": "smartificationLevel",
+          "title": "On a scale of 1-5, how would you rate the overall 'smartness' of your products?",
+          "isRequired": true,
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "Basic products with minimal smart features",
+          "maxRateDescription": "Fully integrated smart products with advanced capabilities"
+        },
+        {
+          "type": "text",
+          "name": "smartFeaturesCount",
+          "title": "On average, how many smart features does each of your products contain?",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "dropdown",
+          "name": "dataCollectionCapabilities",
+          "title": "What level of data collection do your products support?",
+          "isRequired": true,
+          "choices": [
+            "No data collection",
+            "Basic operational data only",
+            "Moderate level of usage and performance data",
+            "Comprehensive data across multiple parameters",
+            "Advanced real-time data with predictive capabilities"
+          ]
+        },
+        {
+          "type": "text",
+          "name": "smartProductRevenue",
+          "title": "What percentage of your revenue comes from 'smart' products?",
+          "inputType": "number",
+          "isRequired": true,
+          "min": 0,
+          "max": 100
+        }
+      ]
+    },
+    {
+      "name": "productIndividualization",
+      "title": "Product Individualization",
+      "description": "Assessment of your product customization capabilities",
+      "elements": [
+        {
+          "type": "checkbox",
+          "name": "customizationOptions",
+          "title": "What types of customization do you offer to customers?",
+          "isRequired": true,
+          "choices": [
+            "Aesthetic customization (colors, finishes, etc.)",
+            "Functional customization (features, capabilities)",
+            "Performance customization (power, speed, etc.)",
+            "Component selection",
+            "Software/firmware customization",
+            "Complete made-to-order products",
+            "None of the above"
+          ]
+        },
+        {
+          "type": "text",
+          "name": "customizableParameters",
+          "title": "How many parameters can customers customize in your typical product?",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "dropdown",
+          "name": "massCustomizationCapability",
+          "title": "What is your mass customization capability?",
+          "isRequired": true,
+          "choices": [
+            "No mass customization capability",
+            "Basic customization with significant lead time",
+            "Moderate customization with some impact on production",
+            "Advanced customization with minimal production impact",
+            "Full mass customization at scale with no production penalty"
+          ]
+        },
+        {
+          "type": "text",
+          "name": "customProductDeliveryTime",
+          "title": "What is your average delivery time for customized products (in days)?",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "rating",
+          "name": "customizationSatisfaction",
+          "title": "Based on your customer feedback, how satisfied are customers with your customization options?",
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "Not satisfied",
+          "maxRateDescription": "Extremely satisfied"
+        },
+        {
+          "type": "text",
+          "name": "customizationPricePremium",
+          "title": "What percentage price premium do customers typically pay for customized products?",
+          "inputType": "number",
+          "min": 0,
+          "isRequired": true
+        },
+        {
+          "type": "dropdown",
+          "name": "configurationTools",
+          "title": "What tools do you offer customers to configure/customize products?",
+          "isRequired": true,
+          "choices": [
+            "None",
+            "Simple option selection",
+            "Basic online configurator",
+            "Advanced online configurator with visualization",
+            "AR/VR product customization experience",
+            "AI-powered recommendation engine"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "developmentProcess",
+      "title": "Smart Product Development Process",
+      "elements": [
+        {
+          "type": "checkbox",
+          "name": "designTools",
+          "title": "Which digital tools are used in your product development process?",
+          "isRequired": true,
+          "choices": [
+            "CAD/CAM software",
+            "Digital twin technology",
+            "Simulation software",
+            "Virtual prototyping",
+            "3D printing for prototyping",
+            "PLM (Product Lifecycle Management) software",
+            "Collaborative design platforms",
+            "None of the above"
+          ]
+        },
+        {
+          "type": "text",
+          "name": "productDevelopmentTime",
+          "title": "What is your average product development time from concept to market (in months)?",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "dropdown",
+          "name": "customerInvolvement",
+          "title": "How are customers involved in your product development process?",
+          "isRequired": true,
+          "choices": [
+            "No customer involvement",
+            "Basic market research only",
+            "Customer feedback on prototypes",
+            "Co-creation with select customers",
+            "Open innovation with customer community",
+            "Real-time feedback integration in development"
+          ]
+        },
+        {
+          "type": "rating",
+          "name": "digitalMaturityProductDev",
+          "title": "How would you rate your digital maturity in product development?",
+          "isRequired": true,
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "Traditional methods with minimal digital tools",
+          "maxRateDescription": "Fully digital, data-driven development process"
+        },
+        {
+          "type": "text",
+          "name": "iterationSpeed",
+          "title": "How many product iterations/versions can you typically develop in a year?",
+          "inputType": "number",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "name": "productDataUtilization",
+      "title": "Product Data Collection and Utilization",
+      "elements": [
+        {
+          "type": "checkbox",
+          "name": "productDataTypes",
+          "title": "What types of data do your products collect?",
+          "isRequired": true,
+          "choices": [
+            "Usage patterns",
+            "Performance metrics",
+            "Environmental data",
+            "User preferences",
+            "Maintenance/service needs",
+            "Location data",
+            "Interaction with other devices/systems",
+            "No data collection"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "dataUse",
+          "title": "How is collected product data utilized?",
+          "isRequired": true,
+          "choices": [
+            "Product improvement",
+            "Predictive maintenance",
+            "Customer experience enhancement",
+            "Service optimization",
+            "New product development",
+            "Business model development (e.g., as-a-service)",
+            "Not currently utilized",
+            "We don't collect product data"
+          ]
+        },
+        {
+          "type": "dropdown",
+          "name": "productAnalytics",
+          "title": "What level of product analytics capabilities do you have?",
+          "isRequired": true,
+          "choices": [
+            "No analytics capabilities",
+            "Basic reporting only",
+            "Moderate analysis with some insights generation",
+            "Advanced analytics with actionable insights",
+            "Predictive analytics with autonomous decision-making"
+          ]
+        },
+        {
+          "type": "rating",
+          "name": "productDataStrategy",
+          "title": "How mature is your product data strategy?",
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "No formal strategy",
+          "maxRateDescription": "Comprehensive strategy driving business decisions"
+        }
+      ]
+    },
+    {
+      "name": "futureDirections",
+      "title": "Future Product Development Plans",
+      "elements": [
+        {
+          "type": "checkbox",
+          "name": "plannedSmartFeatures",
+          "title": "Which smart features do you plan to add to your products in the next 2 years?",
+          "choices": [
+            "Enhanced connectivity (5G, etc.)",
+            "Advanced AI/ML capabilities",
+            "Expanded IoT functionality",
+            "Voice/gesture control",
+            "Augmented reality features",
+            "Autonomous operation capabilities",
+            "Enhanced data collection and analytics",
+            "None planned"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "customizationExpansion",
+          "title": "How do you plan to expand your customization capabilities?",
+          "choices": [
+            "More customizable parameters",
+            "Faster customization delivery",
+            "Lower cost customization",
+            "Enhanced visualization tools",
+            "AI-driven personalization",
+            "Customer co-creation platforms",
+            "No expansion planned"
+          ]
+        },
+        {
+          "type": "text",
+          "name": "smartProductInvestment",
+          "title": "What percentage of your R&D budget is allocated to smart product development?",
+          "inputType": "number",
+          "min": 0,
+          "max": 100
+        },
+        {
+          "type": "comment",
+          "name": "productChallenges",
+          "title": "What are your biggest challenges in implementing smart and customizable products?"
+        }
+      ]
+    }
+  ],
+  "showQuestionNumbers": "off",
+  "completedHtml": "<h4>Thank you for completing the Product Development and Customization assessment!</h4>"
+}

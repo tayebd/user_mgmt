@@ -1,0 +1,394 @@
+{
+  "title": "Industry 4.0 IT Systems and Digital Transformation Assessment",
+  "description": "This comprehensive assessment evaluates your organization's IT infrastructure maturity, system integration capabilities, and digital transformation readiness.",
+  "logoPosition": "right",
+  "pages": [
+    {
+      "name": "itSystems",
+      "title": "IT Systems Integration and Coverage",
+      "description": "Please provide information about your organization's IT systems and their integration.",
+      "elements": [
+        {
+          "type": "text",
+          "name": "totalITSystems",
+          "title": "Total number of distinct IT systems in your organization:",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "checkbox",
+          "name": "itSystemTypes",
+          "title": "Which of the following IT systems are deployed in your organization?",
+          "isRequired": true,
+          "choices": [
+            { "value": "erp", "text": "Enterprise Resource Planning (ERP)" },
+            { "value": "crm", "text": "Customer Relationship Management (CRM)" },
+            { "value": "scm", "text": "Supply Chain Management (SCM)" },
+            { "value": "plm", "text": "Product Lifecycle Management (PLM)" },
+            { "value": "mes", "text": "Manufacturing Execution System (MES)" },
+            { "value": "wms", "text": "Warehouse Management System (WMS)" },
+            { "value": "qms", "text": "Quality Management System (QMS)" },
+            { "value": "cam", "text": "Computer-Aided Manufacturing (CAM)" },
+            { "value": "cad", "text": "Computer-Aided Design (CAD)" },
+            { "value": "cmms", "text": "Computerized Maintenance Management System (CMMS)" },
+            { "value": "bi", "text": "Business Intelligence (BI) & Analytics" },
+            { "value": "eam", "text": "Enterprise Asset Management (EAM)" },
+            { "value": "iot", "text": "IoT Platform" },
+            { "value": "ai_ml", "text": "AI/ML Platform" },
+            { "value": "rpa", "text": "Robotic Process Automation (RPA)" },
+            { "value": "dms", "text": "Document Management System" },
+            { "value": "bpm", "text": "Business Process Management" },
+            { "value": "none", "text": "None of the above" }
+          ]
+        },
+        {
+          "type": "matrix",
+          "name": "systemCoverage",
+          "title": "For each business function, to what extent are your operations covered by IT systems?",
+          "isRequired": true,
+          "columns": [
+            { "value": "none", "text": "No Coverage (0%)" },
+            { "value": "minimal", "text": "Minimal Coverage (1-25%)" },
+            { "value": "partial", "text": "Partial Coverage (26-50%)" },
+            { "value": "significant", "text": "Significant Coverage (51-75%)" },
+            { "value": "high", "text": "High Coverage (76-99%)" },
+            { "value": "full", "text": "Full Coverage (100%)" },
+            { "value": "na", "text": "Not Applicable" }
+          ],
+          "rows": [
+            { "value": "productionPlanning", "text": "Production Planning & Scheduling" },
+            { "value": "inventoryManagement", "text": "Inventory Management" },
+            { "value": "qualityControl", "text": "Quality Control" },
+            { "value": "maintenanceManagement", "text": "Maintenance Management" },
+            { "value": "supplyChain", "text": "Supply Chain Management" },
+            { "value": "productDevelopment", "text": "Product Development" },
+            { "value": "customerManagement", "text": "Customer Management" },
+            { "value": "hr", "text": "Human Resources" },
+            { "value": "financeAccounting", "text": "Finance & Accounting" },
+            { "value": "reporting", "text": "Analytics & Reporting" }
+          ]
+        },
+        {
+          "type": "matrix",
+          "name": "systemIntegration",
+          "title": "How well are the following systems integrated with each other?",
+          "description": "Integration level refers to automated data sharing between systems without manual intervention",
+          "isRequired": true,
+          "columns": [
+            { "value": "not", "text": "Not Integrated" },
+            { "value": "manual", "text": "Manual Integration" },
+            { "value": "partial", "text": "Partially Automated" },
+            { "value": "full", "text": "Fully Automated" },
+            { "value": "na", "text": "Not Applicable" }
+          ],
+          "rows": [
+            { "value": "erpMes", "text": "ERP and MES", "visibleIf": "{itSystemTypes} contains 'erp' and {itSystemTypes} contains 'mes'" },
+            { "value": "erpScm", "text": "ERP and SCM", "visibleIf": "{itSystemTypes} contains 'erp' and {itSystemTypes} contains 'scm'" },
+            { "value": "erpCrm", "text": "ERP and CRM", "visibleIf": "{itSystemTypes} contains 'erp' and {itSystemTypes} contains 'crm'" },
+            { "value": "mesCam", "text": "MES and CAM", "visibleIf": "{itSystemTypes} contains 'mes' and {itSystemTypes} contains 'cam'" },
+            { "value": "plmCad", "text": "PLM and CAD", "visibleIf": "{itSystemTypes} contains 'plm' and {itSystemTypes} contains 'cad'" },
+            { "value": "scmWms", "text": "SCM and WMS", "visibleIf": "{itSystemTypes} contains 'scm' and {itSystemTypes} contains 'wms'" },
+            { "value": "mesQms", "text": "MES and QMS", "visibleIf": "{itSystemTypes} contains 'mes' and {itSystemTypes} contains 'qms'" },
+            { "value": "biErp", "text": "BI Tools and ERP", "visibleIf": "{itSystemTypes} contains 'bi' and {itSystemTypes} contains 'erp'" }
+          ]
+        },
+        {
+          "type": "matrix",
+          "name": "systemCapabilities",
+          "title": "Rate the capabilities of your IT systems in the following areas:",
+          "isRequired": true,
+          "columns": [
+            { "value": "none", "text": "Not Available" },
+            { "value": "basic", "text": "Basic" },
+            { "value": "intermediate", "text": "Intermediate" },
+            { "value": "advanced", "text": "Advanced" },
+            { "value": "cutting_edge", "text": "Cutting Edge" }
+          ],
+          "rows": [
+            { "value": "realtime_data", "text": "Real-time Data Processing" },
+            { "value": "predictive_analytics", "text": "Predictive Analytics" },
+            { "value": "automation", "text": "Process Automation" },
+            { "value": "ai_capabilities", "text": "AI/ML Capabilities" },
+            { "value": "data_visualization", "text": "Data Visualization" },
+            { "value": "mobile_access", "text": "Mobile Accessibility" },
+            { "value": "api_integration", "text": "API Integration" },
+            { "value": "security", "text": "Security Features" }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "apiConnections",
+          "title": "Number of API connection points between your systems:",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "checkbox",
+          "name": "integrationMethods",
+          "title": "Which integration methods are used between your IT systems?",
+          "isRequired": true,
+          "choices": [
+            { "value": "apis", "text": "APIs/Web Services" },
+            { "value": "esb", "text": "Enterprise Service Bus (ESB)" },
+            { "value": "etl", "text": "ETL Tools" },
+            { "value": "middleware", "text": "Middleware" },
+            { "value": "custom", "text": "Custom Point-to-Point Integrations" },
+            { "value": "manual", "text": "Manual Data Transfer" },
+            { "value": "ipaaS", "text": "Integration Platform as a Service (iPaaS)" },
+            { "value": "none", "text": "No integration" }
+          ]
+        },
+        {
+          "type": "radiogroup",
+          "name": "dataStandardization",
+          "title": "To what extent have you standardized data formats across systems?",
+          "isRequired": true,
+          "choices": [
+            { "value": "none", "text": "No standardization" },
+            { "value": "minimal", "text": "Minimal standardization (few common data elements)" },
+            { "value": "partial", "text": "Partial standardization (some master data management)" },
+            { "value": "significant", "text": "Significant standardization (most critical data standardized)" },
+            { "value": "full", "text": "Full standardization (enterprise-wide data model)" }
+          ]
+        },
+        {
+          "type": "matrix",
+          "name": "dataAnalytics",
+          "title": "Rate your organization's data analytics capabilities:",
+          "isRequired": true,
+          "columns": [
+            { "value": "none", "text": "Not Implemented" },
+            { "value": "planning", "text": "Planning Stage" },
+            { "value": "basic", "text": "Basic Implementation" },
+            { "value": "advanced", "text": "Advanced Implementation" },
+            { "value": "optimized", "text": "Fully Optimized" }
+          ],
+          "rows": [
+            { "value": "descriptive", "text": "Descriptive Analytics (What happened?)" },
+            { "value": "diagnostic", "text": "Diagnostic Analytics (Why did it happen?)" },
+            { "value": "predictive", "text": "Predictive Analytics (What might happen?)" },
+            { "value": "prescriptive", "text": "Prescriptive Analytics (What should we do?)" },
+            { "value": "realtime", "text": "Real-time Analytics" },
+            { "value": "bigdata", "text": "Big Data Processing" }
+          ]
+        },
+        {
+          "type": "matrix",
+          "name": "automationLevel",
+          "title": "What is the level of automation in your IT processes?",
+          "isRequired": true,
+          "columns": [
+            { "value": "manual", "text": "Fully Manual" },
+            { "value": "partially", "text": "Partially Automated" },
+            { "value": "mostly", "text": "Mostly Automated" },
+            { "value": "fully", "text": "Fully Automated" },
+            { "value": "intelligent", "text": "Intelligent Automation" }
+          ],
+          "rows": [
+            { "value": "data_collection", "text": "Data Collection" },
+            { "value": "data_processing", "text": "Data Processing" },
+            { "value": "reporting", "text": "Reporting" },
+            { "value": "decision_making", "text": "Decision Making" },
+            { "value": "process_execution", "text": "Process Execution" },
+            { "value": "error_handling", "text": "Error Handling" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cloudTechnology",
+      "title": "Cloud Technology Integration",
+      "description": "Please provide information about your organization's adoption of cloud technologies.",
+      "elements": [
+        {
+          "type": "text",
+          "name": "totalApplications",
+          "title": "Total number of business applications in your organization:",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "text",
+          "name": "cloudApplications",
+          "title": "Number of applications deployed in the cloud:",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "radiogroup",
+          "name": "dataStorage",
+          "title": "What percentage of your organization's data is stored in the cloud?",
+          "isRequired": true,
+          "choices": [
+            { "value": "none", "text": "None (0%)" },
+            { "value": "minimal", "text": "Minimal (1-25%)" },
+            { "value": "partial", "text": "Partial (26-50%)" },
+            { "value": "significant", "text": "Significant (51-75%)" },
+            { "value": "majority", "text": "Majority (76-99%)" },
+            { "value": "all", "text": "All (100%)" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "cloudServiceTypes",
+          "title": "Which types of cloud services does your organization use?",
+          "isRequired": true,
+          "choices": [
+            { "value": "saas", "text": "Software as a Service (SaaS)" },
+            { "value": "paas", "text": "Platform as a Service (PaaS)" },
+            { "value": "iaas", "text": "Infrastructure as a Service (IaaS)" },
+            { "value": "serverless", "text": "Serverless Computing" },
+            { "value": "caas", "text": "Containers as a Service (CaaS)" },
+            { "value": "daas", "text": "Data as a Service (DaaS)" },
+            { "value": "none", "text": "None" }
+          ]
+        },
+        {
+          "type": "matrix",
+          "name": "cloudAdoptionByFunction",
+          "title": "What is the level of cloud adoption across business functions?",
+          "isRequired": true,
+          "columns": [
+            { "value": "none", "text": "No Cloud Use (0%)" },
+            { "value": "minimal", "text": "Minimal (1-25%)" },
+            { "value": "partial", "text": "Partial (26-50%)" },
+            { "value": "significant", "text": "Significant (51-75%)" },
+            { "value": "high", "text": "High (76-99%)" },
+            { "value": "full", "text": "Fully Cloud-Based (100%)" },
+            { "value": "na", "text": "Not Applicable" }
+          ],
+          "rows": [
+            { "value": "production", "text": "Production/Operations" },
+            { "value": "engineering", "text": "Engineering/R&D" },
+            { "value": "supplyChain", "text": "Supply Chain/Logistics" },
+            { "value": "sales", "text": "Sales/Marketing" },
+            { "value": "customerService", "text": "Customer Service" },
+            { "value": "hr", "text": "Human Resources" },
+            { "value": "finance", "text": "Finance/Accounting" },
+            { "value": "it", "text": "IT Infrastructure" }
+          ]
+        },
+        {
+          "type": "radiogroup",
+          "name": "cloudImplementation",
+          "title": "Which cloud implementation approach is primarily used?",
+          "isRequired": true,
+          "choices": [
+            { "value": "public", "text": "Public Cloud" },
+            { "value": "private", "text": "Private Cloud" },
+            { "value": "hybrid", "text": "Hybrid Cloud" },
+            { "value": "multicloud", "text": "Multi-Cloud" },
+            { "value": "none", "text": "No Cloud Implementation" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "cloudProviders",
+          "title": "Which cloud service providers does your organization use?",
+          "visibleIf": "{cloudImplementation} <> 'none'",
+          "isRequired": true,
+          "choices": [
+            { "value": "aws", "text": "Amazon Web Services (AWS)" },
+            { "value": "azure", "text": "Microsoft Azure" },
+            { "value": "gcp", "text": "Google Cloud Platform (GCP)" },
+            { "value": "ibm", "text": "IBM Cloud" },
+            { "value": "oracle", "text": "Oracle Cloud" },
+            { "value": "alibaba", "text": "Alibaba Cloud" },
+            { "value": "sap", "text": "SAP Cloud" },
+            { "value": "salesforce", "text": "Salesforce Cloud" },
+            { "value": "other", "text": "Other" }
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "cloudChallenges",
+          "title": "What are the primary challenges to cloud adoption in your organization?",
+          "isRequired": true,
+          "choices": [
+            { "value": "security", "text": "Security concerns" },
+            { "value": "compliance", "text": "Regulatory compliance" },
+            { "value": "cost", "text": "Cost management" },
+            { "value": "integration", "text": "Integration with existing systems" },
+            { "value": "skills", "text": "Lack of cloud skills" },
+            { "value": "data", "text": "Data migration complexity" },
+            { "value": "connectivity", "text": "Network connectivity/bandwidth" },
+            { "value": "vendor", "text": "Vendor lock-in concerns" },
+            { "value": "performance", "text": "Performance concerns" },
+            { "value": "culture", "text": "Organizational culture" },
+            { "value": "none", "text": "No significant challenges" }
+          ]
+        },
+        {
+          "type": "text",
+          "name": "cloudExpenditure",
+          "title": "Annual expenditure on cloud services (USD):",
+          "inputType": "number"
+        }
+      ]
+    },
+    {
+      "name": "systemPerformance",
+      "title": "IT System Performance and Benefits",
+      "description": "Please provide information about the performance and benefits of your IT systems.",
+      "elements": [
+        {
+          "type": "matrix",
+          "name": "systemReliability",
+          "title": "How would you rate the reliability of your IT systems?",
+          "isRequired": true,
+          "columns": [
+            { "value": "poor", "text": "Poor" },
+            { "value": "fair", "text": "Fair" },
+            { "value": "good", "text": "Good" },
+            { "value": "very_good", "text": "Very Good" },
+            { "value": "excellent", "text": "Excellent" }
+          ],
+          "rows": [
+            { "value": "onpremise", "text": "On-Premise Systems" },
+            { "value": "cloud", "text": "Cloud-Based Systems", "visibleIf": "{cloudImplementation} <> 'none'" },
+            { "value": "integrated", "text": "System Integrations" },
+            { "value": "dataExchange", "text": "Data Exchange Processes" }
+          ]
+        },
+        {
+          "type": "rating",
+          "name": "userSatisfaction",
+          "title": "Overall user satisfaction with IT systems (1-10):",
+          "rateMin": 1,
+          "rateMax": 10,
+          "minRateDescription": "Very dissatisfied",
+          "maxRateDescription": "Very satisfied"
+        },
+        {
+          "type": "matrix",
+          "name": "systemBenefits",
+          "title": "To what extent have your IT systems delivered benefits in the following areas?",
+          "isRequired": true,
+          "columns": [
+            { "value": "none", "text": "No Benefit" },
+            { "value": "minimal", "text": "Minimal Benefit" },
+            { "value": "moderate", "text": "Moderate Benefit" },
+            { "value": "significant", "text": "Significant Benefit" },
+            { "value": "transformative", "text": "Transformative Benefit" },
+            { "value": "not_measured", "text": "Not Measured" }
+          ],
+          "rows": [
+            { "value": "productivity", "text": "Productivity Improvement" },
+            { "value": "costs", "text": "Cost Reduction" },
+            { "value": "quality", "text": "Quality Improvement" },
+            { "value": "innovation", "text": "Innovation Acceleration" },
+            { "value": "flexibility", "text": "Business Flexibility" },
+            { "value": "decisions", "text": "Decision-Making" },
+            { "value": "customer", "text": "Customer Experience" },
+            { "value": "collaboration", "text": "Collaboration & Communication" }
+          ]
+        },
+        {
+          "type": "comment",
+          "name": "systemImprovements",
+          "title": "What improvements would you prioritize for your IT systems and cloud technology integration?"
+        }
+      ]
+    }
+  ]
+}

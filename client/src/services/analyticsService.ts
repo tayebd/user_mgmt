@@ -15,10 +15,46 @@ const skillDistributionSchema = z.object({
   count: z.number()
 });
 
+// Enhanced schema for processed metrics
+const processedMetricsSchema = z.object({
+  timestamp: z.string().or(z.date()),
+  metrics: z.object({
+    technologyMetrics: z.object({
+      implementationCount: z.number(),
+      averageMaturity: z.number(),
+      implementedTechnologies: z.array(z.string())
+    }),
+    processMetrics: z.object({
+      digitizationLevel: z.number(),
+      automationLevel: z.number(),
+      processAreas: z.array(z.string())
+    }),
+    personnelMetrics: z.object({
+      totalSkilled: z.number(),
+      avgProficiency: z.number(),
+      skillDistribution: z.record(z.string(), z.number())
+    }),
+    strategyMetrics: z.object({
+      strategyMaturity: z.number(),
+      implementationProgress: z.number(),
+      keyMilestones: z.array(z.string())
+    })
+  }),
+  confidenceScores: z.record(z.string(), z.number())
+});
+
+const enhancedSurveyResponseSchema = z.object({
+  id: z.number(),
+  surveyId: z.number(),
+  responseJson: z.string(),
+  userId: z.number(),
+  processedMetrics: processedMetricsSchema.optional()
+});
+
 const dashboardMetricsSchema = z.object({
   technologyMetrics: z.object({
     implementationCount: z.number(),
-    averageMaturity: z.number(),
+    averageMaturity: z.number().nullable(),
     trendData: z.array(trendDataSchema)
   }),
   processMetrics: z.object({
@@ -36,14 +72,14 @@ const dashboardMetricsSchema = z.object({
     skillDistribution: z.array(skillDistributionSchema)
   }),
   strategyMetrics: z.object({
-    hasStrategy: z.boolean(),
-    implementationProgress: z.number(),
-    maturityLevel: z.number(),
+    hasI40Strategy: z.boolean().nullable(),
+    implementationProgress: z.number().nullable(),
+    strategyMaturity: z.number().nullable(),
     nextReviewDate: z.string().or(z.date()).nullable()
   }),
   sectorComparison: z.object({
-    companyMaturity: z.number(),
-    sectorAvgMaturity: z.number(),
+    companyMaturity: z.number().nullable(),
+    sectorAvgMaturity: z.number().nullable(),
     sectorName: z.string()
   })
 });
@@ -54,6 +90,9 @@ export interface ApiError {
   error: string;
   details?: Record<string, unknown>;
 }
+
+export type ProcessedMetrics = z.infer<typeof processedMetricsSchema>;
+export type EnhancedSurveyResponse = z.infer<typeof enhancedSurveyResponseSchema>;
 
 export class AnalyticsService {
   private static handleApiError(error: unknown): never {

@@ -1,0 +1,487 @@
+{
+  "title": "Industry 4.0 Assessment: Supply Chain and Warehouse Management",
+  "description": "This survey evaluates your organization's digitization and agility in supply chain and warehouse operations.",
+  "logoPosition": "right",
+  "pages": [
+    {
+      "name": "companyInfo",
+      "title": "Company Information",
+      "elements": [
+        {
+          "type": "dropdown",
+          "name": "industrySector",
+          "title": "Industry Sector",
+          "isRequired": true,
+          "choices": [
+            "Manufacturing", 
+            "Automotive", 
+            "Aerospace", 
+            "Electronics", 
+            "Consumer Goods",
+            "Healthcare", 
+            "Energy", 
+            "Chemical", 
+            "Retail",
+            "Logistics",
+            "Other"
+          ]
+        },
+        {
+          "type": "dropdown",
+          "name": "companySize",
+          "title": "Company Size",
+          "isRequired": true,
+          "choices": [
+            "Small (1-50 employees)",
+            "Medium (51-250 employees)",
+            "Large (251-1000 employees)",
+            "Enterprise (1000+ employees)"
+          ]
+        },
+        {
+          "type": "dropdown",
+          "name": "region",
+          "title": "Geographic Region",
+          "isRequired": true,
+          "choices": [
+            "North America",
+            "South America",
+            "Europe",
+            "Asia-Pacific",
+            "Middle East & Africa"
+          ]
+        },
+        {
+          "type": "text",
+          "name": "supplierCount",
+          "title": "Approximately how many suppliers do you work with?",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "text",
+          "name": "warehouseCount",
+          "title": "How many warehouses or distribution centers do you operate?",
+          "inputType": "number",
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "name": "supplyChainAgility",
+      "title": "Supply Chain Agility",
+      "description": "Assessment of your supply chain's ability to quickly adapt to changes",
+      "elements": [
+        {
+          "type": "text",
+          "name": "orderFulfillmentTime",
+          "title": "What is your average order fulfillment cycle time (in days)?",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "text",
+          "name": "forecastAccuracy",
+          "title": "What is your average demand forecast accuracy (percentage)?",
+          "inputType": "number",
+          "min": 0,
+          "max": 100,
+          "isRequired": true
+        },
+        {
+          "type": "text",
+          "name": "inventoryTurnover",
+          "title": "What is your inventory turnover rate (times per year)?",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "text",
+          "name": "disruptionRecoveryTime",
+          "title": "What is your average recovery time from supply disruptions (in days)?",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "dropdown",
+          "name": "demandResponseCapability",
+          "title": "How would you rate your ability to respond to sudden demand fluctuations?",
+          "isRequired": true,
+          "choices": [
+            "Very limited - significant lead time required",
+            "Basic - can adjust with substantial delays",
+            "Moderate - can adjust with some delays",
+            "Good - can adjust quickly with minimal delays",
+            "Excellent - can adjust in near real-time"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "supplyChainVisibility",
+          "title": "What level of visibility do you have across your supply chain?",
+          "isRequired": true,
+          "choices": [
+            "Real-time tracking of goods in transit",
+            "Supplier inventory visibility",
+            "Production schedule visibility with suppliers",
+            "Demand signals shared with suppliers",
+            "End-to-end visibility from raw materials to customer delivery",
+            "Limited or no visibility beyond our own operations"
+          ]
+        },
+        {
+          "type": "rating",
+          "name": "supplierCollaboration",
+          "title": "Rate your level of digital collaboration with suppliers",
+          "isRequired": true,
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "Minimal digital collaboration",
+          "maxRateDescription": "Fully integrated digital collaboration"
+        },
+        {
+          "type": "checkbox",
+          "name": "alternateSourcesStrategy",
+          "title": "What strategies do you employ for supply chain resilience?",
+          "isRequired": true,
+          "choices": [
+            "Multiple suppliers for critical components",
+            "Geographic diversification of suppliers",
+            "Buffer/safety stock management",
+            "Flexible manufacturing capabilities",
+            "Dynamic sourcing capabilities",
+            "Scenario planning and simulation",
+            "None of the above"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "supplyChainTechnology",
+      "title": "Supply Chain Technology and Integration",
+      "elements": [
+        {
+          "type": "checkbox",
+          "name": "supplyChainSystems",
+          "title": "Which supply chain management systems or technologies do you use?",
+          "isRequired": true,
+          "choices": [
+            "Enterprise Resource Planning (ERP)",
+            "Supply Chain Management (SCM) software",
+            "Transportation Management System (TMS)",
+            "Supplier Relationship Management (SRM)",
+            "Advanced Planning and Scheduling (APS)",
+            "Supply Chain Control Tower",
+            "Blockchain for supply chain",
+            "IoT for supply chain tracking",
+            "AI/ML for supply chain optimization",
+            "None of the above"
+          ],
+          "hasOther": true,
+          "otherText": "Other (please specify)"
+        },
+        {
+          "type": "checkbox",
+          "name": "dataExchangeMethods",
+          "title": "How do you exchange data with supply chain partners?",
+          "isRequired": true,
+          "choices": [
+            "Manual methods (email, phone, etc.)",
+            "Electronic Data Interchange (EDI)",
+            "API integrations",
+            "Supplier/customer portals",
+            "Cloud-based collaboration platforms",
+            "Blockchain/distributed ledger",
+            "Real-time data streams"
+          ]
+        },
+        {
+          "type": "rating",
+          "name": "supplierIntegration",
+          "title": "Rate the level of system integration with your suppliers",
+          "isRequired": true,
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "No integration",
+          "maxRateDescription": "Full digital integration"
+        },
+        {
+          "type": "rating",
+          "name": "customerIntegration",
+          "title": "Rate the level of system integration with your customers",
+          "isRequired": true,
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "No integration",
+          "maxRateDescription": "Full digital integration"
+        },
+        {
+          "type": "checkbox",
+          "name": "advancedSupplyChainTech",
+          "title": "Which advanced technologies are you using in your supply chain?",
+          "choices": [
+            "Digital twins of supply chain",
+            "Predictive analytics for demand forecasting",
+            "AI for supply chain optimization",
+            "Autonomous planning systems",
+            "Robotics Process Automation (RPA)",
+            "Blockchain for traceability",
+            "Advanced simulation tools",
+            "None of the above"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "warehouseDigitization",
+      "title": "Warehouse Management Digitization",
+      "description": "Assessment of the digital technologies in your warehouse operations",
+      "elements": [
+        {
+          "type": "checkbox",
+          "name": "warehouseSystems",
+          "title": "Which warehouse management systems or technologies do you use?",
+          "isRequired": true,
+          "choices": [
+            "Warehouse Management System (WMS)",
+            "Inventory Management System",
+            "Barcode scanning",
+            "RFID tracking",
+            "Automated Storage and Retrieval Systems (AS/RS)",
+            "Pick-to-Light systems",
+            "Voice-directed picking",
+            "Autonomous Mobile Robots (AMRs)",
+            "Automated Guided Vehicles (AGVs)",
+            "Drones for inventory counting",
+            "None of the above"
+          ],
+          "hasOther": true,
+          "otherText": "Other (please specify)"
+        },
+        {
+          "type": "text",
+          "name": "inventoryAccuracy",
+          "title": "What is your current inventory accuracy rate (percentage)?",
+          "inputType": "number",
+          "min": 0,
+          "max": 100,
+          "isRequired": true
+        },
+        {
+          "type": "dropdown",
+          "name": "realTimeInventory",
+          "title": "Do you have real-time inventory visibility?",
+          "isRequired": true,
+          "choices": [
+            "No real-time visibility",
+            "Limited real-time visibility",
+            "Partial real-time visibility",
+            "Comprehensive real-time visibility"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "digitalizedWarehouseProcesses",
+          "title": "Which warehouse processes have been digitized?",
+          "isRequired": true,
+          "choices": [
+            "Receiving",
+            "Put-away",
+            "Storage management",
+            "Picking",
+            "Packing",
+            "Shipping",
+            "Returns processing",
+            "Inventory counts",
+            "Labor management",
+            "Yard management",
+            "None of the above"
+          ]
+        },
+        {
+          "type": "text",
+          "name": "pickingAccuracy",
+          "title": "What is your current order picking accuracy rate (percentage)?",
+          "inputType": "number",
+          "min": 0,
+          "max": 100,
+          "isRequired": true
+        },
+        {
+          "type": "text",
+          "name": "pickingSpeed",
+          "title": "What is your average picking rate (items per hour per worker)?",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "rating",
+          "name": "warehouseAutomation",
+          "title": "Rate your overall level of warehouse automation",
+          "isRequired": true,
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "Minimal automation",
+          "maxRateDescription": "Highly automated warehouse"
+        }
+      ]
+    },
+    {
+      "name": "warehouseAdvancedTech",
+      "title": "Advanced Warehouse Technologies",
+      "elements": [
+        {
+          "type": "checkbox",
+          "name": "warehouseAdvancedTech",
+          "title": "Which advanced technologies are you using in your warehouses?",
+          "choices": [
+            "IoT sensors for environmental monitoring",
+            "Computer vision for quality control",
+            "Robotics for picking and packing",
+            "Exoskeletons for workers",
+            "AI for warehouse layout optimization",
+            "Predictive maintenance for warehouse equipment",
+            "Digital twins of warehouse operations",
+            "Augmented reality for picking guidance",
+            "3D printing for spare parts",
+            "None of the above"
+          ]
+        },
+        {
+          "type": "dropdown",
+          "name": "warehouseAnalytics",
+          "title": "How advanced are your warehouse analytics capabilities?",
+          "isRequired": true,
+          "choices": [
+            "Basic reporting only",
+            "Standard KPI dashboards",
+            "Advanced analytics with some predictive capabilities",
+            "Comprehensive predictive and prescriptive analytics",
+            "AI-driven autonomous optimization"
+          ]
+        },
+        {
+          "type": "text",
+          "name": "automatedProcessPercentage",
+          "title": "What percentage of your warehouse processes are fully automated?",
+          "inputType": "number",
+          "min": 0,
+          "max": 100,
+          "isRequired": true
+        },
+        {
+          "type": "text",
+          "name": "digitizedProcessPercentage",
+          "title": "What percentage of your warehouse processes are digitized (but not fully automated)?",
+          "inputType": "number",
+          "min": 0,
+          "max": 100,
+          "isRequired": true
+        }
+      ]
+    },
+    {
+      "name": "performanceMetrics",
+      "title": "Supply Chain and Warehouse Performance Metrics",
+      "elements": [
+        {
+          "type": "text",
+          "name": "perfectOrderRate",
+          "title": "What is your perfect order rate (percentage of orders delivered complete, accurate, and on time)?",
+          "inputType": "number",
+          "min": 0,
+          "max": 100,
+          "isRequired": true
+        },
+        {
+          "type": "text",
+          "name": "daysOfInventory",
+          "title": "What is your average days of inventory on hand?",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "text",
+          "name": "carrierOnTimeDelivery",
+          "title": "What is your carrier on-time delivery rate (percentage)?",
+          "inputType": "number",
+          "min": 0,
+          "max": 100,
+          "isRequired": true
+        },
+        {
+          "type": "text",
+          "name": "warehouseCostPerOrder",
+          "title": "What is your average warehouse cost per order processed?",
+          "inputType": "number",
+          "isRequired": true
+        },
+        {
+          "type": "rating",
+          "name": "performanceTracking",
+          "title": "Rate your ability to track these metrics in real-time",
+          "isRequired": true,
+          "rateMin": 1,
+          "rateMax": 5,
+          "minRateDescription": "Manual tracking with delays",
+          "maxRateDescription": "Automated real-time dashboards"
+        }
+      ]
+    },
+    {
+      "name": "futureDirections",
+      "title": "Future Directions and Challenges",
+      "elements": [
+        {
+          "type": "checkbox",
+          "name": "plannedInvestments",
+          "title": "In which areas are you planning to invest in the next 2 years?",
+          "choices": [
+            "Warehouse automation",
+            "Supply chain visibility tools",
+            "Predictive analytics",
+            "AI/ML for supply chain optimization",
+            "Robotics/autonomous vehicles",
+            "Blockchain for supply chain",
+            "Digital twins",
+            "Supplier collaboration platforms",
+            "Sustainable supply chain technologies",
+            "No major investments planned"
+          ]
+        },
+        {
+          "type": "checkbox",
+          "name": "biggestChallenges",
+          "title": "What are your biggest challenges in supply chain and warehouse digitization?",
+          "choices": [
+            "Budget constraints",
+            "Integration with legacy systems",
+            "Skilled workforce shortages",
+            "Change management/adoption",
+            "ROI justification",
+            "Vendor selection",
+            "Technology complexity",
+            "Data quality issues",
+            "Security concerns",
+            "Regulatory compliance"
+          ]
+        },
+        {
+          "type": "text",
+          "name": "digitalTransformationBudget",
+          "title": "What percentage of your supply chain budget is allocated to digital transformation?",
+          "inputType": "number",
+          "min": 0,
+          "max": 100
+        },
+        {
+          "type": "comment",
+          "name": "additionalInsights",
+          "title": "Please share any additional insights about your supply chain and warehouse digitization journey"
+        }
+      ]
+    }
+  ],
+  "showQuestionNumbers": "off",
+  "completedHtml": "<h4>Thank you for completing the Supply Chain and Warehouse Management assessment!</h4>"
+}

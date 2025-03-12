@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { AnalyticsService, AnalyticsError } from '@services/analyticsService';
-import { validateRequest } from '@middleware/validateRequest';
+import { AnalyticsService, AnalyticsError } from '../services/analyticsService';
+import { validateRequest } from '../middleware/validateRequest';
 import { z } from 'zod';
 
 type DashboardRequest = Request<{}, {}, {}, { companyId: string }>;
@@ -135,9 +135,9 @@ router.get('/metrics/export',
         distribution: metrics.personnelMetrics.skillDistribution
       },
       strategy: {
-        hasStrategy: metrics.strategyMetrics.hasStrategy,
+        hasStrategy: metrics.strategyMetrics.hasI40Strategy,
         implementationProgress: metrics.strategyMetrics.implementationProgress,
-        maturityLevel: metrics.strategyMetrics.maturityLevel
+        maturityLevel: metrics.strategyMetrics.strategyMaturity
       },
       sector: {
         companyMaturity: metrics.sectorComparison.companyMaturity,

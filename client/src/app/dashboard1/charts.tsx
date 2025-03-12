@@ -15,11 +15,7 @@ interface ChartProps {
 }
 
 // Sample data generators for different chart types
-const generateTimeSeriesData = (kpiId: string | undefined, timeRange: TimeRange, sector: Sector) => {
-  if (!kpiId) {
-    console.warn('No KPI ID provided for time series data generation');
-    return [];
-  }
+const generateTimeSeriesData = (kpiId: string, timeRange: TimeRange, sector: Sector) => {
   let dataPoints = 0;
   let startValue = 0;
   let increment = 0;
@@ -41,17 +37,16 @@ const generateTimeSeriesData = (kpiId: string | undefined, timeRange: TimeRange,
       break;
   }
 
-  // Set starting value and increment based on KPI type
-  const kpiType = kpiId.toLowerCase();
-  if (kpiType.includes('maturity') || kpiType.includes('level')) {
+  // Set starting value and increment based on KPI
+  if (kpiId.includes('maturity') || kpiId.includes('level')) {
     startValue = 1.5;
     increment = 0.15;
     volatility = 0.1;
-  } else if (kpiType.includes('percentage') || kpiType.includes('rate')) {
+  } else if (kpiId.includes('percentage') || kpiId.includes('rate')) {
     startValue = 30;
     increment = 1.5;
     volatility = 3;
-  } else if (kpiType.includes('personnel')) {
+  } else if (kpiId.includes('personnel')) {
     startValue = 8000;
     increment = 500;
     volatility = 1000;
@@ -165,7 +160,7 @@ const getColorForSector = (sector: string) => {
 // const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#83a6ed'];
 
 // Line Chart Component
-export const LineChart: React.FC<ChartProps> = ({ kpiId = '', timeRange, sector }) => {
+export const LineChart: React.FC<ChartProps> = ({ kpiId, timeRange, sector }) => {
   const data = generateTimeSeriesData(kpiId, timeRange, sector);
   
   return (
@@ -177,7 +172,7 @@ export const LineChart: React.FC<ChartProps> = ({ kpiId = '', timeRange, sector 
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis />
-        <Tooltip formatter={(value) => Number(value).toFixed(1)} />
+        <Tooltip />
         <Legend />
         <Line 
           type="monotone" 
@@ -198,7 +193,7 @@ export const LineChart: React.FC<ChartProps> = ({ kpiId = '', timeRange, sector 
 };
 
 // Bar Chart Component
-export const BarChart: React.FC<ChartProps> = ({ kpiId = '' }) => {   // ,sector
+export const BarChart: React.FC<ChartProps> = ({ kpiId }) => {   // ,sector
   const data = generateSectorData(kpiId);
   
   return (
@@ -210,7 +205,7 @@ export const BarChart: React.FC<ChartProps> = ({ kpiId = '' }) => {   // ,sector
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey="name" />
         <YAxis />
-        <Tooltip formatter={(value) => Number(value).toFixed(1)} />
+        <Tooltip />
         <Legend />
         <Bar dataKey="value" fill="#8884d8">
           {data.map((entry, index) => (
@@ -223,8 +218,8 @@ export const BarChart: React.FC<ChartProps> = ({ kpiId = '' }) => {   // ,sector
 };
 
 // Pie Chart Component
-export const PieChart: React.FC<ChartProps> = ({ kpiId = '', timeRange, sector }) => {
-  const data = kpiId ? generateMaturityData() : [];
+export const PieChart: React.FC<ChartProps> = () => {
+  const data = generateMaturityData();
   
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -237,7 +232,7 @@ export const PieChart: React.FC<ChartProps> = ({ kpiId = '', timeRange, sector }
           outerRadius={80}
           fill="#8884d8"
           dataKey="value"
-          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -251,7 +246,7 @@ export const PieChart: React.FC<ChartProps> = ({ kpiId = '', timeRange, sector }
 };
 
 // Area Chart Component
-export const AreaChart: React.FC<ChartProps> = ({ kpiId = '', timeRange, sector }) => {
+export const AreaChart: React.FC<ChartProps> = ({ kpiId, timeRange, sector }) => {
   const data = generateTimeSeriesData(kpiId, timeRange, sector);
   
   return (
@@ -273,7 +268,7 @@ export const AreaChart: React.FC<ChartProps> = ({ kpiId = '', timeRange, sector 
         <XAxis dataKey="name" />
         <YAxis />
         <CartesianGrid strokeDasharray="3 3" />
-        <Tooltip formatter={(value) => Number(value).toFixed(1)} />
+        <Tooltip />
         <Legend />
         <Area 
           type="monotone" 
@@ -295,12 +290,9 @@ export const AreaChart: React.FC<ChartProps> = ({ kpiId = '', timeRange, sector 
 };
 
 // Donut Chart Component
-export const DonutChart: React.FC<ChartProps> = ({ kpiId = '', timeRange, sector }) => {
-  // Get data based on KPI if provided, otherwise use sample data
-  const data = kpiId ? [
-    // Data will be generated based on KPI
-    ...generateMaturityData()
-  ] : [
+export const DonutChart: React.FC<ChartProps> = () => {
+  // Sample data for automation levels
+  const data = [
     { name: 'Fully Automated', value: 25, fill: '#0088FE' },
     { name: 'Semi-Automated', value: 30, fill: '#00C49F' },
     { name: 'Partial Automation', value: 28, fill: '#FFBB28' },
@@ -325,7 +317,7 @@ export const DonutChart: React.FC<ChartProps> = ({ kpiId = '', timeRange, sector
             <Cell key={`cell-${index}`} fill={entry.fill} />
           ))}
         </Pie>
-        <Tooltip formatter={(value) => `${Number(value).toFixed(1)}%`} />
+        <Tooltip formatter={(value) => `${value}%`} />
         <Legend />
       </RechartsPieChart>
     </ResponsiveContainer>

@@ -39,14 +39,14 @@ interface DashboardMetrics {
     }[];
   };
   strategyMetrics: {
-    hasStrategy: boolean | null;
+    hasI40Strategy: boolean | null;
     implementationProgress: number | null;
-    maturityLevel: number | null;
+    strategyMaturity: number | null;
     nextReviewDate: Date | null;
   };
   sectorComparison: {
-    companyMaturity: number;
-    sectorAvgMaturity: number;
+    companyMaturity: number | null;
+    sectorAvgMaturity: number | null;
     sectorName: string;
   };
 }
@@ -63,7 +63,7 @@ export class AnalyticsService {
     }
   };
 
-  private sanitizeNumber = (value: number | null | undefined, defaultValue: number = 0): number => {
+  private sanitizeNumber = (value: number | null | undefined, defaultValue: number | null = 0): number | null => {
     if (value === null || value === undefined || isNaN(value)) {
       return defaultValue;
     }
@@ -207,7 +207,7 @@ export class AnalyticsService {
       return {
         technologyMetrics: {
           implementationCount: techImplementation._count,
-          averageMaturity: this.sanitizeNumber(techImplementation._avg.maturityLevel),
+          averageMaturity: this.sanitizeNumber(techImplementation._avg.maturityLevel, null),
           trendData: techTrend.map(t => ({
             date: t.date,
             count: t.technologyCount,
@@ -224,22 +224,22 @@ export class AnalyticsService {
           }))
         },
         personnelMetrics: {
-          totalSkilled: personnelSkills._sum.numberOfPersonnel,
-          avgProficiency: personnelSkills._avg.proficiencyLevel,
+          totalSkilled: this.sanitizeNumber(personnelSkills._sum.numberOfPersonnel, 0),
+          avgProficiency: this.sanitizeNumber(personnelSkills._avg.proficiencyLevel, null),
           skillDistribution: skillDistribution.map(s => ({
             category: skillMap.get(s.skillId) || 'Unknown',
             count: s._sum.numberOfPersonnel || 0
           }))
         },
         strategyMetrics: {
-          hasStrategy: strategyStatus?.hasI40Strategy || false,
-          implementationProgress: strategyStatus?.implementationProgress || 0,
-          maturityLevel: strategyStatus?.strategyMaturity || 0,
-          nextReviewDate: strategyStatus?.nextReviewDate || null
+          hasI40Strategy: strategyStatus?.hasI40Strategy ?? null,
+          implementationProgress: strategyStatus?.implementationProgress ?? null,
+          strategyMaturity: strategyStatus?.strategyMaturity ?? null,
+          nextReviewDate: strategyStatus?.nextReviewDate ?? null
         },
         sectorComparison: {
-          companyMaturity: Number(techImplementation._avg.maturityLevel || 0),
-          sectorAvgMaturity: Number(sectorMaturity._avg.avgMaturityLevel || 0),
+          companyMaturity: this.sanitizeNumber(Number(techImplementation._avg.maturityLevel), 0),
+          sectorAvgMaturity: this.sanitizeNumber(Number(sectorMaturity._avg.avgMaturityLevel), 0),
           sectorName: company.industry.name
         }
       };
