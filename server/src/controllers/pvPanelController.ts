@@ -3,8 +3,9 @@ import { prisma } from '../config/db';
 
 export const getPVPanels = async (req: Request, res: Response) => {
   const { page = 1, limit = 50 } = req.query;
-  const pageNumber = parseInt(page as string, 10);
-  const limitNumber = parseInt(limit as string, 10);
+  // Parse page and limit, defaulting to 1 and 50 if invalid
+  const pageNumber = Number.isNaN(parseInt(page as string, 10)) ? 1 : parseInt(page as string, 10);
+  const limitNumber = Number.isNaN(parseInt(limit as string, 10)) ? 50 : parseInt(limit as string, 10);
 
   try {
     const pvPanels = await prisma.pVPanel.findMany({
@@ -15,17 +16,21 @@ export const getPVPanels = async (req: Request, res: Response) => {
         manufacturer: true,
         modelNumber: true,
         description: true,
-        maxPower: true,
-        shortCircuitCurrent: true,
-        openCircuitVoltage: true,
-        tempCoeffPmax: true,
-        tempCoeffIsc: true,
-        tempCoeffVoc: true,
+        moduleType: true,
         shortSide: true,
         longSide: true,
         weight: true,
         performanceWarranty: true,
         productWarranty: true,
+        efficiency: true,
+        openCircuitVoltage: true,
+        shortCircuitCurrent: true,
+        maxPower: true,
+        tempCoeffPmax: true,
+        tempCoeffIsc: true,
+        tempCoeffVoc: true,
+        tempCoeffIpmax: true,
+        tempCoeffVpmax: true,
       },
     });
     res.status(200).json(pvPanels);
@@ -45,17 +50,21 @@ export const getPVPanel = async (req: Request, res: Response) => {
         manufacturer: true,
         modelNumber: true,
         description: true,
-        maxPower: true,
-        shortCircuitCurrent: true,
-        openCircuitVoltage: true,
-        tempCoeffPmax: true,
-        tempCoeffIsc: true,
-        tempCoeffVoc: true,
+        moduleType: true,
         shortSide: true,
         longSide: true,
         weight: true,
         performanceWarranty: true,
         productWarranty: true,
+        efficiency: true,
+        openCircuitVoltage: true,
+        shortCircuitCurrent: true,
+        maxPower: true,
+        tempCoeffPmax: true,
+        tempCoeffIsc: true,
+        tempCoeffVoc: true,
+        tempCoeffIpmax: true,
+        tempCoeffVpmax: true,
       },
     });
     if (!pvPanel) {
@@ -69,60 +78,121 @@ export const getPVPanel = async (req: Request, res: Response) => {
 };
 
 export const createPVPanel = async (req: Request, res: Response) => {
-  const { manufacturer, modelNumber, description, maxPower, shortCircuitCurrent, openCircuitVoltage, tempCoeffPmax, tempCoeffIsc, tempCoeffVoc, shortSide, longSide, weight, performanceWarranty, productWarranty } = req.body;
   try {
+    // Extract all possible fields from request body
+    const {
+      manufacturer,
+      modelNumber,
+      description,
+      moduleType,
+      shortSide,
+      longSide,
+      weight,
+      performanceWarranty,
+      productWarranty,
+      efficiency,
+      openCircuitVoltage,
+      shortCircuitCurrent,
+      maxPower,
+      currentAtPmax,
+      tempCoeffPmax,
+      tempCoeffIsc,
+      tempCoeffVoc,
+      tempCoeffIpmax,
+      tempCoeffVpmax,
+    } = req.body;
+
+    // Validate required fields
+    if (!manufacturer || !modelNumber) {
+      return res.status(400).json({ message: 'Manufacturer and model number are required' });
+    }
+
+    // Create PV panel with all available fields
     const pvPanel = await prisma.pVPanel.create({
       data: {
         manufacturer,
         modelNumber,
         description,
-        maxPower,
-        shortCircuitCurrent,
-        openCircuitVoltage,
-        tempCoeffPmax,
-        tempCoeffIsc,
-        tempCoeffVoc,
+        moduleType,
         shortSide,
         longSide,
         weight,
         performanceWarranty,
         productWarranty,
+        efficiency,
+        openCircuitVoltage,
+        shortCircuitCurrent,
+        maxPower,
+        currentAtPmax,
+        tempCoeffPmax,
+        tempCoeffIsc,
+        tempCoeffVoc,
+        tempCoeffIpmax,
+        tempCoeffVpmax,
       },
     });
     res.status(201).json(pvPanel);
   } catch (error) {
     console.error('Error creating PV panel:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error', error: (error as Error).message });
   }
 };
 
 export const updatePVPanel = async (req: Request, res: Response) => {
   const { pvPanelId } = req.params;
-  const { manufacturer, modelNumber, description, maxPower, shortCircuitCurrent, openCircuitVoltage, tempCoeffPmax, tempCoeffIsc, tempCoeffVoc, shortSide, longSide, weight, performanceWarranty, productWarranty } = req.body;
   try {
+    // Extract all possible fields from request body
+    const {
+      manufacturer,
+      modelNumber,
+      description,
+      moduleType,
+      shortSide,
+      longSide,
+      weight,
+      performanceWarranty,
+      productWarranty,
+      efficiency,
+      openCircuitVoltage,
+      shortCircuitCurrent,
+      maxPower,
+      currentAtPmax,
+      tempCoeffPmax,
+      tempCoeffIsc,
+      tempCoeffVoc,
+      tempCoeffIpmax,
+      tempCoeffVpmax,
+    } = req.body;
+
+    // Update PV panel with all available fields
     const pvPanel = await prisma.pVPanel.update({
       where: { id: Number(pvPanelId) },
       data: {
         manufacturer,
         modelNumber,
         description,
-        maxPower,
-        shortCircuitCurrent,
-        openCircuitVoltage,
-        tempCoeffPmax,
-        tempCoeffIsc,
-        tempCoeffVoc,
+        moduleType,
         shortSide,
         longSide,
         weight,
         performanceWarranty,
         productWarranty,
+        efficiency,
+        openCircuitVoltage,
+        shortCircuitCurrent,
+        maxPower,
+        currentAtPmax,
+        tempCoeffPmax,
+        tempCoeffIsc,
+        tempCoeffVoc,
+        tempCoeffIpmax,
+        tempCoeffVpmax,
       },
     });
     res.status(200).json(pvPanel);
   } catch (error) {
     console.error('Error updating PV panel:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(500).json({ message: 'Internal server error', error: (error as Error).message });
   }
 };
 

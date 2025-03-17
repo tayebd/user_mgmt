@@ -1,14 +1,8 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut as firebaseSignOut,
-  onAuthStateChanged,
-  User
-} from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { AuthError, Session, User } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
 type AuthContextType = {
   user: User | null;
@@ -26,42 +20,54 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     console.log('Setting up auth state listener...');
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      console.log('Auth state changed:', user ? 'User logged in' : 'No user');
+    
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event);
 
-      if (user) {
-        console.log('User details:', {
-          uid: user.uid,
-          email: user.email,
-          emailVerified: user.emailVerified
-        });
-
-        try {
-          const token = await user.getIdToken();
-          console.log('Token successfully retrieved:', token.substring(0, 10) + '...');
-        } catch (error) {
-          console.error('Error getting token:', error);
+        if (session?.user) {
+          console.log('User details:', {
+            id: session.user.id,
+            email: session.user.email,
+            role: session.user.role
+          });
+          setUser(session.user);
+        } else {
+          setUser(null);
         }
+        setLoading(false);
       }
+    );
 
-      setUser(user);
+    // Check existing session
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user);
+      }
       setLoading(false);
-    });
+    };
+
+    checkSession();
 
     return () => {
       console.log('Cleaning up auth state listener');
-      unsubscribe();
+      authListener?.subscription.unsubscribe();
     };
   }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
       console.log('Attempting sign in for:', email);
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      console.log('Sign in successful for user:', result.user.uid);
-      const token = await result.user.getIdToken();
-      console.log('Initial token retrieved:', token.substring(0, 10) + '...');
-      return result.user;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+      
+      console.log('Sign in successful for user:', data.user?.id);
+      return data.user!;
     } catch (error) {
       console.error('Sign in error:', error);
       throw error;
@@ -71,26 +77,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signUp = async (email: string, password: string) => {
     try {
       console.log('Attempting sign up for:', email);
-      const result = await createUserWithEmailAndPassword(auth, email, password);
-      console.log('Sign up successful for user:', result.user.uid);
-      window.location.href = '/login'; // Redirect to login page after sign-up
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/welcome`
+        }
+      });
+
+      if (error) throw error;
+      
+      console.log('Sign up successful for user:', data.user?.id);
+      window.location.href = '/login';
     } catch (error) {
       console.error('Sign up error:', error);
       throw error;
     }
   };
 
-const signOut = async () => {
-  try {
-    console.log('Attempting sign out...');
-    await firebaseSignOut(auth);
-    console.log('Sign out successful');
-    window.location.href = '/login'; // Redirect to login page
-  } catch (error) {
-    console.error('Sign out error:', error);
-    throw error;
-  }
-};
+  const signOut = async () => {
+    try {
+      console.log('Attempting sign out...');
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      console.log('Sign out successful');
+      window.location.href = '/login';
+    } catch (error) {
+      console.error('Sign out error:', error);
+      throw error;
+    }
+  };
 
   return (
     <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>

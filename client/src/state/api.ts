@@ -1,110 +1,46 @@
 import { create } from 'zustand';
+import { supabase } from '../lib/supabase';
 import { Company, Review, PVPanel, Inverter, SolarProject, Project, Task,
-         Survey, CreateSurveyParams, SurveyResponse, User, ProjectStatus, 
-         SurveyStatus, TaskStatus, TaskPriority } from '@/types';
-import { ProcessedMetrics, EnhancedSurveyResponse } from '@/types/metrics';
+  Survey, CreateSurveyParams, SurveyResponse, User} from '@/types';
+// import { ProcessedMetrics, EnhancedSurveyResponse } from '@/types/metrics';
 import { SurveyMetricService } from '@/services/surveyMetricService';
-import { auth } from '@/lib/firebase';
+import { getAuthToken } from '@/utils/auth';
+
+const REQUEST_TIMEOUT = 10000; // 10 seconds
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
+const isUser = (data: unknown): data is User => {
+  if (!data || typeof data !== 'object') return false;
+  const user = data as Record<string, unknown>;
+  return typeof user.uid === 'string' && 
+         typeof user.email === 'string' &&
+         (!user.displayName || typeof user.displayName === 'string') &&
+         (!user.photoURL || typeof user.photoURL === 'string') &&
+         (!user.role || typeof user.role === 'string') &&
+         typeof user.createdAt === 'string' &&
+         typeof user.updatedAt === 'string';
+};
 
 export interface SearchResults {
   companies?: Company[];
 }
 
-// Helper function to get the current auth token
-const getAuthToken = async () => {
-  try {
-    const user = auth.currentUser;
-    if (!user) {
-      throw new Error('User not authenticated');
-    }
-    return await user.getIdToken(true);
-  } catch (error) {
-    console.error('Error getting auth token:', error);
-    return null;
-  }
-};
+import {
+  INITIAL_SOLARPROJECT_DATA,
+  INITIAL_PROJECT_DATA,
+  INITIAL_SURVEY_DATA,
+  INITIAL_TASK_DATA
+} from '../types/initialData';
 
-export const INITIAL_SOLARPROJECT_DATA: SolarProject = {
-  id: 0,
-  address: '',
-  coordinates: { lat: 0, lng: 0 },
-  dcSystemSize: 0,
-  arrayType: 'Fixed',
-  systemLosses: 14,
-  tilt: 20,
-  azimuth: 180,
-  bifacial: false,
-  selectedPanelId: 1,
-  pvPanelQuantity: 1,
-  selectedInverterId: 1,
-  inverterQuantity: 1,
-  mountingType: 'Flat Roof',
-  roofMaterial: '',
-  roofSlope: 0,
-  roofOrientation: '',
-  roofArea: 0,
-  roofLoadCapacity: 0,
-  groundArea: 0,
-  groundSlope: 0,
-  groundOrientation: '',
-  groundLoadCapacity: 0,
-  trackingType: '',
-  trackingSlope: 0,
-  trackingOrientation: '',
-  trackingLoadCapacity: 0,
-  derivedEquipment: {
-    fuses: 0,
-    dcSurgeProtector: 0,
-    dcDisconnectSwitches: 0,
-    acSurgeProtector: 0,
-    generalDisconnectSwitch: 0,
-    residualCurrentBreaker: 0,
-    generalCircuitBreaker: 0,
-    dcCableLength: 0,
-    acCableLength: 0,
-    earthingCableLength: 0,
-    mc4ConnectorPairs: 0,
-    splitters: 0,
-    cableTrayLength: 0
-  }
-};
+// Cache configuration
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const FAILED_LOOKUP_TTL = 60 * 1000; // 1 minute
 
-const INITIAL_PROJECT_DATA: Project = {
-  id: 0,
-  name: '',
-  description: '',
-  status: ProjectStatus.NOT_STARTED,
-  tasks: [],
-  members: [],
-  startDate: new Date(),
-  endDate: new Date()
-};
+const userCache: { [uid: string]: { user: User; timestamp: number } } = {};
+const userEmailCache: { [email: string]: string } = {};
+const failedLookupCache: { [uid: string]: { timestamp: number } } = {};
 
-const INITIAL_SURVEY_DATA: Survey = {
-  id: 0,
-  title: '',
-  description: '',
-  surveyJson: '',
-  status: SurveyStatus.DRAFT,
-  targetResponses: 0,
-  userId: 0
-};
-
-const INITIAL_TASK_DATA: Task = {
-  id: 0,
-  title: '',
-  description: '',
-  status: TaskStatus.NOT_STARTED,
-  priority: TaskPriority.MEDIUM,
-  dueDate: new Date(),
-  createdAt: new Date(),
-  updatedAt: new Date(),
-  projectId: 0,
-  project: INITIAL_PROJECT_DATA,
-  assignedToId: 0,
-};
-
-interface ApiState {
+export interface ApiState {
   projects: Project[];
   tasks: Task[];
   solarProjects: SolarProject[];
@@ -119,8 +55,8 @@ interface ApiState {
   searchResults: SearchResults;
   isLoading: boolean;
 
-  fetchPVPanels: (page: number, limit: number) => Promise<PVPanel[]>;
 
+  fetchPVPanels: (page: number, limit: number) => Promise<PVPanel[]>;
   fetchInverters: (page: number, limit: number) => Promise<Inverter[]>;
 
   fetchTasks: (page: number, limit: number) => Promise<Task[]>;
@@ -151,19 +87,21 @@ interface ApiState {
   fetchSurveyById: (surveyId: number) => Promise<Survey>;
   updateSurvey: (surveyId: number, survey: Partial<Survey>) => Promise<void>;
 
-  createSurveyResponse:   (surveyId: number, replyJson: string, userId: number) => Promise<SurveyResponse>;
+  createSurveyResponse: (surveyId: number, replyJson: string, userId: number, authToken?: string) => Promise<SurveyResponse>;
   
   fetchReviews: (companyId: number) => Promise<Review[]>;
   fetchSurveyResponses: (surveyId: number) => Promise<SurveyResponse[]>;
   fetchSurveysByUserId: (userId: number) => Promise<Survey[]>;
 
   fetchUsers: () => Promise<User[]>;
+  fetchUserByUid: (uid: string) => Promise<User>;
+  findUserByEmail: (email: string) => Promise<User | null>;
   createUser: (user: Partial<User>) => Promise<User>;
-  updateUser: (userId: number, company: Partial<User>) => Promise<void>;
-  deleteUser: (userId: number) => Promise<void>;
+  updateUser: (userId: number, user: Partial<User>) => Promise<User>;
+  deleteUser: (userId: number) => Promise<boolean>;
 }
 
-const apiStore = create<ApiState>((set) => ({
+const apiStore = create<ApiState>((set, get) => ({
   users:[],
   companies: [],
   surveys: [],
@@ -179,62 +117,8 @@ const apiStore = create<ApiState>((set) => ({
   task: INITIAL_TASK_DATA,
   isLoading: false,
 
-  fetchUsers: async () => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/users`, {
-      method: 'GET',
-      credentials: 'include',
-    });
-    const data = await response.json();
-    set({ users: data });
-    return data;
-  },
-  createUser: async (user: Partial<User>) => {
-    const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/users`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(user),
-      credentials: 'include',
-    });
-    const data = await response.json();
-    set((state) => ({ users: [...state.users, data] }));
-    return data;
-  },
-  updateUser: async (userId: number, user: Partial<User>) => {
-    const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/users/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(user),
-      credentials: 'include',
-    });
-    const data = await response.json();
-    set((state) => ({
-      users: state.users.map((c) => (c.id === userId ? data : c)),
-    }));
-  },
-  deleteUser: async (userId: number) => {
-    const token = await getAuthToken();
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/users/${userId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      credentials: 'include',
-    });
-    set((state) => ({
-      users: state.users.filter((c) => c.id !== userId),
-    }));
-  },
-
   fetchSurveys: async () => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys`, {
+    const response = await fetch(`${API_BASE_URL}/surveys`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -243,7 +127,7 @@ const apiStore = create<ApiState>((set) => ({
     return data;
   },
   fetchSurveysByUserId:  async (userId: number) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys`, {
+    const response = await fetch(`${API_BASE_URL}/surveys`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -252,7 +136,7 @@ const apiStore = create<ApiState>((set) => ({
     return data;
   },
   fetchSurveyById:  async (surveyId: number) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys/${surveyId}`, {
+    const response = await fetch(`${API_BASE_URL}/surveys/${surveyId}`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -262,7 +146,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   createSurvey: async (survey: CreateSurveyParams) => {
     const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys`, {
+    const response = await fetch(`${API_BASE_URL}/surveys`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -277,7 +161,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   updateSurvey: async (surveyId: number, survey: Partial<Survey>) => {
     const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys/${surveyId}`, {
+    const response = await fetch(`${API_BASE_URL}/surveys/${surveyId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -291,7 +175,7 @@ const apiStore = create<ApiState>((set) => ({
   },
 
   fetchPVPanels: async (page = 1, limit = 50) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/pv-panels?page=${page}&limit=${limit}`, {
+    const response = await fetch(`${API_BASE_URL}/pv-panels?page=${page}&limit=${limit}`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -301,7 +185,7 @@ const apiStore = create<ApiState>((set) => ({
   },
 
   fetchInverters: async (page = 1, limit = 50) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/inverters?page=${page}&limit=${limit}`, {
+    const response = await fetch(`${API_BASE_URL}/inverters?page=${page}&limit=${limit}`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -311,7 +195,7 @@ const apiStore = create<ApiState>((set) => ({
   },
 
   fetchTasks: async (page = 1, limit = 50) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/tasks?page=${page}&limit=${limit}`, {
+    const response = await fetch(`${API_BASE_URL}/tasks?page=${page}&limit=${limit}`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -321,7 +205,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   createTask: async (task: Partial<Task>) => {
     const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/tasks`, {
+    const response = await fetch(`${API_BASE_URL}/tasks`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -336,7 +220,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   deleteTask: async (taskId: number) => {
     const token = await getAuthToken();
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/tasks/${taskId}`, {
+    await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -347,7 +231,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   updateTask: async (taskId: number, task: Partial<Task>) => {
     const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/tasks/${taskId}`, {
+    const response = await fetch(`${API_BASE_URL}/tasks/${taskId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -362,7 +246,7 @@ const apiStore = create<ApiState>((set) => ({
     }));
   },
   fetchProject: async () => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/projects`, {
+    const response = await fetch(`${API_BASE_URL}/projects`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -372,7 +256,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   createProject: async (project: Partial<Project>) => {
     const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/projects`, {
+    const response = await fetch(`${API_BASE_URL}/projects`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -387,7 +271,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   updateProject: async (projectId: number, project: Partial<Project>) => {
     const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/projects/${projectId}`, {
+    const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -401,7 +285,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   deleteProject: async (projectId: number) => {
     const token = await getAuthToken();
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/projects/${projectId}`, {
+    await fetch(`${API_BASE_URL}/projects/${projectId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -414,7 +298,7 @@ const apiStore = create<ApiState>((set) => ({
   },
 
   fetchSolarProject: async () => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/solarProjects`, {
+    const response = await fetch(`${API_BASE_URL}/solarProjects`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -424,7 +308,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   createSolarProject: async (project: SolarProject) => {
     const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/solarProjects`, {
+    const response = await fetch(`${API_BASE_URL}/solarProjects`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -439,7 +323,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   updateSolarProject: async (projectId: number, project: Partial<SolarProject>) => {
     const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/solarProjects/${projectId}`, {
+    const response = await fetch(`${API_BASE_URL}/solarProjects/${projectId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -453,7 +337,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   deleteSolarProject: async (projectId: number) => {
     const token = await getAuthToken();
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/solarProjects/${projectId}`, {
+    await fetch(`${API_BASE_URL}/solarProjects/${projectId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -468,7 +352,7 @@ const apiStore = create<ApiState>((set) => ({
   fetchCompanies: async () => {
     try {
       console.log('Fetching companies from client...');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies`, {
+      const response = await fetch(`${API_BASE_URL}/companies`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -488,7 +372,7 @@ const apiStore = create<ApiState>((set) => ({
   fetchCompanyById: async (companyId: number) => {
     try {
       console.log(`Fetching company with ID ${companyId}...`);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies/${companyId}`, {
+      const response = await fetch(`${API_BASE_URL}/companies/${companyId}`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -504,7 +388,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   createCompany: async (company: Partial<Company>) => {
     const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies`, {
+    const response = await fetch(`${API_BASE_URL}/companies`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -525,7 +409,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   updateCompany: async (companyId: number, company: Partial<Company>) => {
     const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies/${companyId}`, {
+    const response = await fetch(`${API_BASE_URL}/companies/${companyId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -547,7 +431,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   deleteCompany: async (companyId: number) => {
     const token = await getAuthToken();
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies/${companyId}`, {
+    await fetch(`${API_BASE_URL}/companies/${companyId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -560,7 +444,7 @@ const apiStore = create<ApiState>((set) => ({
   },
   createReview: async (companyId: number, review: Partial<Review>) => {
     const token = await getAuthToken();
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies/${companyId}/reviews`, {
+    const response = await fetch(`${API_BASE_URL}/companies/${companyId}/reviews`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -573,17 +457,19 @@ const apiStore = create<ApiState>((set) => ({
     return data;
   },
   fetchReviews: async (companyId: number) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/companies/${companyId}/reviews`, {
+    const response = await fetch(`${API_BASE_URL}/companies/${companyId}/reviews`, {
       method: 'GET',
       credentials: 'include',
     });
     const data = await response.json();
     return data;
   },
-  createSurveyResponse: async (surveyId: number, surveyResponse: string, userId: number): Promise<SurveyResponse> => {
+  createSurveyResponse: async (surveyId: number, surveyResponse: string, userId: number, authToken?: string): Promise<SurveyResponse> => {
     try {
+      console.log(`Creating survey response for surveyId: ${surveyId}, userId: ${userId}`);
+      
       // Validate input parameters
-      if (!surveyId || !surveyResponse || !userId) {
+      if (!surveyId || !surveyResponse) {
         throw new Error('Missing required parameters for survey response');
       }
 
@@ -601,48 +487,80 @@ const apiStore = create<ApiState>((set) => ({
 
       // Ensure companyId exists in the parsed response
       const companyId = parsedResponse.companyId || 1; // Default to 1 if not provided
+      console.log(`Using companyId: ${companyId} for survey response`);
 
       // Process metrics from survey response
       const processedResponse = SurveyMetricService.processSurveyResponse({
         id: 0, // Temporary ID
         surveyId,
         responseJson: surveyResponse,
+        companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 10),
         userId,
-        companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 263)
       });
 
-      // Get auth token
-      const token = await getAuthToken();
+      // Use provided token or get a fresh one
+      let token = authToken;
       if (!token) {
-        throw new Error('Authentication required');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          console.error('No authenticated user found when attempting to create survey response');
+          throw new Error('Authentication required');
+        }
+        
+        // Force token refresh to ensure we have the latest token
+        console.log('No token provided, refreshing authentication token...');
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          throw new Error('Failed to retrieve authentication token');
+        }
+        token = session.access_token;
+        if (!token) {
+          throw new Error('Failed to retrieve authentication token');
+        }
+        console.log('Successfully refreshed authentication token');
+      } else {
+        console.log('Using provided authentication token');
       }
 
       // Make API request
+      console.log('Making API request with token:', token.substring(0, 10) + '...');
+      
+      const requestBody = {
+        userId: userId,
+        companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 10),
+        responseJson: typeof surveyResponse === 'string' ? surveyResponse : JSON.stringify(surveyResponse),
+        processedMetrics: processedResponse.processedMetrics
+      };
+      
+      console.log('Request body:', JSON.stringify(requestBody, null, 2));
+      
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys/${surveyId}/surveyResponses`,
+        `${API_BASE_URL}/surveys/${surveyId}/surveyResponses`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({
-            userId,
-            companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 263),
-            // Ensure responseJson is a valid JSON string
-            responseJson: typeof surveyResponse === 'string' ? surveyResponse : JSON.stringify(surveyResponse),
-            // Properly serialize processedMetrics to ensure it's stored correctly in the database
-            processedMetrics: JSON.parse(JSON.stringify(processedResponse.processedMetrics))
-          }),
-          credentials: 'include'
+          body: JSON.stringify(requestBody)
         }
       );
 
       // Handle non-200 responses
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('Server error response:', errorData);
-        throw new Error(errorData.message || `Failed to save survey response: ${response.status}`);
+        const errorText = await response.text();
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+        } catch (e) {
+          errorData = { message: errorText };
+        }
+        console.error('Server error response:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData
+        });
+        throw new Error(errorData.message || `Failed to save survey response: ${response.status} - ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -653,7 +571,6 @@ const apiStore = create<ApiState>((set) => ({
       // Log successful metrics processing
       console.log('Survey response processed successfully:', {
         surveyId,
-        userId,
         companyId,
         hasMetrics: !!data.processedMetrics,
         timestamp: new Date().toISOString()
@@ -670,7 +587,6 @@ const apiStore = create<ApiState>((set) => ({
       console.error('Survey response creation error:', {
         error,
         surveyId,
-        userId,
         timestamp: new Date().toISOString(),
       });
       throw error; // Re-throw to let components handle the error
@@ -683,11 +599,21 @@ const apiStore = create<ApiState>((set) => ({
         throw new Error('Invalid survey ID');
       }
 
+      // Get auth token
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
       // Make API request
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/surveys/${surveyId}/surveyResponses`,
+        `${API_BASE_URL}/surveys/${surveyId}/surveyResponses`,
         {
           method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
           credentials: 'include',
         }
       );
@@ -721,9 +647,396 @@ const apiStore = create<ApiState>((set) => ({
       throw error; // Re-throw to let components handle the error
     }
   },
+  fetchUsers: async () => {
+    const requestId = Math.random().toString(36).substring(2, 8);
+    console.log(`[API:${requestId}] Fetching all users`);
+
+    try {
+      const token = await getAuthToken();
+      if (!token) {
+        console.error(`[API:${requestId}] Authentication required to fetch users`);
+        throw new Error('Not authenticated');
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/users`,
+          {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            signal: controller.signal
+          }
+        );
+
+        if (!response.ok) {
+          const errorMessage = `Failed to fetch users: ${response.status} ${response.statusText}`;
+          console.error(`[API:${requestId}] ${errorMessage}`);
+          throw new Error(errorMessage);
+        }
+
+        const data = await response.json();
+        if (!Array.isArray(data)) {
+          console.error(`[API:${requestId}] Invalid response format: expected array of users`);
+          throw new Error('Invalid response format: expected array of users');
+        }
+
+        console.log(`[API:${requestId}] Successfully fetched ${data.length} users`);
+        set({ users: data });
+        return data;
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`[API:${requestId}] Error fetching users: ${errorMessage}`);
+      
+      if (errorMessage.includes('timed out')) {
+        throw new Error('TIMEOUT: Request timed out while fetching users');
+      }
+      if (errorMessage.includes('NetworkError') || errorMessage.includes('network')) {
+        throw new Error('NETWORK_ERROR: Network error while fetching users');
+      }
+      throw error;
+    }
+  },
+  fetchUserByUid: async (uid: string): Promise<User> => {
+    if (!uid) {
+      throw new Error('User UID is required');
+    }
+
+    const requestId = Math.random().toString(36).substring(2, 8);
+    console.log(`[API:${requestId}] Fetching user by UID: ${uid}`);
+
+    // Check if we have a failed lookup cached
+    const failedLookup = failedLookupCache[uid];
+    if (failedLookup && Date.now() - failedLookup.timestamp < FAILED_LOOKUP_TTL) {
+      const errorMessage = `User with UID ${uid} not found (cached)`;
+      console.log(`[API:${requestId}] ${errorMessage}`);
+      throw new Error(`USER_NOT_FOUND: ${errorMessage}`);
+    }
+
+    try {
+      // Check cache first
+      const cachedUser = userCache[uid];
+      if (cachedUser && Date.now() - cachedUser.timestamp < CACHE_TTL) {
+        console.log(`[API:${requestId}] Returning cached user data for UID: ${uid}`);
+        return cachedUser.user;
+      }
+
+      const token = await getAuthToken();
+      if (!token) {
+        console.error('[API] Authentication required to fetch user');
+        throw new Error('Not authenticated');
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/users/uid/${uid}`,
+          {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+            signal: controller.signal
+          }
+        );
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            const errorMessage = `User with UID ${uid} not found`;
+            console.error('[API]', errorMessage);
+            // Add to failed lookup cache
+            failedLookupCache[uid] = { timestamp: Date.now() };
+            throw new Error(`USER_NOT_FOUND: ${errorMessage}`);
+          }
+          const errorText = await response.text();
+          const errorMessage = `Failed to fetch user: ${response.status} ${response.statusText}\n${errorText}`;
+          console.error('[API]', errorMessage);
+          throw new Error(errorMessage);
+        }
+
+        const responseData = await response.json();
+        if (!isUser(responseData)) {
+          console.error('[API] Invalid user data structure:', responseData);
+          throw new Error('Invalid user data structure');
+        }
+
+        // Update store and cache
+        const users = get().users;
+        set({ users: [...users.filter(u => u.uid !== uid), responseData] });
+        userCache[uid] = { user: responseData, timestamp: Date.now() };
+        
+        console.log('[API] Successfully fetched user data for UID:', uid);
+        return responseData;
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[API] Error fetching user by UID:', errorMessage);
+      
+      if (errorMessage.includes('timed out')) {
+        throw new Error(`TIMEOUT: Request timed out while fetching user with UID ${uid}`);
+      }
+      if (errorMessage.includes('NetworkError') || errorMessage.includes('network')) {
+        throw new Error(`NETWORK_ERROR: Network error while fetching user with UID ${uid}`);
+      }
+      throw error;
+    }
+  },
+  // Helper function to find a user by email in the cache or API
+  findUserByEmail: async (email: string): Promise<User | null> => {
+    if (!email?.includes('@')) {
+      throw new Error('Invalid email format');
+    }
+
+    // Check store first
+    const { users } = get();
+    const storeUser = users.find(user => user.email === email);
+    if (storeUser) {
+      console.log('[API] Found user in store for email:', email);
+      return storeUser;
+    }
+
+    // Check email cache
+    const cachedUid = userEmailCache[email];
+    if (cachedUid) {
+      const cachedUser = userCache[cachedUid];
+      if (cachedUser && Date.now() - cachedUser.timestamp < CACHE_TTL) {
+        console.log('[API] Found user in cache for email:', email);
+        return cachedUser.user;
+      }
+    }
+
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('Authentication required to find user');
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/users/email/${encodeURIComponent(email)}`,
+        {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          signal: controller.signal
+        }
+      );
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          console.log('[API] No user found with email:', email);
+          return null;
+        }
+        const errorText = await response.text();
+        throw new Error(`Failed to find user: ${response.status} ${response.statusText}\n${errorText}`);
+      }
+
+      const data = await response.json();
+      if (!data?.id || !data?.email || !data?.uid) {
+        throw new Error('Invalid user data received from server');
+      }
+
+      // Update store and cache
+      set({ users: [...users.filter(u => u.uid !== data.uid), data] });
+      userCache[data.uid] = { user: data, timestamp: Date.now() };
+      userEmailCache[email] = data.uid;
+
+      console.log('[API] Successfully found user with email:', email);
+      return data;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[API] Error finding user by email:', errorMessage);
+      
+      if (errorMessage.includes('timed out')) {
+        throw new Error(`TIMEOUT: Request timed out while finding user with email ${email}`);
+      }
+      if (errorMessage.includes('NetworkError') || errorMessage.includes('network')) {
+        throw new Error(`NETWORK_ERROR: Network error while finding user with email ${email}`);
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  },
+  
+  createUser: async (user: Partial<User>): Promise<User> => {
+    // Validate required fields
+    if (!user?.uid || !user?.email) {
+      throw new Error('Cannot create user without UID and email');
+    }
+    if (!user.email.includes('@')) {
+      throw new Error('Invalid email format');
+    }
+
+    // Check if user already exists in store
+    const { users } = get();
+    const existingUser = users.find(u => u.uid === user.uid || u.email === user.email);
+    if (existingUser) {
+      throw new Error(`User already exists with ${existingUser.uid === user.uid ? 'UID' : 'email'}`);
+    }
+    
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('Authentication required to create user');
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+    
+    try {
+      console.log('[API] Creating user with UID:', user.uid);
+      const response = await fetch(`${API_BASE_URL}/users`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ...user,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }),
+        signal: controller.signal
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to create user: ${response.status} ${response.statusText}\n${errorText}`);
+      }
+      
+      const data = await response.json();
+      if (!isUser(data)) {
+        throw new Error('Invalid user data received from server');
+      }
+      
+      // Update store and cache
+      set({ users: [...users, data] });
+      userCache[data.uid] = { user: data, timestamp: Date.now() };
+      userEmailCache[data.email] = data.uid;
+      
+      // Remove from failed lookup cache if present
+      delete failedLookupCache[data.uid];
+      
+      console.log('[API] Successfully created user:', data.id);
+      return data;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[API] Error creating user:', errorMessage);
+      
+      if (errorMessage.includes('timed out')) {
+        throw new Error(`TIMEOUT: Request timed out while creating user with UID ${user.uid}`);
+      }
+      if (errorMessage.includes('NetworkError') || errorMessage.includes('network')) {
+        throw new Error(`NETWORK_ERROR: Network error while creating user with UID ${user.uid}`);
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  },
+  updateUser: async (userId: number, user: Partial<User>): Promise<User> => {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('Authentication required to update user');
+    }
+
+    try {
+      console.log('[API] Updating user:', userId);
+      const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(user)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to update user: ${response.status} ${response.statusText}\n${errorText}`);
+      }
+
+      const data = await response.json();
+      if (!data?.id) {
+        throw new Error('Invalid user data received from server');
+      }
+
+      // Update store
+      const { users } = get();
+      set({
+        users: users.map(u => u.id === userId ? { ...u, ...data } : u)
+      });
+
+      console.log('[API] Successfully updated user:', data.id);
+      return data;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[API] Error updating user:', errorMessage);
+      throw error;
+    }
+  },
+  deleteUser: async (userId: number): Promise<boolean> => {
+    if (!userId) {
+      throw new Error('User ID is required');
+    }
+
+    const token = await getAuthToken();
+    if (!token) {
+      throw new Error('Authentication required to delete user');
+    }
+
+    try {
+      console.log('[API] Deleting user:', userId);
+      const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to delete user: ${response.status} ${response.statusText}\n${errorText}`);
+      }
+
+      // Update store
+      const { users } = get();
+      set({
+        users: users.filter(u => u.id !== userId)
+      });
+
+      console.log('[API] Successfully deleted user:', userId);
+      return true;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[API] Error deleting user:', errorMessage);
+      throw error;
+    }
+  },
 }));
 
 export const useApiStore = apiStore;
 
-export const fetchPVPanels = apiStore.getState().fetchPVPanels;
-export const fetchInverters = apiStore.getState().fetchInverters;
+// export const fetchPVPanels = apiStore.getState().fetchPVPanels;
+// export const fetchInverters = apiStore.getState().fetchInverters;

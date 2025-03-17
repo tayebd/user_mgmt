@@ -9,10 +9,11 @@ import {
 
 const router = express.Router();
 
-router.get('/pv-panels', getPVPanels);
-router.get('/pv-panels/:pvPanelId', getPVPanel);
-router.post('/pv-panels', createPVPanel);
-router.put('/pv-panels/:pvPanelId', updatePVPanel);
-router.delete('/pv-panels/:pvPanelId', deletePVPanel);
+// Use root routes since the base path is already set in index.ts as '/api/pv-panels'
+router.get('/', getPVPanels);
+router.get('/:pvPanelId', getPVPanel);
+router.post('/', createPVPanel);
+router.put('/:pvPanelId', updatePVPanel);
+router.delete('/:pvPanelId', deletePVPanel);
 
 export default router;

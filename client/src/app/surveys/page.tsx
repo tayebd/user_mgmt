@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Users, Edit, ClipboardList, FileText } from 'lucide-react';
@@ -9,21 +9,32 @@ import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { useApiStore } from '@/state/api';
 import Sidebar from '@/components/Sidebar';
-import { Survey, SurveyStatus } from '@/types';
+import { Survey } from '@/types';
+import { SurveyStatus } from '@/types/enums';
+import { useUserAuth } from './utils/userAuth';
 
 function SurveysPage() {
   const router = useRouter();
   const { surveys = [], fetchSurveysByUserId } = useApiStore();
+  const { currentUserId, isLoading } = useUserAuth();
 
-  useEffect(() => {
+  // Fetch surveys when currentUserId changes
+  React.useEffect(() => {
     const fetchSurveys = async () => {
+      if (!currentUserId) {
+        console.log('No user ID available yet, waiting for authentication...');
+        return;
+      }
+      
       try {
-        const data = await fetchSurveysByUserId(1);
+        console.log('Fetching surveys for user ID:', currentUserId);
+        const data = await fetchSurveysByUserId(currentUserId);
         if (Array.isArray(data)) {
           const surveysWithResponseCounts = data.map(survey => ({
             ...survey,
             responseCount: survey.responses?.length || 0
           }));
+          console.log('Surveys fetched successfully:', surveysWithResponseCounts.length);
         } else {
           console.error('Invalid surveys data:', data);
         }
@@ -33,7 +44,7 @@ function SurveysPage() {
     };
 
     fetchSurveys();
-  }, [fetchSurveysByUserId]);
+  }, [currentUserId, fetchSurveysByUserId]);
 
   return (
     <div className="flex">
@@ -44,11 +55,13 @@ function SurveysPage() {
         <div className="flex justify-between items-center mb-6">
           <div>
             <p className="text-gray-600">Create and manage your surveys</p>
+            {isLoading && <p className="text-blue-600 mt-2">Loading user data...</p>}
           </div>
           <div className="space-x-2">
             <Button 
               className="bg-blue-600 hover:bg-blue-700 text-white"
               onClick={() => router.push('/surveys/create')}
+              disabled={isLoading}
             >
               <PlusCircle className="w-4 h-4 mr-2" />
               Create Survey
@@ -56,6 +69,7 @@ function SurveysPage() {
             <Button 
               className="bg-blue-600 hover:bg-blue-700 text-white"
               onClick={() => router.push('/surveys/upload')}
+              disabled={isLoading}
             >
               <FileText className="w-4 h-4 mr-2" />
               Upload Survey
@@ -91,10 +105,10 @@ function SurveysPage() {
                     </p>
                     <div className="flex items-center mt-2">
                       <div className="mr-4">
-                        {survey.status === SurveyStatus.ACTIVE ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>
+                        {survey.status === SurveyStatus.PUBLISHED ? (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Published</span>
                         ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Inactive</span>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Draft</span>
                         )}
                       </div>
                       <div className="flex items-center text-sm text-gray-600">

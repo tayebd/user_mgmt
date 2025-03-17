@@ -184,11 +184,29 @@ describe('POST /api/surveys/:surveyId/surveyResponses', () => {
 
     describe('GET /api/surveys/:surveyId/surveyResponses', () => {
         it('should fetch survey responses', async () => {
+            // First, create a test company if needed
+            let testCompany = await prisma.company.findFirst({
+                where: { name: 'Test Company' }
+            });
+            
+            if (!testCompany) {
+                testCompany = await prisma.company.create({
+                    data: {
+                        name: 'Test Company',
+                        address: '123 Test St',
+                        phone: '555-TEST'
+                    }
+                });
+            }
+            
             await prisma.surveyResponse.create({
                 data: {
                     surveyId: surveyId,
                     responseJson: '{}',
-                    userId: testUserId
+                    userId: testUserId,
+                    companyId: testCompany.id, // Adding required company ID
+                    processedMetrics: {}, // Adding required field
+                    metricsVersion: '1.0.0' // Adding version for consistency
                 }
             });
 

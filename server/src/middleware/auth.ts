@@ -1,8 +1,8 @@
 // server/src/middleware/auth.ts
 import { Request, Response, NextFunction } from 'express';
-import { auth } from '../config/firebase';
 import { prisma } from '../config/db';
 import { UserRole, Prisma } from '@prisma/client';
+import { createClient } from '../config/supabase';
 
 declare global {
   namespace Express {
@@ -40,42 +40,47 @@ export const authenticateToken = async (
     console.log('Token found, attempting to verify...');
     
     try {
-      const decodedToken = await auth.verifyIdToken(token);
-      console.log('Token verified successfully:', {
-        uid: decodedToken.uid,
-        email: decodedToken.email,
+      const supabase = createClient({ req, res });
+      const { data: { user: supabaseUser }, error } = await supabase.auth.getUser(token);
+      
+      if (error || !supabaseUser) {
+        throw new Error(error?.message || 'Failed to verify user');
+      }
+      console.log('Supabase user verified successfully:', {
+        id: supabaseUser.id,
+        email: supabaseUser.email,
       });
 
-      // First try to find user by Firebase UID
+      // First try to find user by Supabase ID
       let user = await prisma.user.findUnique({
-        where: { uid: decodedToken.uid }
+        where: { uid: supabaseUser.id }
       });
 
-      // If not found by UID, try to find by email
-      if (!user && decodedToken.email) {
+      // If not found by ID, try to find by email
+      if (!user && supabaseUser.email) {
         user = await prisma.user.findUnique({
-          where: { email: decodedToken.email }
+          where: { email: supabaseUser.email }
         });
 
-        // If found by email but different UID, update the UID
-        if (user && user.uid !== decodedToken.uid) {
-          console.log('Updating user ID to match Firebase UID');
+        // If found by email but different ID, update the ID
+        if (user && user.uid !== supabaseUser.id) {
+          console.log('Updating user ID to match Supabase ID');
           user = await prisma.user.update({
             where: { id: user.id },
-            data: { uid: decodedToken.uid }
+            data: { uid: supabaseUser.id }
           });
         }
       }
 
       // If user doesn't exist at all, create them
       if (!user) {
-        console.log('Creating new user in database:', decodedToken.uid);
+        console.log('Creating new user in database:', supabaseUser.id);
         try {
           user = await prisma.user.create({
             data: {
-              uid: decodedToken.uid,
-              email: decodedToken.email || '',
-              name: decodedToken.name || decodedToken.email?.split('@')[0] || 'Anonymous',
+              uid: supabaseUser.id,
+              email: supabaseUser.email || '',
+              name: supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'Anonymous',
               role: UserRole.USER,
             }
           });
@@ -85,7 +90,7 @@ export const authenticateToken = async (
             if (error.code === 'P2002') {
               console.error('Unique constraint failed, trying to find existing user');
               user = await prisma.user.findUnique({
-                where: { email: decodedToken.email || '' }
+                where: { email: supabaseUser.email || '' }
               });
               if (!user) {
                 throw new Error('Failed to create or find user');

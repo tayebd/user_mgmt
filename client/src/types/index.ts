@@ -75,8 +75,8 @@ export type Inverter = {
   description: string;
   phaseType: string;
   outputVoltage: number;
-  maxCurrent: number;
-  maxPower: number;
+  maxOutputCurrent: number;
+  maxOutputPower: number;
   efficiency: number; // Efficiency percentage  
   inputVoltage: { min: number; max: number };
   warranty: number;
@@ -142,12 +142,9 @@ export interface Survey {
   responses?: SurveyResponse[];
 }
 
-export enum SurveyStatus {
-  DRAFT = 'DRAFT',
-  ACTIVE = 'ACTIVE',
-  COMPLETED = 'COMPLETED',
-  ARCHIVED = 'ARCHIVED',
-}
+import { SurveyStatus, ProjectStatus, TaskStatus, TaskPriority } from './enums';
+
+export { SurveyStatus, ProjectStatus, TaskStatus, TaskPriority };
 export interface CreateSurveyParams {
   title: string;
   description: string;
@@ -169,27 +166,7 @@ export interface SurveyResponse {
   processedMetrics?: ProcessedMetrics;
 }
 
-export enum ProjectStatus {
-  NOT_STARTED = 'NOT_STARTED',
-  PLANNING = 'PLANNING',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETED = 'COMPLETED',
-  ON_HOLD = 'ON_HOLD',
-}
 
-export enum TaskStatus {
-  NOT_STARTED = 'NOT_STARTED',
-  IN_PROGRESS = 'IN_PROGRESS',
-  COMPLETED = 'COMPLETED',
-  ON_HOLD = 'ON_HOLD'
-}
-
-export enum TaskPriority {
-  URGENT = 'URGENT',
-  HIGH = 'HIGH',
-  MEDIUM = 'MEDIUM',
-  LOW = 'LOW'
-}
 
 export interface Project {
   id : number;

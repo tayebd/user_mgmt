@@ -1,24 +1,13 @@
-# Progress
+## Progress
 
-## What Works
+### What works
+- The application can manage and display company data, including details about their projects, services, and contact information.
+- The application provides an intuitive and user-friendly interface for users to explore and interact with company information.
+- The application is designed to handle a growing number of companies and data entries.
+- The application simplifies the process of importing company data from Excel files.
 
--   Basic project setup with Next.js (client) and Express (server).
--   Prisma schema defined for Company, Service, Partnership, Certification, Description, Review, CompanyProject, and ProjectPhoto models.
--   Database connection established.
--   Excel seeding functionality implemented and working. Data from `Company.xlsx` is successfully imported into the database.
--   API endpoint for getting all companies.
--   Companies are displayed on the client-side `/companies` page.
+### What's left to build
+- Master data preparation for PVPanel, Inverter, Company, etc.
 
-## What's Left to Build
-
--   API endpoints for creating, updating, and deleting companies.
--   API endpoints for related models (services, partnerships, etc.).
--   UI components to display and manage company data (beyond the basic list).
--   UI components for related models.
--   User authentication and authorization.
--   Image uploading and management.
--   Deployment configuration.
-
-## Current Status
-
-The database seeding is complete, and the company data is displayed on the client. The next step is to implement the CRUD operations for companies and then move on to the related models.
+### Progress status
+- The project is in the initial phase of master data preparation.

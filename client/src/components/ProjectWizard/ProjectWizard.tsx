@@ -17,7 +17,8 @@ import {
   MiscEquipmentStep,
   ReportStep
 } from './steps/index';
-import { useApiStore, INITIAL_SOLARPROJECT_DATA } from '@/state/api';
+import { useApiStore } from '@/state/api'; 
+import { INITIAL_SOLARPROJECT_DATA } from '@/types/initialData'
 import { getPVPanels, getInverters } from '@/services/equipment';
 import { PVPanel, Inverter } from '@/types';
 

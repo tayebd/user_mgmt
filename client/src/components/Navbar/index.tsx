@@ -3,10 +3,9 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { auth } from "@/lib/firebase";
+import { supabase } from "@/lib/supabase";
 import useStore from "@/state";
 import { GlobalState } from "@/state";
-import { signOut } from "firebase/auth";
 import { Moon, Search, Settings, Sun } from "lucide-react";
 
 const Navbar = () => {
@@ -16,7 +15,8 @@ const Navbar = () => {
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth);
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
     } catch (error) {
       console.error('Error signing out:', error);
     }

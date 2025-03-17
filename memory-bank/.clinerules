@@ -4,7 +4,7 @@
 
 - **User Authentication:**
   - Client: `Login.tsx`, `AuthContext.tsx`
-  - Firebase
+  - Supabase
   - Server: `auth.ts` (middleware)
 
 - **Company Data Retrieval:**
@@ -22,7 +22,7 @@
 
 - Client-server architecture with Next.js and Express.js.
 - Prisma for database interaction.
-- Firebase for authentication.
+- Supabase for authentication.
 - Data seeding using Excel files (`excelSeeder.ts`).
 
 ## Known Challenges
@@ -36,7 +36,7 @@
 ## Evolution of Project Decisions
 
 - Initial database setup with migrations.
-- Added Firebase authentication.
+- Added Supabase authentication.
 - Implemented basic company CRUD.
 - Added company descriptions and icon URLs.
 

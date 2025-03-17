@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Calendar, User, Edit2, Trash2 } from 'lucide-react';
-import { Task, TaskStatus, TaskPriority } from '@/types';
+import { Task } from '@/types';
+import { TaskStatus, TaskPriority } from '@/types/enums'; 
 import { useRouter } from 'next/navigation';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import EditTaskModal from '@/components/TaskCard/EditTaskModal';

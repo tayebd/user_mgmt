@@ -8,9 +8,13 @@ import SurveyDisplay from '@/components/surveys/SurveyDisplay';
 import { useRouter } from 'next/navigation'
 import { useApiStore } from '@/state/api';
 import { toast } from 'sonner';
+import { useUserAuth } from '../../utils/userAuth';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 // import "survey-core/survey-core.min.css";
 import { themeJson, customCss } from "./theme";
+import { SurveyTheme } from "./themeTypes";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -23,13 +27,17 @@ export default function RespondPage({ params: rawParams }: PageProps) {
   // Unwrap params Promise with proper type safety
   const { id } = React.use(rawParams) as { id: string };
   const [survey, setSurvey] = useState<Survey | null>(null);
-  const [surveyId, setsurveyId] = useState(0);
+  const [surveyId, setSurveyId] = useState(0);
+  const [surveyModel, setSurveyModel] = useState<Model | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
   const { fetchSurveyById, createSurveyResponse } = useApiStore();
+  const { currentUserId, isLoading: isUserLoading } = useUserAuth();
+  const { user } = useAuth();
  
+
   useEffect(() => {
     const fetchSurvey = async () => {
       try {
@@ -43,7 +51,7 @@ export default function RespondPage({ params: rawParams }: PageProps) {
           throw new Error(`Invalid survey ID: ${id}`);
         }
 
-        setsurveyId(surveyId);
+        setSurveyId(surveyId);
 
         // Fetch and validate survey data
         const survey = await fetchSurveyById(surveyId);
@@ -68,8 +76,8 @@ export default function RespondPage({ params: rawParams }: PageProps) {
 
           // Create survey model to validate structure
           const surveyModel = new Model(jsonData);
-          // Cast the theme to any to avoid type errors with the SurveyJS library
-          surveyModel.applyTheme(themeJson as any);
+          // Apply the theme with proper type
+          surveyModel.applyTheme(themeJson as SurveyTheme);
           surveyModel.customCss = customCss;
         } catch (jsonError) {
           console.error('Survey JSON validation error:', jsonError);
@@ -130,7 +138,7 @@ export default function RespondPage({ params: rawParams }: PageProps) {
 
       // Get companyId from localStorage or use a default value
       // In a real application, this would come from user authentication or context
-      const companyId = localStorage.getItem('companyId') || '263';
+      const companyId = localStorage.getItem('companyId') || '263'; // Use default companyId of 1 to prevent foreign key constraint violations
       
       // Add companyId to the survey data for metrics processing
       cleanData.companyId = parseInt(companyId, 10);
@@ -138,11 +146,27 @@ export default function RespondPage({ params: rawParams }: PageProps) {
       // Convert the cleaned data back to a JSON string
       const responseJsonString = JSON.stringify(cleanData);
 
+      // Validate that we have a current user ID
+      if (!currentUserId) {
+        throw new Error('User authentication required. Please log in to submit a survey response.');
+      }
+
+      // Get the current session from Supabase
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        toast.error('User authentication required. Please log in to submit a survey response.');
+        return;
+      }
+
+      const freshToken = session.access_token;
+
       // Save survey response with metrics processing
       const response = await createSurveyResponse(
         surveyId,
         responseJsonString,
-        1 // TODO: Get actual user ID from session/auth when available
+        currentUserId, // Use the actual user ID from authentication
+        freshToken // Pass the fresh token to the API call
       );
 
       if (!response) {
@@ -162,15 +186,29 @@ export default function RespondPage({ params: rawParams }: PageProps) {
 
       // Show success message and redirect
       toast.success('Survey response submitted successfully');
-      router.push(`/surveys/${surveyId}/thank-you`);
+      // router.push(`/surveys/${surveyId}/thank-you`);
     } catch (error) {
       // Log detailed error for debugging
       console.error('Survey submission error:', {
         error: error instanceof Error ? error.message : 'Unknown error',
         type: error?.constructor?.name,
         surveyId,
+        userId: currentUserId,
         timestamp: new Date().toISOString()
       });
+
+      // Check for authentication errors specifically
+      if (error instanceof Error && 
+          (error.message.includes('Authentication required') || 
+           error.message.includes('401') || 
+           error.message.includes('Unauthorized'))) {
+        // Try to refresh the page to re-authenticate
+        toast.error('Authentication error. Refreshing to re-authenticate...');
+        // setTimeout(() => {
+        //   window.location.reload();
+        // }, 2000);
+        return;
+      }
 
       // Show user-friendly error
       const errorMessage = error instanceof Error 
@@ -180,13 +218,7 @@ export default function RespondPage({ params: rawParams }: PageProps) {
     }
   };
 
-  if (loading) {
-    return <div className="container mx-auto py-6">Loading survey...</div>;
-  }
-
-  if (error) {
-    return <div className="container mx-auto py-6 text-red-500">{error}</div>;
-  }
+  // Loading and error states are now handled at the return statement
   if (survey) {
     // Check if surveyJson exists and is not null/undefined before parsing
     if (!survey.surveyJson) {
@@ -197,8 +229,8 @@ export default function RespondPage({ params: rawParams }: PageProps) {
     let surveyModel;
     try {
       surveyModel = new Model(JSON.parse(survey.surveyJson));
-      // Cast the theme to any to avoid type errors with the SurveyJS library
-      surveyModel.applyTheme(themeJson as any);
+      // Apply the theme with proper type
+      surveyModel.applyTheme(themeJson as SurveyTheme);
       surveyModel.customCss = customCss;
       // Helper function to safely get score from a choice
       const getChoiceScore = (choice: { value: string; score?: number }): number => {
@@ -326,7 +358,24 @@ export default function RespondPage({ params: rawParams }: PageProps) {
       return <div className="container mx-auto py-6 text-red-500">Error parsing survey data. Please contact support.</div>;
     }
     
-    return (
+    // Show loading state for both survey and user authentication
+  if (loading || isUserLoading) {
+    return <div className="container mx-auto py-6">Loading {isUserLoading ? 'user data' : 'survey'}...</div>;
+  }
+
+  // Show error if any
+  if (error) {
+    return <div className="container mx-auto py-6 text-red-500">{error}</div>;
+  }
+
+  // Show error if user is not authenticated
+  if (!currentUserId) {
+    return <div className="container mx-auto py-6 text-red-500">
+      User authentication required. Please log in to submit a survey response.
+    </div>;
+  }
+
+  return (
     <div className="container mx-auto py-6">
       {survey && (
         <>
@@ -340,18 +389,6 @@ export default function RespondPage({ params: rawParams }: PageProps) {
             survey={surveyModel}
             onComplete={handleSurveyComplete}
           />
-        </>
-      )}
-    </div>
-  );
-} else {
-  return (
-    <div className="container mx-auto py-6">
-      {survey && (
-        <>
-          <h1 className="text-2xl font-bold mb-6">No Survey</h1>
-          <p className="text-gray-600 mb-6">No Survey</p>
-
         </>
       )}
     </div>

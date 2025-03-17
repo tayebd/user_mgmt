@@ -11,6 +11,7 @@ import { Survey } from 'survey-react-ui';
 import { toast } from 'sonner';
 import { ArrowLeft, Upload, FileText } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
+import { useUserAuth } from '../utils/userAuth';
 
 function validateIndustry (params: string[]) {
   const value = params[0];
@@ -21,6 +22,7 @@ FunctionFactory.Instance.register("validateIndustry", validateIndustry);
 
 export default function LoadSurveyPage() {
   const router = useRouter();
+  const { currentUserId, isLoading } = useUserAuth();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [surveyJson, setSurveyJson] = useState('');
@@ -125,6 +127,9 @@ export default function LoadSurveyPage() {
       return;
     }
     
+    // Set submitting state to show loading indicator
+    setIsSubmitting(true);
+    
     try {
       setIsSubmitting(true);
       let createdSurvey;
@@ -146,14 +151,19 @@ export default function LoadSurveyPage() {
         });
         
         // Log what we're about to send - but only the string version of the JSON
-        console.log('upload survey:', { title, description, jsonLength: surveyJson.length });
+        console.log('upload survey:', { 
+          title, 
+          description, 
+          jsonLength: surveyJson.length,
+          userId: currentUserId
+        });
         
         // Send the original JSON string, not the model instance
         createdSurvey = await createSurvey({
           title,
           description,
           surveyJson, // This is already a string
-          userId: 1,
+          userId: currentUserId as number, // Type assertion since we've checked it's not null
           active: false,
           responseCount: 0,
           targetResponses: 100,
@@ -278,11 +288,11 @@ export default function LoadSurveyPage() {
               <div className="flex justify-end">
                 <Button 
                   type="submit" 
-                  disabled={isSubmitting || !surveyJson}
+                  disabled={isSubmitting || !surveyJson || isLoading}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <Upload className="w-4 h-4 mr-2" />
-                  {isSubmitting ? 'Creating...' : 'Create Survey'}
+                  {isSubmitting ? 'Creating...' : isLoading ? 'Loading User...' : 'Create Survey'}
                 </Button>
               </div>
             </div>

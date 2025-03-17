@@ -6,20 +6,50 @@ import { describe, beforeAll, afterAll, beforeEach, expect, it } from '@jest/glo
 describe('PV Panel Controller', () => {
     let testPvPanelId: number;
 
+    // Updated sample PV panel with fields matching the new schema
     const samplePvPanel = {
         manufacturer: 'SunPower',
-        modelNumber: 'SPR-X22-360',
+        modelNumber: 'SPR-X22-360-' + Date.now(), // Make unique to avoid conflicts
         description: 'High-efficiency solar panel',
-        maxPower: 360,
-        openCircuitVoltage: 48.2,
+        safetyCertification: 'UL 1703',
+        ptcRating: 345.5,
+        notes: 'Premium panel with excellent warranty',
+        designQualificationCert: 'IEC 61215',
+        performanceEvaluation: 'Tier 1',
+        family: 'X-Series',
+        technology: 'Monocrystalline',
+        activeArea: 1.6,
+        numberOfCells: 96,
+        numberOfPanels: 1,
+        bipv: false,
+        nameplateMaxCurrentAtPmax: 5.9,
+        nameplateVoltageAtPmax: 61.0,
+        averageNoct: 45.0,
         tempCoeffPmax: -0.29,
         tempCoeffIsc: 0.05,
         tempCoeffVoc: -0.25,
+        tempCoeffIpmax: 0.03,
+        tempCoeffVpmax: -0.24,
+        currentAtLowPower: 5.5,
+        voltageAtLowPower: 58.0,
+        currentAtNoct: 4.8,
+        voltageAtNoct: 56.5,
+        mountingType: 'Roof Mount',
+        moduleType: 'Standard',
         shortSide: 1046,
         longSide: 1558,
+        geometricMultiplier: 1.0,
+        performanceRatio: 0.85,
         weight: 18.6,
+        framingMaterial: 'Aluminum',
+        junctionBoxType: 'IP67',
+        connectorType: 'MC4',
         performanceWarranty: '25 years',
-        productWarranty: '10 years'
+        productWarranty: '10 years',
+        efficiency: 22.8,
+        openCircuitVoltage: 48.2,
+        shortCircuitCurrent: 6.2,
+        maxPower: 360
     };
 
     beforeAll(async () => {
@@ -46,23 +76,24 @@ describe('PV Panel Controller', () => {
             testPvPanelId = response.body.id;
         });
 
-        it('should return 500 when required fields are missing', async () => {
+        it('should return 400 when required fields are missing', async () => {
             const response = await request(app)
                 .post('/api/pv-panels')
                 .send({
-                    manufacturer: 'SunPower'
-                    // Missing other required fields
+                    // Missing manufacturer which is required
+                    modelNumber: 'TEST-MODEL-' + Date.now()
                 });
 
-            expect(response.status).toBe(500);
-            expect(response.body).toHaveProperty('message', 'Internal server error');
+            expect(response.status).toBe(400);
+            expect(response.body).toHaveProperty('message', 'Manufacturer and model number are required');
         });
 
         it('should validate numeric fields', async () => {
             const invalidPanel = {
-                ...samplePvPanel,
-                maxPower: 'invalid', // Should be a number
-                tempCoeffPmax: 'invalid'
+                manufacturer: 'SunPower',
+                modelNumber: 'INVALID-MODEL-' + Date.now(),
+                maxPower: 'invalid' as any, // Should be a number
+                tempCoeffPmax: 'invalid' as any
             };
 
             const response = await request(app)
@@ -70,6 +101,7 @@ describe('PV Panel Controller', () => {
                 .send(invalidPanel);
 
             expect(response.status).toBe(500);
+            expect(response.body).toHaveProperty('error');
         });
     });
 
@@ -79,7 +111,8 @@ describe('PV Panel Controller', () => {
             if (!testPvPanelId) {
                 const pvPanel = await prisma.pVPanel.create({
                     data: {
-                        ...samplePvPanel
+                        ...samplePvPanel,
+                        modelNumber: 'UNIQUE-MODEL-' + Date.now() // Ensure unique model number
                     }
                 });
                 testPvPanelId = pvPanel.id;
@@ -129,18 +162,47 @@ describe('PV Panel Controller', () => {
     describe('PUT /api/pv-panels/:pvPanelId', () => {
         const updatedPanel = {
             manufacturer: 'Updated Manufacturer',
-            modelNumber: 'UPD-400',
+            modelNumber: 'UPD-400-' + Date.now(), // Ensure unique model number
             description: 'Updated high-efficiency panel',
-            maxPower: 400,
-            openCircuitVoltage: 50.0,
+            safetyCertification: 'UL 1703 Updated',
+            ptcRating: 395.5,
+            notes: 'Updated premium panel with excellent warranty',
+            designQualificationCert: 'IEC 61215 Updated',
+            performanceEvaluation: 'Tier 1 Premium',
+            family: 'X-Series Premium',
+            technology: 'Monocrystalline PERC',
+            activeArea: 1.65,
+            numberOfCells: 104,
+            numberOfPanels: 1,
+            bipv: false,
+            nameplateMaxCurrentAtPmax: 6.1,
+            nameplateVoltageAtPmax: 65.0,
+            averageNoct: 44.0,
             tempCoeffPmax: -0.30,
             tempCoeffIsc: 0.06,
             tempCoeffVoc: -0.26,
+            tempCoeffIpmax: 0.04,
+            tempCoeffVpmax: -0.25,
+            currentAtLowPower: 5.8,
+            voltageAtLowPower: 60.0,
+            currentAtNoct: 5.0,
+            voltageAtNoct: 58.5,
+            mountingType: 'Roof Mount Premium',
+            moduleType: 'Premium',
             shortSide: 1050,
             longSide: 1560,
+            geometricMultiplier: 1.1,
+            performanceRatio: 0.88,
             weight: 19.0,
+            framingMaterial: 'Aluminum Premium',
+            junctionBoxType: 'IP68',
+            connectorType: 'MC4 Premium',
             performanceWarranty: '30 years',
-            productWarranty: '15 years'
+            productWarranty: '15 years',
+            efficiency: 23.5,
+            openCircuitVoltage: 50.0,
+            shortCircuitCurrent: 6.5,
+            maxPower: 400
         };
 
         it('should update an existing PV panel', async () => {
@@ -165,9 +227,10 @@ describe('PV Panel Controller', () => {
 
         it('should validate update data types', async () => {
             const invalidUpdate = {
-                ...updatedPanel,
-                maxPower: 'invalid',
-                performanceWarranty: 'invalid'
+                manufacturer: 'Test Manufacturer',
+                modelNumber: 'TEST-MODEL-' + Date.now(),
+                maxPower: 'invalid' as any,
+                performanceWarranty: 123 as any // Should be a string
             };
 
             const response = await request(app)
@@ -175,6 +238,7 @@ describe('PV Panel Controller', () => {
                 .send(invalidUpdate);
 
             expect(response.status).toBe(500);
+            expect(response.body).toHaveProperty('error');
         });
     });
 
@@ -187,7 +251,7 @@ describe('PV Panel Controller', () => {
 
             // Verify the PV panel was deleted
             const getResponse = await request(app)
-                .get(`/api/pvpanels/${testPvPanelId}`);
+                .get(`/api/pv-panels/${testPvPanelId}`);
             expect(getResponse.status).toBe(404);
         });
 

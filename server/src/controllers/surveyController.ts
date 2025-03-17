@@ -107,17 +107,14 @@ export const createSurvey = async (req: Request, res: Response) => {
       title, 
       description, 
       surveyJson, 
-      userId,
       targetResponses = 0,
-      // Ignore fields that don't exist in our schema
-      active, // Not in schema, ignore
-      responseCount // Not in schema, ignore
+      userId
     } = req.body;
     
     // Validate required fields
-    if (!title || !description || !surveyJson || !userId) {
+    if (!title || !description || !surveyJson) {
       return res.status(400).json({ 
-        message: 'Missing required fields: title, description, surveyJson, and userId are required',
+        message: 'Missing required fields: title, description, and surveyJson are required',
         receivedBody: {
           title: !!title,
           description: !!description,
@@ -134,7 +131,7 @@ export const createSurvey = async (req: Request, res: Response) => {
       jsonLength: surveyJson?.length,
       userId
     });
-    
+  
     // Create the survey
     const survey = await prisma.survey.create({
       data: {
@@ -193,8 +190,9 @@ export const deleteSurvey = async (req: Request, res: Response) => {
 export const createSurveyResponse = async (req: Request, res: Response) => {
   const { surveyId } = req.params;
   console.log('Request body received:', req.body);
+
+  const { responseJson, companyId, processedMetrics, userId } = req.body;
   
-  const { responseJson, userId, companyId, processedMetrics } = req.body;
   console.log('Extracted values:', { 
     surveyId, 
     responseJson: !!responseJson, 
@@ -206,13 +204,6 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
   if (!responseJson) {
     return res.status(400).json({ 
       message: 'responseJson is required',
-      receivedBody: req.body
-    });
-  }
-  
-  if (!userId) {
-    return res.status(400).json({ 
-      message: 'userId is required',
       receivedBody: req.body
     });
   }
@@ -261,7 +252,7 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
       data: {
         surveyId: Number(surveyId),
         responseJson: parsedResponse as Prisma.InputJsonValue,
-        userId: Number(userId),
+        userId: userId, // Use authenticated user ID
         companyId: Number(companyId),
         metricsVersion: validatedMetrics ? CURRENT_METRICS_VERSION : null,
         lastMetricsUpdate: validatedMetrics ? new Date() : null,

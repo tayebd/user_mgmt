@@ -1,4 +1,6 @@
-export const themeJson = {
+import { SurveyTheme, SurveyCustomCss } from './themeTypes';
+
+export const themeJson: SurveyTheme = {
 
   "backgroundOpacity": 1,
   "isPanelless": true,
@@ -126,7 +128,7 @@ export const themeJson = {
   "headerView": "advanced"
 };
 
-export const customCss = {
+export const customCss: SurveyCustomCss = {
     footer: "sv_nav mt-10 flex justify-between",
     imagepicker: {
       item: "sv_q_imgsel w-full inline-block !mr-0 max-w-[10rem] text-center",

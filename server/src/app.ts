@@ -3,8 +3,24 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { PrismaClient } from '@prisma/client';
+import dotenv from "dotenv";
+
+/* ROUTE IMPORTS */
+import searchRoutes from "./routes/searchRoutes";
+import companyRoutes from "./routes/companyRoutes";
+import pvPanelRoutes from './routes/pvPanelRoutes';
+import inverterRoutes from './routes/inverterRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 import surveyRoutes from './routes/surveyRoutes';
+import userRoutes from './routes/userRoutes';
+
+/* CONFIGURATIONS */
+dotenv.config();
+console.log('Environment loaded:', {
+  NODE_ENV: process.env.NODE_ENV,
+  PORT: process.env.PORT,
+  DATABASE_URL: process.env.DATABASE_URL?.substring(0, 20) + '...',
+});
 
 // Initialize Prisma client
 const prisma = new PrismaClient();
@@ -44,6 +60,29 @@ app.get('/health', (req, res) => {
 // API Routes
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/surveys', surveyRoutes);
+app.use('/api/users', userRoutes);
+app.use("/api/search", searchRoutes);
+app.use("/api/companies", companyRoutes);
+app.use('/api/pv-panels', pvPanelRoutes);
+app.use('/api/inverters', inverterRoutes);
+
+// Log all routes for debugging
+console.log('Registered routes:');
+app._router.stack.forEach((middleware: any) => {
+  if (middleware.route) {
+    // Routes registered directly on the app
+    console.log(`${middleware.route.stack[0].method.toUpperCase()} ${middleware.route.path}`);
+  } else if (middleware.name === 'router') {
+    // Router middleware
+    middleware.handle.stack.forEach((handler: any) => {
+      if (handler.route) {
+        const method = handler.route.stack[0].method.toUpperCase();
+        const path = handler.route.path;
+        console.log(`${method} ${middleware.regexp} ${path}`);
+      }
+    });
+  }
+});
 
 // Error handling for 404
 app.use((req, res) => {

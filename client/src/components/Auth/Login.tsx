@@ -2,25 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { FirebaseError } from 'firebase/app';
+import { AuthError } from '@supabase/supabase-js';
 import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 
-const getErrorMessage = (error: FirebaseError) => {
-  switch (error.code) {
-    case 'auth/operation-not-allowed':
-      return 'Email/Password sign-in is not enabled. Please contact the administrator.';
-    case 'auth/email-already-in-use':
-      return 'An account with this email already exists.';
-    case 'auth/invalid-email':
-      return 'Please enter a valid email address.';
-    case 'auth/weak-password':
-      return 'Password should be at least 6 characters long.';
-    case 'auth/user-disabled':
-      return 'This account has been disabled. Please contact support.';
-    case 'auth/user-not-found':
-    case 'auth/wrong-password':
+const getErrorMessage = (error: AuthError) => {
+  switch (error.message) {
+    case 'Email rate limit exceeded':
+      return 'Too many attempts. Please try again later.';
+    case 'Email not confirmed':
+      return 'Please confirm your email address before signing in.';
+    case 'Invalid login credentials':
       return 'Invalid email or password.';
+    case 'Email link is invalid or has expired':
+      return 'The sign-in link has expired. Please request a new one.';
+    case 'User already registered':
+      return 'An account with this email already exists.';
+    case 'Password should be at least 6 characters':
+      return 'Password should be at least 6 characters long.';
     default:
       return 'An error occurred during authentication. Please try again.';
   }
@@ -56,7 +55,7 @@ export const Login = () => {
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Authentication error:', error);
-      if (error instanceof FirebaseError) {
+      if (error instanceof AuthError) {
         setError(getErrorMessage(error));
       } else {
         setError('An unexpected error occurred. Please try again.');

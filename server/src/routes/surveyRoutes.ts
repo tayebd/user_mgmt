@@ -10,19 +10,23 @@ import {
   updateSurveyResponse,
   deleteSurveyResponse,
 } from '../controllers/surveyController';
+import { authenticateToken } from '../middleware/auth';
 
 const router = express.Router();
 
+// Protected routes - require authentication
+
 router.get('/', getSurveys);
 router.get('/:surveyId', getSurvey);
-router.post('/', createSurvey);
-router.put('/:surveyId', updateSurvey);
-router.delete('/:surveyId', deleteSurvey);
 
+router.post('/', authenticateToken, createSurvey);
+router.put('/:surveyId', authenticateToken, updateSurvey);
+router.delete('/:surveyId', authenticateToken, deleteSurvey);
 
-router.post('/:surveyId/surveyResponses', createSurveyResponse);
-router.get('/:surveyId/surveyResponses', getSurveyResponses);
-router.put('/surveyResponses/:surveyResponseId', updateSurveyResponse);
-router.delete('/surveyResponses/:surveyResponseId', deleteSurveyResponse);
+// Survey response routes - all require authentication
+router.post('/:surveyId/surveyResponses', authenticateToken, createSurveyResponse);
+router.get('/:surveyId/surveyResponses', authenticateToken, getSurveyResponses);
+router.put('/surveyResponses/:surveyResponseId', authenticateToken, updateSurveyResponse);
+router.delete('/surveyResponses/:surveyResponseId', authenticateToken, deleteSurveyResponse);
 
 export default router;

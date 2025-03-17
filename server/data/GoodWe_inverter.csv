@@ -1,0 +1,11 @@
+Inverter Model,Max. Input Voltage,MPPT Operating Voltage Range,Start-up Voltage,Nominal Input Voltage,Max. Input Current per MPPT,Max. Short Circuit Current per MPPT,Number of MPP Trackers,Number of Strings per MPPT,Nominal Output Power,Nominal Output Apparent Power,Max. AC Active Power,Max. AC Apparent Power,Nominal Output Voltage,Nominal AC Grid Frequency,Max. Output Current,Power Factor,Max. Total Harmonic Distortion,Max. Efficiency,European Efficiency
+GW3000D-NS,600,80-550,80,360,11,13.8,2,1,3000,3000,3000,3000,220/230,50/60,13.6,-1 (Adjustable from 0.8 leading to 0.8 lagging),<3,97.8,97.5
+GW3600D-NS,600,80-550,80,360,11,13.8,2,1,3680,3680,3680,3680,220/230,50/60,16, -1 (Adjustable from 0.8 leading to 0.8 lagging),<3,97.8,97.5
+GW4200D-NS,600,80-550,80,360,11,13.8,2,1,4200,4200,4200,4200,220/230,50/60,19, -1 (Adjustable from 0.8 leading to 0.8 lagging),<3,97.8,97.5
+GW5000D-NS,600,80-550,80,360,11,13.8,2,1,5000,5000,5000,5000,220/230,50/60,22.8, -1 (Adjustable from 0.8 leading to 0.8 lagging),<3,97.8,97.5
+GW6000D-NS,600,80-550,80,360,11,13.8,2,1,6000,6000,6000,6000,220/230,50/60,27.3, -1 (Adjustable from 0.8 leading to 0.8 lagging),<3,97.8,97.5
+GW3000T-DS,600,80-550,80,360,13,16.3,2,1,3000,3000,3000,3000,220/230,50/60,13.6, -1 (Adjustable from 0.8 leading to 0.8 lagging),<3,97.8,97.5
+GW3600T-DS,600,80-550,80,360,13,16.3,2,1,3680,3680,3680,3680,220/230,50/60,16, -1 (Adjustable from 0.8 leading to 0.8 lagging),<3,97.8,97.5
+GW4200T-DS,600,80-550,80,360,13,16.3,2,1,4200,4200,4200,4200,220/230,50/60,19, -1 (Adjustable from 0.8 leading to 0.8 lagging),<3,97.8,97.5
+GW5000T-DS,600,80-550,80,360,13,16.3,2,1,5000,5000,5000,5000,220/230,50/60,22.8, -1 (Adjustable from 0.8 leading to 0.8 lagging),<3,97.8,97.5
+GW6000T-DS,600,80-550,80,360,13,16.3,2,1,6000,6000,6000,6000,220/230,50/60,27.3, -1 (Adjustable from 0.8 leading to 0.8 lagging),<3,97.8,97.5

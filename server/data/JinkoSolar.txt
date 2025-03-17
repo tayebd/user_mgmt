@@ -1,0 +1,22 @@
+| Parameter                                | JKM550M-72HL4 / JKM550M-72HL4-V | JKM555M-72HL4 / JKM555M-72HL4-V | JKM560M-72HL4-V | JKM565M-72HL4-V | JKM570M-72HL4 / JKM570M-72HL4-V |
+|------------------------------------------|------------------------------------|------------------------------------|-------------------|-------------------|------------------------------------|
+| Maximum Power (Pmax) STC                | 550Wp                              | 555Wp                              | 560Wp             | 565Wp             | 570Wp                              |
+| Maximum Power (Pmax) NOCT               | 409Wp                              | 413Wp                              | 417Wp             | 420Wp             | 424Wp                              |
+| Maximum Power Voltage (Vmp) STC         | 40.90V                             | 40.99V                             | 41.09V            | 41.21V            | 41.34V                             |
+| Maximum Power Voltage (Vmp) NOCT        | 38.42V                             | 38.59V                             | 38.69V            | 38.74V            | 38.84V                             |
+| Maximum Power Current (Imp) STC         | 13.45A                             | 13.54A                             | 13.63A            | 13.71A            | 13.79A                             |
+| Maximum Power Current (Imp) NOCT        | 10.65A                             | 10.70A                             | 10.77A            | 10.85A            | 10.92A                             |
+| Open-circuit Voltage (Voc) STC          | 49.62V                             | 49.72V                             | 49.82V            | 49.93V            | 50.04V                             |
+| Open-circuit Voltage (Voc) NOCT         | 46.84V                             | 46.93V                             | 47.02V            | 47.13V            | 47.23V                             |
+| Short-circuit Current (Isc) STC         | 14.03A                             | 14.12A                             | 14.21A            | 14.30A            | 14.39A                             |
+| Short-circuit Current (Isc) NOCT        | 11.33A                             | 11.40A                             | 11.48A            | 11.55A            | 11.62A                             |
+| Module Efficiency STC (%)               | 21.33%                             | 21.52%                             | 21.72%            | 21.91%            | 22.10%                             |
+| Operating Temperature (°C)             | -40°C~+85°C                        | -40°C~+85°C                        | -40°C~+85°C       | -40°C~+85°C       | -40°C~+85°C                        |
+| Maximum System Voltage                  | 1000/1500VDC (IEC)                 | 1000/1500VDC (IEC)                 | 1000/1500VDC (IEC)| 1000/1500VDC (IEC)| 1000/1500VDC (IEC)                 |
+| Maximum Series Fuse Rating              | 25A                                | 25A                                | 25A               | 25A               | 25A                                |
+| Power Measurement Tolerance             | -3%~+3%                            | -3%~+3%                            | -3%~+3%          | -3%~+3%          | -3%~+3%                            |
+| Power Sorting Tolerance                 | -5W-+15W                           | -5W-+15W                           | -5W-+15W         | -5W-+15W         | -5W-+15W                           |
+| Temperature Coefficients of Pmax        | -0.35%/°C                          | -0.35%/°C                          | -0.35%/°C        | -0.35%/°C        | -0.35%/°C                          |
+| Temperature Coefficients of Voc         | -0.28%/°C                          | -0.28%/°C                          | -0.28%/°C        | -0.28%/°C        | -0.28%/°C                          |
+| Temperature Coefficients of Isc         | 0.048%/°C                         | 0.048%/°C                         | 0.048%/°C        | 0.048%/°C        | 0.048%/°C                         |
+| Nominal Operating Cell Temperature (NOCT)| 45±2°C                            | 45±2°C                            | 45±2°C           | 45±2°C           | 45±2°C                            |
