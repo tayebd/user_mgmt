@@ -13,8 +13,8 @@ export const getPVPanels = async (req: Request, res: Response) => {
       take: limitNumber,
       select: {
         id: true,
-        manufacturer: true,
-        modelNumber: true,
+        maker: true,
+        model: true,
         description: true,
         moduleType: true,
         shortSide: true,
@@ -47,8 +47,8 @@ export const getPVPanel = async (req: Request, res: Response) => {
       where: { id: Number(pvPanelId) },
       select: {
         id: true,
-        manufacturer: true,
-        modelNumber: true,
+        maker: true,
+        model: true,
         description: true,
         moduleType: true,
         shortSide: true,
@@ -81,8 +81,8 @@ export const createPVPanel = async (req: Request, res: Response) => {
   try {
     // Extract all possible fields from request body
     const {
-      manufacturer,
-      modelNumber,
+      maker,
+      model,
       description,
       moduleType,
       shortSide,
@@ -103,15 +103,15 @@ export const createPVPanel = async (req: Request, res: Response) => {
     } = req.body;
 
     // Validate required fields
-    if (!manufacturer || !modelNumber) {
+    if (!maker || !model) {
       return res.status(400).json({ message: 'Manufacturer and model number are required' });
     }
 
     // Create PV panel with all available fields
     const pvPanel = await prisma.pVPanel.create({
       data: {
-        manufacturer,
-        modelNumber,
+        maker,
+        model,
         description,
         moduleType,
         shortSide,
@@ -143,8 +143,8 @@ export const updatePVPanel = async (req: Request, res: Response) => {
   try {
     // Extract all possible fields from request body
     const {
-      manufacturer,
-      modelNumber,
+      maker,
+      model,
       description,
       moduleType,
       shortSide,
@@ -168,8 +168,8 @@ export const updatePVPanel = async (req: Request, res: Response) => {
     const pvPanel = await prisma.pVPanel.update({
       where: { id: Number(pvPanelId) },
       data: {
-        manufacturer,
-        modelNumber,
+        maker,
+        model,
         description,
         moduleType,
         shortSide,

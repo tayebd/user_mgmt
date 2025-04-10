@@ -1,0 +1,105 @@
+ac_protection:
+  fuse:
+    In: 25
+    Vn: 230
+    maker: TOMZN Electric
+    ref_type: TOM2A-125
+  lightning:
+    In: 30
+    InUnit: kVA
+    Isc: 20
+    IscUnit: kA
+    Uc: 230
+    Up: 2.5 kV
+    maker: TOMZN Electric
+    ref_type: TZG40-AC
+  switch:
+    Isec: 50
+    Usec: 230
+    maker: TOMZN Electric
+    ref_type: TOM7C-230
+cable_tray:
+  maker: Multi contact
+  model: MC4
+circuit_breaker:
+  maker: SIAME
+  model: SIAME 2x16 30mA
+connector:
+  mc4:
+    maker: Multi contact
+    model: MC4
+dc_cable:
+  Iz: 43
+  circuitGrouping: "Un seul circuit dans un chemin de c\xE2ble"
+  installationMethod: "Dans un chemin de c\xE2ble 30*35"
+  layerFactors: Un seul conducteur de deux couches = 0.8
+  length: 10
+  maker: EXTRA CABLE
+  numberLayers: Deux couches
+  referenceMethod: "Tous les autre cas ( lettre E num\xE9ro 13 )"
+  section: 4
+  temperatureFactors: "A 25\xB0C = 1,04"
+ac_cable:
+  Iz: 43
+  circuitGrouping: "Un seul circuit dans un chemin de c\xE2ble"
+  installationMethod: "Dans un chemin de c\xE2ble 30*35"
+  layerFactors: Un seul conducteur de deux couches = 0.8
+  length: 10
+  maker: EXTRA CABLE
+  numberLayers: Deux couches
+  referenceMethod: "Tous les autre cas ( lettre E num\xE9ro 13 )"
+  section: 4
+  temperatureFactors: "A 25\xB0C = 1,04"
+dc_protection:
+  fuse:
+    In: 25
+    Vn: 500
+    maker: TOMZN Electric
+    ref_type: TOM1C-125
+  lightning:
+    In: 30
+    InUnit: kVA
+    Iscpv: 20
+    IscpvUnit: kA
+    Ucpv: 500
+    Up: 2,5 kV
+    maker: TOMZN Electric
+    ref_type: TZG40-PV
+  switch:
+    Isec: 125
+    Usec: 1000
+    maker: TOMZN Electric
+    ref_type: TOM7Z-125
+distributor:
+  maker: Multi contact
+  model: MC4
+ground_cable:
+  maker: "Tunisie c\xE2ble"
+  section: 6
+inverter:
+  MPPT_range: 80-500V
+  maker: Growatt
+  maxApparentPower: 5000
+  maxDcVoltage: 500
+  maxInputCurrentPerMppt: 13.5
+  maxOutputCurrent: 22.7
+  maxShortCircuitCurrent: 16.9
+  model: MIN 6000TL-X
+  mpptVoltageRangeMax: 500
+  mpptVoltageRangeMin: 80
+  nominalOutputPower: 5000
+  numberOfMpptTrackers: 2
+  startVoltage: 100
+  voltage: 230
+panel:
+  currentAtPmax: 17.43
+  maker: LONGI SOLAR
+  maxPower: 500
+  maxSeriesFuseRating: 35
+  model: LR4-72HBD-435M
+  openCircuitVoltage: 46.3
+  shortCircuitCurrent: 18.55
+  tempCoeffIsc: 0.048
+  tempCoeffPowerPmax: -0.35
+  tempCoeffVoc: -0.27
+  voltageAtPmax: 38.5

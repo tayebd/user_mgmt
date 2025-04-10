@@ -4,8 +4,8 @@ import * as csv from 'fast-csv';
 
 // Define the PVPanel interface matching the database model
 interface PVPanel {
-  manufacturer: string;
-  modelNumber: string;
+  maker: string;
+  model: string;
   description?: string;
   tempCoeffPmax?: number;
   tempCoeffIsc?: number;
@@ -34,10 +34,10 @@ interface RawPanelData {
 
 // Abstract parser class
 abstract class PanelParser {
-  protected manufacturer: string;
+  protected maker: string;
   
-  constructor(manufacturer: string) {
-    this.manufacturer = manufacturer;
+  constructor(maker: string) {
+    this.maker = maker;
   }
   
   abstract parseData(data: string): PVPanel[];
@@ -110,13 +110,13 @@ class JinkoSolarParser extends PanelParser {
     }
     
     // Convert raw data to PVPanel objects
-    return models.map(modelNumber => {
-      const modelData = rawData[modelNumber];
+    return models.map(model => {
+      const modelData = rawData[model];
       
       return {
-        manufacturer: this.manufacturer,
-        modelNumber,
-        description: `JinkoSolar ${modelNumber} PV Panel`,
+        maker: this.maker,
+        model,
+        description: `JinkoSolar ${model} PV Panel`,
         tempCoeffPmax: this.parseNumber(modelData['Temperature Coefficients of Pmax']),
         tempCoeffIsc: this.parseNumber(modelData['Temperature Coefficients of Isc']),
         tempCoeffVoc: this.parseNumber(modelData['Temperature Coefficients of Voc']),
@@ -200,8 +200,8 @@ class CanadianSolarParser extends PanelParser {
     }
     
     // Convert raw data to PVPanel objects
-    return models.map(modelNumber => {
-      const modelData = rawData[modelNumber];
+    return models.map(model => {
+      const modelData = rawData[model];
       
       // Extract dimensions
       let longSide: number | undefined;
@@ -216,9 +216,9 @@ class CanadianSolarParser extends PanelParser {
       }
       
       return {
-        manufacturer: this.manufacturer,
-        modelNumber,
-        description: `Canadian Solar ${modelNumber} PV Panel`,
+        maker: this.maker,
+        model,
+        description: `Canadian Solar ${model} PV Panel`,
         tempCoeffPmax: this.parseNumber(modelData['THERMAL RATINGS - Temperature Coefficient of Pmax']),
         tempCoeffIsc: this.parseNumber(modelData['THERMAL RATINGS - Temperature Coefficient of Isc']),
         tempCoeffVoc: this.parseNumber(modelData['THERMAL RATINGS - Temperature Coefficient of Voc']),
@@ -248,7 +248,7 @@ class ParserFactory {
     } else if (filePath.includes('JASolar')) {
       return new JASolarParser();
     } else {
-      throw new Error('Unsupported manufacturer format');
+      throw new Error('Unsupported maker format');
     }
   }
 }
@@ -331,12 +331,12 @@ class JASolarParser extends PanelParser {
         panelData[header] = cells[index];
       });
 
-      const modelNumber = panelData['Module Type'];
+      const model = panelData['Module Type'];
 
       panels.push({
-        manufacturer: this.manufacturer,
-        modelNumber: modelNumber,
-        description: `JASolar ${modelNumber}`,
+        maker: this.maker,
+        model: model,
+        description: `JASolar ${model}`,
         maxPower: this.parseNumber(panelData['Rated Maximum Power (Pmax)']),
         openCircuitVoltage: this.parseNumber(panelData['Open Circuit Voltage (Voc)']),
         voltageAtPmax: this.parseNumber(panelData['Maximum Power Voltage (Vmp)']),

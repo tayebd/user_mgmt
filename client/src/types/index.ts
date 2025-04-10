@@ -1,3 +1,117 @@
+// export type PVPanel = {
+//   id : number;
+//   maker: string;
+//   model: string;
+//   description: string;
+//   power: number;
+//   shortCircuitCurrent: number;
+//   openCircuitVoltage: number;
+//   tempCoeffPmax: number;
+//   tempCoeffIsc: number;
+//   tempCoeffVoc: number;
+//   shortSide: number;
+//   longSide: number;
+//   weight: number;
+//   performanceWarranty: string;
+//   productWarranty: string;
+//   length: number;
+//   width: number;
+//   height: number;
+//   efficiency: number;
+//   price: number;
+// };
+
+// export type Inverter = {
+//   id : number;
+//   maker: string;
+//   model: string;
+//   description: string;
+//   phaseType: string;
+//   outputVoltage: number;
+//   maxOutputCurrent: number;
+//   maxOutputPower: number;
+//   efficiency: number; // Efficiency percentage
+//   inputVoltage: { min: number; max: number };
+//   warranty: number;
+//   price: number;
+//   phases: number;
+// };
+
+// export interface Site {
+//   address: string;
+//   country: string;
+//   latitude: number;
+//   longitude: number;
+//   city: string;
+//   client: string;
+//   elevation: number;
+//   timezone: number;
+//   gridVoltage: number;
+//   gridFrequency: number;
+// }
+
+// export interface PVArray {
+//   panelId: number;
+//   quantity: number;
+//   tilt: number;
+//   azimuth: number;
+//   losses: number;
+//   racking: string;
+//   bifacial?: boolean;
+//   roofType?: string;
+//   roofMaterial?: string;
+//   shading?: number;
+// }
+
+// export interface Load {
+//   name: string;
+//   power: number;
+//   hours: number;
+//   quantity: number;
+//   avgDailyConsumption?: number;
+//   peakDemand?: number;
+//   voltageRequired?: number;
+// }
+
+// export interface ProtectionDevice {
+//   id: number;
+//   type: string;
+//   rating: number;
+//   quantity: number;
+// }
+
+// export interface Wire {
+//   type: string;
+//   section: number;
+//   length: number;
+//   isAC: boolean;
+// }
+
+// export interface BatteryBank {
+//   id: number;
+//   quantity: number;
+//   voltageConfig: number;
+// }
+
+// export interface PVProject {
+//   id?: number;
+//   name: string;
+//   site: Site;
+//   arrays: PVArray[];
+//   loads: Load[];
+//   inverters: {
+//     id: number;
+//     quantity: number;
+//   }[];
+//   protectionDevices: ProtectionDevice[];
+//   wiring: Wire[];
+//   batteryBank?: BatteryBank;
+//   systemType: 'grid-tied' | 'off-grid' | 'hybrid';
+//   dcSystemSize: number;
+//   systemLosses: number;
+//   numberPanels: number; // Added property
+// };
+
 export type Company = {
   id : number;
   name: string;
@@ -45,91 +159,6 @@ export type User = {
   phone?: string;
 };
 
-export type PVPanel = {
-  id : number;
-  manufacturer: string;
-  modelNumber: string;
-  description: string;
-  power: number;
-  shortCircuitCurrent: number;
-  openCircuitVoltage: number;
-  tempCoeffPmax: number;
-  tempCoeffIsc: number;
-  tempCoeffVoc: number;
-  shortSide: number;
-  longSide: number;
-  weight: number;
-  performanceWarranty: string;
-  productWarranty: string;
-  length: number;
-  width: number;
-  height: number;
-  efficiency: number;
-  price: number;
-};
-
-export type Inverter = {
-  id : number;
-  manufacturer: string;
-  modelNumber: string;
-  description: string;
-  phaseType: string;
-  outputVoltage: number;
-  maxOutputCurrent: number;
-  maxOutputPower: number;
-  efficiency: number; // Efficiency percentage  
-  inputVoltage: { min: number; max: number };
-  warranty: number;
-  price: number;
-  phases: number;
-};
-
-export type SolarProject = {
-  id : number;
-  address: string;
-  coordinates: { lat: number; lng: number };
-  dcSystemSize: number;
-  arrayType: string;
-  systemLosses: number;
-  tilt: number;
-  azimuth: number;
-  bifacial: boolean;
-  selectedPanelId: number;
-  pvPanelQuantity: number;
-  selectedInverterId: number;
-  inverterQuantity: number;
-  mountingType: string;
-  roofMaterial?: string;
-  roofSlope?: number;
-  roofOrientation?: string;
-  roofArea?: number;
-  roofLoadCapacity?: number;
-  groundArea?: number;
-  groundSlope?: number;
-  groundOrientation?: string;
-  groundLoadCapacity?: number;
-  trackingType?: string;
-  trackingSlope?: number;
-  trackingOrientation?: string;
-  trackingLoadCapacity?: number;
-
-  derivedEquipment: {
-    fuses: number;
-    dcSurgeProtector: number;
-    dcDisconnectSwitches: number;
-    acSurgeProtector: number;
-    generalDisconnectSwitch: number;
-    residualCurrentBreaker: number;
-    generalCircuitBreaker: number;
-    dcCableLength: number;
-    acCableLength: number;
-    earthingCableLength: number;
-    mc4ConnectorPairs: number;
-    splitters: number;
-    cableTrayLength: number;
-  };
-};
-
 export interface Survey {
   id : number;
   title: string;
@@ -166,8 +195,6 @@ export interface SurveyResponse {
   processedMetrics?: ProcessedMetrics;
 }
 
-
-
 export interface Project {
   id : number;
   name: string;
@@ -193,66 +220,3 @@ export interface Task {
   assignedToId: number;
   assignedTo?: User;
 }
-
-export interface Coordinates {
-  lat: number;
-  lng: number;
-}
-
-export interface Equipment {
-  id: number;
-  manufacturer: string;
-  modelNumber: string;
-  quantity: number;
-}
-
-import { z } from 'zod';
-export const projectValidationSchema = z.object({
-  id: z.number(),
-  address: z.string().min(1, 'Address is required'),
-  coordinates: z.object({
-    lat: z.number().min(-90).max(90),
-    lng: z.number().min(-180).max(180),
-  }),
-  dcSystemSize: z.number().min(0),
-  arrayType: z.string(),
-  systemLosses: z.number().min(0).max(100),
-  tilt: z.number().min(0).max(90),
-  azimuth: z.number().min(0).max(360),
-  bifacial: z.boolean(),
-  selectedPanelId: z.number().min(1, 'PV Panel selection is required'),
-  pvPanelQuantity: z.number().min(1, 'At least one panel is required'),
-  selectedInverterId: z.number().min(1, 'Inverter selection is required'),
-  inverterQuantity: z.number().min(1, 'At least one inverter is required'),
-  mountingType: z.string(),
-  roofMaterial: z.string().optional(),
-  roofSlope: z.number().optional(),
-  roofOrientation: z.string().optional(),
-  roofArea: z.number().optional(),
-  roofLoadCapacity: z.number().optional(),
-  groundArea: z.number().optional(),
-  groundSlope: z.number().optional(),
-  groundOrientation: z.string().optional(),
-  groundLoadCapacity: z.number().optional(),
-  trackingType: z.string().optional(),
-  trackingSlope: z.number().optional(),
-  trackingOrientation: z.string().optional(),
-  trackingLoadCapacity: z.number().optional(),
-  derivedEquipment: z.object({
-    fuses: z.number(),
-    dcSurgeProtector: z.number(),
-    dcDisconnectSwitches: z.number(),
-    acSurgeProtector: z.number(),
-    generalDisconnectSwitch: z.number(),
-    residualCurrentBreaker: z.number(),
-    generalCircuitBreaker: z.number(),
-    dcCableLength: z.number(),
-    acCableLength: z.number(),
-    earthingCableLength: z.number(),
-    mc4ConnectorPairs: z.number(),
-    splitters: z.number(),
-    cableTrayLength: z.number(),
-  })
-});
-
-

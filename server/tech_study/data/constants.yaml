@@ -1,0 +1,14 @@
+constants:
+  resistivity_cu: 0.0168
+  resistivity_al: 0.037
+  K1: 1        # Installation method factor
+  K2: 0.94     # Circuit grouping factor
+  K3: 0.80     # Ambient temperature factor
+  # Different K4 values based on temperature
+  K4_80C: 0.41  # 80°C (cable tray exposed to sun)
+  K4_50C: 0.82  # 50°C (cable tray not exposed)
+  K4_25C: 1.04  # 25°C (buried)
+  cos_phi: 0.8
+  sin_phi: 0.6
+  lambda: 0.00008
+  gridVoltage: 230

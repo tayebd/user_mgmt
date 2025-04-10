@@ -1,0 +1,218 @@
+class PVArray
+                'tilt': data_field('tilt', 'Tilt Angle (Degrees):', 0.0),
+                'azimuth': data_field('azimuth', 'Azimuth (Degrees):', 0.0),
+                'mtg_cnfg': option_field('mtg_cnfg', 'Mounting Configuration:', '',
+                                         panel_racking, panel_racking),
+                'mtg_spc': data_field('mtg_spc', 'Space under Panel (cm):', 0.0),
+                'mtg_hgt': data_field('mtg_hgt', 'Mounting Height (m):', 0.0),
+                'gnd_cnd': option_field('gnd_cnd', 'Ground Surface Condition:', '',
+                                        list(albedo_types), albedo_types),
+                'albedo': data_field('albedo', 'Albedo:', 0.0),
+                'uis': data_field('uis', 'Units in Series:', 1),
+                'sip': data_field('sip', 'Strings in Parallel:', 1),
+                'ary_Vmp': data_field('ary_Vmp', 'Array Vmp:', 0.0),
+                'ary_Imp': data_field('ary_Imp', 'Array Imp:', 0.0),
+                'ary_tpnl': data_field('ary_tpnl', 'Total Panels:', 1),
+
+class PVBatBank
+                     'doa':data_field('doa','Days of Autonomy:  ',  0),
+                     'doc':data_field('doc','Depth of Discharge (%):  ',  100.0),
+                     'bnk_uis':data_field('bnk_uis','Units in Series:  ',  1),
+                     'bnk_sip':data_field('bnk_sip','Strings in Parallel:  ',  1),
+                     'bnk_tbats':data_field('bnk_tbats','Total Bank Batteries:  ',  1),
+                     'bnk_cap':data_field('bnk_cap','Bank Capacity (A-H):  ',  0.0),
+                     'bnk_vo':data_field('bnk_vo','Bank Voltage:  ',  0.0)
+
+
+class PVBattery
+                 'b_mfg':data_field('b_mfg','Manufacturer:', ''),
+                 'b_mdl':data_field('b_mdl','  Model:', ''),
+                 'b_desc':data_field('b_desc','Description:', ''),
+                 'b_typ':option_field('b_typ','Type:', '',
+                                      list(battery_types), battery_types),
+                 'b_nomv':data_field('b_nomv','Nominal Voltage (VDC):', 0.0),
+                 'b_rcap':data_field('b_rcap','Rated Capacity (AH):', 0.0),
+                 'b_rhrs':data_field('b_rhrs','Hour Basis for Rating:', 100),                           
+                 'b_ir':data_field('b_ir','Internal Resistance (Ohms):', 0.0),
+                 'b_stdTemp':data_field('b_stdTemp','Rated temperature (C):', 25.0),
+                 'b_tmpc':data_field('b_tmpc','Temp Coeficient (C):', 0.0),
+                 'b_mxDschg':data_field('b_mxDschg', "Max No. of Discharge Cycles:", 1000),
+                 'b_mxDoD':data_field('b_mxDoD', 'Depth of Discharge % for Max Lifecycle:', 50.0)
+
+class PVChgControl(Component):
+        """ Define Charge Controller Attributes """
+                     'c_mfg':data_field('c_mfg', 'Manufactuerer:',''),
+                     'c_mdl':data_field('c_mdl', 'Model:',''),
+                     'Name':data_field('Name','Description:', ''),
+                     'c_type':option_field('c_type','Type:', '',
+                                           list(chgcntl_types), chgcntl_types),
+                     'c_pvmxv':data_field('c_pvmxv', 'Max PV Voltage (Vdc):',0.0),
+                     'c_pvmxi':data_field('c_pvmxi', 'Max PV Current (A):',0.0),
+                     'c_bvnom':data_field('c_bvnom', 'Bat Volts (Vdc):',0.0),
+                     'c_mvchg':data_field('c_mvchg', 'Max Chg Volts (Vdc):',0.0),
+                     'c_michg':data_field('c_michg', 'Max Chg Current (A):',0.0),
+                     'c_midschg':data_field('c_midschg', 'Max Dischg Current (A):',0.0),
+                     'c_tmpc':data_field('c_tmpc', 'Temp Compensation Coefficient (/C)', 0.0),
+                     'c_tmpr':data_field('c_tmpc', 'Temp Rating (C)', 25.0),
+                     'c_cnsmpt':data_field ('c_stdbyPow', 'Self Consumption (W):',0.0),
+                     'c_eff':data_field('c_eff', 'Efficiency (%):',90.0),
+
+class PVInverter
+                 'i_mfg':option_field('m_mfg', 'Manufacturer:', '',
+                                    sorted(list(set(self.master.inverters['Manufacturer']))),
+                                    self.master.inverters),
+                 'i_mdl':option_field('m_mdl', 'Model:', '',
+                                    sorted(list(set(self.master.inverters['Model']))),
+                                    self.master.inverters),
+                 'Name':data_field('Name', 'Description:', ''),
+                 'Vac':data_field('Vac', 'AC Voltage (Vac):', 0.0),
+                 'Paco':data_field('Paco', 'AC Power (Watts):', 0.0),
+                 'Pdco':data_field('Pdco', 'DC Power Panel(Watts):', 0.0),
+                 'Vdco':data_field('Vdco', 'DC Voltage (Vdc):', 0.0),
+                 'Pnt':data_field('Pnt', 'Night Time Power (Watts):', 0.0),
+                 'Vdcmax':data_field('Vdcmax', 'Max DC Voltage (Vdcmax):', 0.0),
+                 'Idcmax':data_field('Idcmax','Max DC Current (Idcmax):', 0.0),
+                 'Mppt_low':data_field('Mppt_low', 'Mppt_low (Vdc):', 0.0),
+                 'Mppt_high':data_field('Mppt_high', 'Mppt_high (Vdc)', 0.0),
+
+
+class PVPanel
+                 'm_mfg':option_field('m_mfg', 'Manufacturer:', '',
+                                    sorted(list(set(self.master.modules['Manufacturer']))),
+                                    self.master.modules),
+                 'm_mdl':option_field('m_mdl', 'Model:', '',
+                                    sorted(list(set(self.master.modules['Model']))),
+                                    self.master.modules),
+                 'Name':data_field('Name', 'Description:', ''),
+                 'Technology':data_field('Technology','Cell Type:  ', ''),
+                 'T_NOCT':data_field('T_NOCT', 'Nominal Operating Cell Temp:', 0.0),
+                 'V_mp_ref':data_field('V_mp_ref','Voltage at Max Power (Vmp):', 0.0),
+                 'I_mp_ref':data_field('I_mp_ref', 'Current at Max Power (Imp):', 0.0),
+                 'V_oc_ref':data_field('V_oc_ref','Open Circuit Voltage (Voc):', 0.0),
+                 'I_sc_ref':data_field('I_sc_ref','Short Circuit Current (Isc):', 0.0),
+                 'PTC':data_field('PTC', 'Power Rating Pmpp (W):', 0.0),
+                 'A_c':data_field('A_c', 'Cell Size(cm):', 0.0),
+                 'N_s':data_field('N_s', 'Number of cells:', 0),
+                 'R_s':data_field('R_s', 'Series Resistance (ohms):', 0.0),
+                 'R_sh_ref':data_field('R_sh_ref','Shunt Resistance (ohms):', 0.0),
+                 'BIPV':data_field('BIPV', 'BIPV:', 0.0),
+                 'alpha_sc':data_field('alpha_sc', 'alpha_sc:', 0.0),
+                 'beta_oc':data_field('beta_oc', 'beta_oc:', 0.0),
+                 'a_ref':data_field('a_ref', 'a_ref:', 0.0),
+                 'I_L_ref':data_field('I_L_ref', 'I_L_ref:', 0.0),
+                 'I_o_ref':data_field('I_o_ref', 'I_o_ref:', 0.0),
+                 'Adjust':data_field('Adjust', 'Adjust:', 0.0),
+                 'gamma_r':data_field('gamma_r', 'gamma_r:', 0.0)
+
+class PVSite
+                 'cntry':option_field('cntry', 'Country:    ', '',
+                                      sorted(self.master.countries.index.values),
+                                      self.master.countries),
+                 'proj':data_field('proj', 'Project Name:', ''),
+                 'p_desc':data_field('p_desc','Description:', ''),
+                 'lat':data_field('lat', 'Latitude:', 0.0),
+                 'lon':data_field('lon', 'Longitude:', 0.0),
+                 'city':data_field('city', 'City:', ''),
+                 'client':data_field('client', 'Client:', ''),
+                 'elev':data_field('elev', 'Elevation (m):', 0.0),
+                 'tz':data_field('tz', 'TimeZone:', 0),
+                 'gv':data_field('gv', 'Grid Volts (VAC):  ', 0),
+                 'gf':data_field('gf', 'Grid Freq (Hz):  ', 0),
+
+
+
+class SiteLoad
+
+load_fields = ['Type', 'Qty', 'Use Factor','Hours', 'Start Hour', 'Watts', 'Mode']
+
+# Declare Energy Load Table Field Types by Column
+load_field_types = [str, int, float, float, int, float, str]
+
+
+Prisma Schema:
+model PVPanel {
+  maker        String
+  model         String             @unique
+  description         String?
+  tempCoeffPmax       Float?
+  tempCoeffIsc        Float?
+  tempCoeffVoc        Float?
+  tempCoeffIpmax      Float?
+  tempCoeffVpmax      Float?
+  moduleType          String?
+  shortSide           Float?
+  longSide            Float?
+  weight              Float?
+  performanceWarranty String?
+  productWarranty     String?
+  efficiency          Float?
+  openCircuitVoltage  Float?
+  shortCircuitCurrent Float?
+  maxPower            Float?
+  id                  Int                @id @default(autoincrement())
+  certification       String?
+  currentAtPmax       Float?
+  voltageAtPmax       Float?
+  projectEquipment    ProjectEquipment[] @relation("ProjectPVPanel")
+
+  @@index([maker, model])
+}
+
+
+model Inverter {
+  id                      Int     @id @default(autoincrement())
+  model             String  @unique
+  description             String?
+  maker            String?
+  
+  // AC Output Parameters
+  phaseType               String?  // Single-phase, Three-phase
+  outputVoltage           Float?   // Nominal AC voltage
+  nominalFrequency        Float?   // Nominal AC grid frequency
+  maxOutputCurrent        Float?   // Max output current
+  nominalOutputPower      Float?   // Nominal output power
+  maxOutputPower          Float?   // Max AC active power
+  maxApparentPower        Float?   // Max AC apparent power
+  powerFactor             Float?   // Adjustable power factor range
+  totalHarmonicDistortion Float?   // THDi (%)
+  acGridConnectionType    String?  // Grid connection type
+  
+  // DC Input Parameters
+  maxDcVoltage            Float?   // Max DC voltage
+  startVoltage            Float?   // Start-up voltage
+  nominalDcVoltage        Float?   // Nominal input voltage
+  mpptVoltageRangeMin     Float?   // Min MPPT voltage
+  mpptVoltageRangeMax     Float?   // Max MPPT voltage
+  numberOfMpptTrackers    Int?     // Number of MPPT trackers
+  stringsPerMppt          Int?     // Number of strings per MPPT
+  maxInputCurrentPerMppt  Float?   // Max input current per MPPT
+  maxShortCircuitCurrent  Float?   // Max short circuit current per MPPT
+  maxRecommendedPvPower   Float?   // Max recommended PV power (STC)
+  
+  // Efficiency
+  maxEfficiency           Float?   // Maximum efficiency (%)
+  europeanEfficiency      Float?   // European efficiency (%)
+  mpptEfficiency          Float?   // MPPT efficiency (%)
+  
+  // Physical & Environmental
+  dimensions              String?  // Width x Height x Depth
+  weight                  Float?   // Weight (kg)
+  ipRating                String?  // IP rating (e.g., IP65)
+  operatingTempRange      String?  // Operating temperature range
+  coolingMethod           String?  // e.g., Natural convection, Fan
+  noiseLevel              Float?   // Noise emission (dB)
+  
+  // Communication & Protection
+  communicationInterfaces String?  // e.g., "RS485, WiFi, Ethernet"
+  displayType             String?  // e.g., "LCD, LED indicators"
+  protectionFeatures      String?  // e.g., "DC reverse polarity, Anti-islanding"
+  
+  // Certifications & Warranty
+  certifications          String?  // e.g., "IEC 62109, G99, VDE-AR-N 4105"
+  warrantyYears           Int?     // Standard warranty period
+  projectEquipment ProjectEquipment[] @relation("ProjectInverter")
+
+  @@index([maker, model])
+}
+
+

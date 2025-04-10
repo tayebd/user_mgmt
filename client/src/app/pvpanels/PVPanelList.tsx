@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useApiStore } from '@/state/api';
-import { PVPanel } from '@/types';
+import type { PVPanel } from '@/../../server/shared/types';
 import Sidebar from '@/components/Sidebar';
 
 const PVPanelList = () => {
@@ -41,8 +41,8 @@ const PVPanelList = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {pvPanels.map((panel) => (
               <tr key={panel.id}>
-                <td className="py-4 px-6 text-sm font-medium text-gray-900">{panel.manufacturer}</td>
-                <td className="py-4 px-6 text-sm text-gray-500">{panel.modelNumber}</td>
+                <td className="py-4 px-6 text-sm font-medium text-gray-900">{panel.maker}</td>
+                <td className="py-4 px-6 text-sm text-gray-500">{panel.model}</td>
                 <td className="py-4 px-6 text-sm text-gray-500">{panel.description}</td>
                 <td className="py-4 px-6 text-sm text-gray-500">{panel.power}</td>
               </tr>

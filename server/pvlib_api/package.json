@@ -1,0 +1,36 @@
+{
+  "dependencies": {
+    "@types/node": "^22.13.11",
+    "axios": "^1.8.4",
+    "child_process": "^1.0.2",
+    "fastapi": "^0.0.8",
+    "fs": "0.0.1-security",
+    "pybridge": "^1.4.0",
+    "rxjs": "^7.8.2",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-scripts eject",
+    "dev": "react-app-rewired start"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ],
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@deepkit/type-compiler",
+      "core-js"
+    ],
+    "ignoredBuiltDependencies": [
+      "core-js-pure"
+    ]
+  },
+  "devDependencies": {
+    "@deepkit/type-compiler": "^1.0.2"
+  }
+}

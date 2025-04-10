@@ -342,12 +342,11 @@ model Project {
   description String?
   startDate   DateTime
   endDate     DateTime
-  createdAt   DateTime           @default(now())
-  status      ProjectStatus      @default(NOT_STARTED)
-  updatedAt   DateTime           @updatedAt
-  id          Int                @id @default(autoincrement())
+  createdAt   DateTime      @default(now())
+  status      ProjectStatus @default(NOT_STARTED)
+  updatedAt   DateTime      @updatedAt
+  id          Int           @id @default(autoincrement())
   memberIds   Int[]
-  equipment   ProjectEquipment[]
   tasks       Task[]
 }
 
@@ -366,9 +365,9 @@ model Task {
   project      Project      @relation(fields: [projectId], references: [id])
 }
 
+
+
 model PVPanel {
-  manufacturer        String
-  modelNumber         String             @unique
   description         String?
   tempCoeffPmax       Float?
   tempCoeffIsc        Float?
@@ -389,109 +388,216 @@ model PVPanel {
   certification       String?
   currentAtPmax       Float?
   voltageAtPmax       Float?
+  maker               String
+  maxSeriesFuseRating Float?
+  model               String             @unique
   projectEquipment    ProjectEquipment[] @relation("ProjectPVPanel")
 
-  @@index([manufacturer, modelNumber])
+  @@index([maker, model])
 }
 
 model Inverter {
-  id                      Int     @id @default(autoincrement())
-  modelNumber             String  @unique
   description             String?
-  manufacturer            String?
-  
-  // AC Output Parameters
-  phaseType               String?  // Single-phase, Three-phase
-  outputVoltage           Float?   // Nominal AC voltage
-  nominalFrequency        Float?   // Nominal AC grid frequency
-  maxOutputCurrent        Float?   // Max output current
-  nominalOutputPower      Float?   // Nominal output power
-  maxOutputPower          Float?   // Max AC active power
-  maxApparentPower        Float?   // Max AC apparent power
-  powerFactor             Float?   // Adjustable power factor range
-  totalHarmonicDistortion Float?   // THDi (%)
-  acGridConnectionType    String?  // Grid connection type
-  
-  // DC Input Parameters
-  maxDcVoltage            Float?   // Max DC voltage
-  startVoltage            Float?   // Start-up voltage
-  nominalDcVoltage        Float?   // Nominal input voltage
-  mpptVoltageRangeMin     Float?   // Min MPPT voltage
-  mpptVoltageRangeMax     Float?   // Max MPPT voltage
-  numberOfMpptTrackers    Int?     // Number of MPPT trackers
-  stringsPerMppt          Int?     // Number of strings per MPPT
-  maxInputCurrentPerMppt  Float?   // Max input current per MPPT
-  maxShortCircuitCurrent  Float?   // Max short circuit current per MPPT
-  maxRecommendedPvPower   Float?   // Max recommended PV power (STC)
-  
-  // Efficiency
-  maxEfficiency           Float?   // Maximum efficiency (%)
-  europeanEfficiency      Float?   // European efficiency (%)
-  mpptEfficiency          Float?   // MPPT efficiency (%)
-  
-  // Physical & Environmental
-  dimensions              String?  // Width x Height x Depth
-  weight                  Float?   // Weight (kg)
-  ipRating                String?  // IP rating (e.g., IP65)
-  operatingTempRange      String?  // Operating temperature range
-  coolingMethod           String?  // e.g., Natural convection, Fan
-  noiseLevel              Float?   // Noise emission (dB)
-  
-  // Communication & Protection
-  communicationInterfaces String?  // e.g., "RS485, WiFi, Ethernet"
-  displayType             String?  // e.g., "LCD, LED indicators"
-  protectionFeatures      String?  // e.g., "DC reverse polarity, Anti-islanding"
-  
-  // Certifications & Warranty
-  certifications          String?  // e.g., "IEC 62109, G99, VDE-AR-N 4105"
-  warrantyYears           Int?     // Standard warranty period
-  projectEquipment ProjectEquipment[] @relation("ProjectInverter")
+  phaseType               String?
+  outputVoltage           Float?
+  id                      Int                @id @default(autoincrement())
+  acGridConnectionType    String?
+  certifications          String?
+  communicationInterfaces String?
+  coolingMethod           String?
+  dimensions              String?
+  displayType             String?
+  europeanEfficiency      Float?
+  ipRating                String?
+  maxApparentPower        Float?
+  maxDcVoltage            Float?
+  maxEfficiency           Float?
+  maxInputCurrentPerMppt  Float?
+  maxOutputCurrent        Float?
+  maxOutputPower          Float?
+  maxRecommendedPvPower   Float?
+  maxShortCircuitCurrent  Float?
+  mpptEfficiency          Float?
+  mpptVoltageRangeMax     Float?
+  mpptVoltageRangeMin     Float?
+  noiseLevel              Float?
+  nominalDcVoltage        Float?
+  nominalFrequency        Float?
+  nominalOutputPower      Float?
+  numberOfMpptTrackers    Int?
+  operatingTempRange      String?
+  powerFactor             Float?
+  protectionFeatures      String?
+  startVoltage            Float?
+  stringsPerMppt          Int?
+  totalHarmonicDistortion Float?
+  warrantyYears           Int?
+  weight                  Float?
+  maker                   String?
+  model                   String             @unique
+  projectEquipment        ProjectEquipment[] @relation("ProjectInverter")
 
-  @@index([manufacturer, modelNumber])
+  @@index([maker, model])
+}
+
+model BatteryBank {
+  id                     Int                @id @default(autoincrement())
+  maker                  String
+  description            String?
+  batteryType            String
+  nominalVoltage         Float
+  ratedCapacity          Float
+  hourBasisForRating     Int
+  internalResistance     Float
+  ratedTemperature       Float
+  temperatureCoefficient Float
+  maxDischargeCycles     Int
+  maxDepthOfDischarge    Float
+  daysOfAutonomy         Int
+  depthOfDischarge       Float
+  unitsInSeries          Int
+  stringsInParallel      Int
+  totalBankBatteries     Int
+  model                  String
+  projectEquipment       ProjectEquipment[] @relation("ProjectBatteryBank")
+
+  @@unique([maker, model])
+  @@index([maker, model])
+}
+
+model ChargeController {
+  id                          Int                @id @default(autoincrement())
+  maker                       String
+  description                 String?
+  controllerType              String
+  maxPVVoltage                Float
+  maxPVCurrent                Float
+  batteryVoltage              Float
+  maxChargeVoltage            Float
+  maxChargeCurrent            Float
+  maxDischargeCurrent         Float
+  tempCompensationCoefficient Float
+  temperatureRating           Float
+  selfConsumption             Float
+  efficiency                  Float
+  model                       String
+  projectEquipment            ProjectEquipment[] @relation("ProjectChargeController")
+
+  @@unique([maker, model])
+  @@index([maker, model])
+}
+
+model Load {
+  id            Int       @id @default(autoincrement())
+  loadType      String
+  quantity      Int
+  usageFactor   Float
+  hoursPerDay   Float
+  startHour     Int
+  wattage       Float
+  operationMode String
+  projectId     Int
+  project       PVProject @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
 }
 
 model MountingHardware {
-  modelNumber      String             @unique
-  equipmentType    String?
-  description      String?
-  manufacturer     String
   id               Int                @id @default(autoincrement())
+  maker            String
+  model            String             @unique
+  description      String?
+  type             String
+  material         String
+  maxLoad          Float
+  maxWindSpeed     Float
+  maxSnowLoad      Float
+  warranty         String
+  price            Float?
   projectEquipment ProjectEquipment[] @relation("ProjectMountingHardware")
 
-  @@index([manufacturer, modelNumber])
+  @@index([maker, model])
 }
 
+// Central model for all protection devices (DC and AC)
 model ProtectionDevice {
-  id                  Int                @id @default(autoincrement())
-  maker               String
-  refType             String
-  circuitType         String
-  equipmentType       String
-  ratedCurrent        Float?
-  ratedVoltage        Float?
-  protectionLevel     String?
-  nominalDischarge    String?
-  shortCircuitCurrent Float?
+  id                     Int    @id @default(autoincrement())
+  maker                  String
+  deviceType             DeviceType
+  side                   SystemSide
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  
+  // Common device properties
+  model                  String?
+  reference              String?
+  
+  // Rating properties (applicable to most devices)
+  ratedVoltage           Float?
+  ratedCurrent           Float?
+  
+  // Fuse specific properties
+  minRequiredVoltage     Float?   // For requirements tracking
+  minRequiredCurrent     Float?
+  maxRequiredCurrent     Float?
+  
+  // Switch specific properties
+  breakingCapacity       Float?
+  
+  // Circuit breaker specific properties
+  differentialSensitivity Float?
+  
+  // Surge protector specific properties
+  type                   String?   // "Type 1" or "Type 2"
+  continuousOperatingVoltage Float?
+  protectionLevel        Float?
+  nominalDischargeCurrentKA Float?
+  maxDischargeCurrentKA   Float?
+  minRequiredDischargeKA  Float?
+  
+  // Compliance
+  isCompliant            Boolean  @default(false)
+  complianceIssue        String?
+  recommendation         String?
+  
   projectEquipment    ProjectEquipment[] @relation("ProjectProtectionDevice")
 
-  @@index([maker, refType])
-  @@index([circuitType, equipmentType])
-  @@map("protection_equipment")
 }
 
+// Cables for both DC and AC
 model Wire {
-  modelNumber      String             @unique
-  equipmentType    String?
-  description      String?
-  manufacturer     String
   id               Int                @id @default(autoincrement())
+  maker            String
+  Iz               Float             // currentCapacity
+  model            String             @unique
+  section          Float
+  side               SystemSide
+  maxVoltageDropPercent Float?
+  lengthInMeters     Float?
+  isCompliant        Boolean    @default(true)
+  complianceIssue    String?
   projectEquipment ProjectEquipment[] @relation("ProjectWire")
 
-  @@index([manufacturer, modelNumber])
+  @@index([maker, model])
+}
+
+// Grounding system details
+model GroundingSystem {
+  id               Int                @id @default(autoincrement())
+  metalPartsGrounded Boolean  @default(true)
+  cableSection       Float?
+  resistance         Float?
+  isCompliant        Boolean  @default(true)
+  complianceIssue    String?
+  
+  // Relationships
+  projectEquipment ProjectEquipment[] @relation("ProjectGrounding")
+  
+  @@map("grounding_systems")
 }
 
 model ProjectEquipment {
-  equipmentType      EquipmentType
+  type               EquipmentType
   quantity           Int               @default(1)
   position           Json?
   specifications     Json?
@@ -504,17 +610,81 @@ model ProjectEquipment {
   inverterId         Int?
   mountingHardwareId Int?
   wireId             Int?
+  groundId           Int?
   protectionDeviceId Int?
+  batteryBankId      Int?
+  chargeControllerId Int?
+  batteryBank        BatteryBank?      @relation("ProjectBatteryBank", fields: [batteryBankId], references: [id])
+  chargeController   ChargeController? @relation("ProjectChargeController", fields: [chargeControllerId], references: [id])
   inverter           Inverter?         @relation("ProjectInverter", fields: [inverterId], references: [id])
   mountingHardware   MountingHardware? @relation("ProjectMountingHardware", fields: [mountingHardwareId], references: [id])
-  project            Project           @relation(fields: [projectId], references: [id])
+  project            PVProject         @relation(fields: [projectId], references: [id])
   protectionDevice   ProtectionDevice? @relation("ProjectProtectionDevice", fields: [protectionDeviceId], references: [id])
   pvPanel            PVPanel?          @relation("ProjectPVPanel", fields: [pvPanelId], references: [id])
   wire               Wire?             @relation("ProjectWire", fields: [wireId], references: [id])
+  grounding          GroundingSystem?  @relation("ProjectGrounding", fields: [groundId], references: [id])
 
-  @@unique([projectId, equipmentId, equipmentType])
+  @@unique([projectId, equipmentId, type])
   @@index([projectId])
   @@index([equipmentId])
+}
+
+model PVProject {
+  id               Int                @id @default(autoincrement())
+  name             String
+  customer         String
+  address          String
+  country          String
+  description      String?
+  city             String?
+  designer         String?
+  latitude         Float
+  longitude        Float
+  elevation        Float
+  timezone         Int
+  powerkW          Float
+  numberPanels     Int
+  numberOfStrings  Int
+  reference        String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  loads            Load[]
+  arrays           PVArray[]
+  gridVoltage      Int
+  gridFrequency    Int
+  projectEquipment ProjectEquipment[]
+}
+
+model PVArray {
+  id                     Int       @id @default(autoincrement())
+  tilt                   Float
+  azimuth                Float
+  mountingConfiguration  String?
+  spaceUnderPanel        Float
+  mountingHeight         Float
+  groundSurfaceCondition String?
+  albedo                 Float
+  unitsInSeries          Int
+  stringsInParallel      Int
+  arrayVmp               Float
+  arrayImp               Float
+  totalPanels            Int
+  projectId              Int
+  project                PVProject @relation(fields: [projectId], references: [id])
+}
+
+
+// Enums for categorizing devices
+enum DeviceType {
+  FUSE
+  DISCONNECT_SWITCH
+  CIRCUIT_BREAKER
+  SURGE_PROTECTOR
+}
+
+enum SystemSide {
+  DC
+  AC
 }
 
 enum UserRole {
@@ -557,4 +727,6 @@ enum EquipmentType {
   MOUNTING_HARDWARE
   MISC_EQUIPMENT
   WIRE
+  GROUNDING
+  PROTECTION
 }

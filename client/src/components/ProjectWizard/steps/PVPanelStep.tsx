@@ -1,19 +1,35 @@
 import { useEffect, useState } from 'react';
 import { StepProps } from './types';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { getPVPanels } from '@/services/equipment';
-import { PVPanel } from '@/types';
+import { getPVPanels } from '@/types/initialData'
+
+import type { PVPanel } from '@/shared/types';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // eslint-disable-next-line no-unused-vars
-export function PVPanelStep({ form, projectData, setSolarProject }: StepProps) {
+export function PVPanelStep({ form, pvProject, setPVProject }: StepProps) {
   const [panels, setPanels] = useState<PVPanel[]>([]);
   const [loading, setLoading] = useState(true);
   const { register, setValue, watch, formState: { errors } } = form;
-  const selectedPanelId = watch('selectedPanelId');
+  const panelId = watch('arrays.0.panelId') as number | undefined;
+
+  useEffect(() => {
+    if (panelId) {
+      const selectedPanel = panels.find(p => p.id === panelId);
+      if (selectedPanel) {
+        setPVProject?.(prev => ({
+          ...prev,
+          arrays: [
+            ...prev.arrays,
+            { panelId, quantity: 1, tilt: 0, azimuth: 0, losses: 14, racking: 'roof' }
+          ],
+          panels: [...prev.panels, selectedPanel]
+        }));
+      }
+    }
+  }, [panelId, panels, setPVProject]);
 
   useEffect(() => {
     const loadPanels = async () => {
@@ -30,7 +46,7 @@ export function PVPanelStep({ form, projectData, setSolarProject }: StepProps) {
     loadPanels();
   }, []);
 
-  const selectedPanel = panels.find(p => p.id === selectedPanelId);
+  const selectedPanel = panels.find(p => p.id === panelId);
 
   if (loading) {
     return <div className="space-y-4">
@@ -45,22 +61,22 @@ export function PVPanelStep({ form, projectData, setSolarProject }: StepProps) {
         <div className="space-y-2">
           <Label>Select PV Panel Model</Label>
           <Select
-            onValueChange={(value) => setValue('selectedPanelId', Number(value), { shouldValidate: true })}
-            defaultValue={selectedPanelId.toString()} 
+            onValueChange={(value) => setValue('arrays.0.panelId', Number(value), { shouldValidate: true })}
+            defaultValue={panelId?.toString()}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select a panel model" />
             </SelectTrigger>
             <SelectContent>
               {panels.map(panel => (
-                <SelectItem key={panel.id} value={panel.id.toString()}>
-                  {panel.manufacturer} - {panel.modelNumber} ({panel.power}W)
+                <SelectItem key={panel.id || 0} value={String(panel.id || 0)}>
+                  {panel.maker} - {panel.model} ({panel.power}W)
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          {errors.selectedPanelId?.message && (
-            <p className="text-sm text-red-500">{String(errors.selectedPanelId.message)}</p>
+          {errors.arrays?.[0]?.panelId?.message && (
+            <p className="text-sm text-red-500">{String(errors.arrays[0].panelId.message)}</p>
           )}
         </div>
 
@@ -95,42 +111,7 @@ export function PVPanelStep({ form, projectData, setSolarProject }: StepProps) {
         )}
       </div>
 
-      {selectedPanel && (
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="quantity">Number of Panels</Label>
-            <Input
-              id="quantity"
-              type="number"
-              min="1"
-              {...register('pvPanelQuantity', { valueAsNumber: true })}
-              className={errors.pvPanelQuantity ? 'border-red-500' : ''}
-            />
-            {errors.pvPanelQuantity?.message && (
-              <p className="text-sm text-red-500">{String(errors.pvPanelQuantity.message)}</p>
-            )}
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>Total Power</Label>
-              <Input
-                type="text"
-                value={`${(watch('pvPanelQuantity') || 0) * selectedPanel.power}W`}
-                readOnly
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Total Cost</Label>
-              <Input
-                type="text"
-                value={`$${(watch('pvPanelQuantity') || 0) * selectedPanel.price}`}
-                readOnly
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
-} 
+}

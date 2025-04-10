@@ -5,84 +5,121 @@ import { useForm, FormProvider, Path } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { SolarProject, projectValidationSchema } from '@/types';
-import { z } from 'zod';
+import { PVProject } from '@/shared/types';
 import { ProgressIndicator } from './ProgressIndicator';
 import {
   LocationStep,
-  SystemAttributesStep,
-  PVPanelStep,
+  ArrayStep,
   InverterStep,
   MountingStep,
   MiscEquipmentStep,
-  ReportStep
+  ReportStep1
 } from './steps/index';
-import { useApiStore } from '@/state/api'; 
-import { INITIAL_SOLARPROJECT_DATA } from '@/types/initialData'
-import { getPVPanels, getInverters } from '@/services/equipment';
-import { PVPanel, Inverter } from '@/types';
-
-const stepValidationFields: Record<number, Path<SolarProject>[]> = {
-  0: ['address', 'coordinates'], // Location
-  1: ['dcSystemSize', 'arrayType', 'systemLosses', 'tilt', 'azimuth', 'bifacial'], // System Attributes
-  2: ['selectedPanelId', 'pvPanelQuantity'], // PV Panels
-  3: ['selectedInverterId', 'inverterQuantity'], // Inverters
-  4: ['mountingType'], // Mounting
-  5: [], // Misc Equipment
-  6: [], // Report
-};
+import { useApiStore } from '@/state/api';
+import { INITIAL_PVPROJECT } from '@/types/initialData'
+import { PVProjectSchema } from '@/shared/types';
 
 export function ProjectWizard() {
+  const { createPVProject } = useApiStore();
+  
   console.log('ProjectWizard rendering');
-
   const [currentStep, setCurrentStep] = useState(0);
-  const [projectData, setSolarProject] = useState<SolarProject>(INITIAL_SOLARPROJECT_DATA);
-  const { fetchSolarProject, createSolarProject } = useApiStore();
-  const [pvPanels, setPVPanels] = useState<PVPanel[]>([]);
-  const [inverters, setInverters] = useState<Inverter[]>([]);
+  const [pvProject, setPVProject] = useState<PVProject>(INITIAL_PVPROJECT);
 
-  useEffect(() => {
-    fetchSolarProject();
-    getPVPanels().then(setPVPanels);
-    getInverters().then(setInverters);
-  }, [fetchSolarProject]);
-
-  // Define the type from the Zod schema
-  type ProjectFormValues = z.infer<typeof projectValidationSchema>;
-
-  const methods = useForm<ProjectFormValues>({
-    resolver: zodResolver(projectValidationSchema),
-    // defaultValues: {
-    //   ...INITIAL_PROJECT_DATA,
-    //   id: INITIAL_PROJECT_DATA.id || 0,
-    // },
+  const methods = useForm<PVProject>({
+    resolver: zodResolver(PVProjectSchema),
+    defaultValues: {
+      ...INITIAL_PVPROJECT,
+      id: INITIAL_PVPROJECT.id || 0,
+      arrays: INITIAL_PVPROJECT.arrays
+    },
     mode: 'onChange'
   });
 
+  // Validation functions for each step
+  const validateLocationStep = async () => {
+    return methods.trigger(['name'] as const);
+  };
+
+  const validateArrayStep = async () => {
+    return methods.trigger(['arrays'] as const);
+  };
+
+  const validateInvertersStep = async () => {
+    return methods.trigger(['inverters'] as const);
+  };
+
+  const validateMountingStep = async () => {
+    return methods.trigger(['arrays'] as const);
+  };
+
+  const validateMiscEquipmentStep = async () => {
+    return methods.trigger(['batteryBanks', 'chargeControllers', 'loads'] as const);
+  };
+
+  // No validation needed for report step
+  const validateReportStep = async () => true;
+
+  const stepValidationFunctions = [
+    validateLocationStep,
+    validateArrayStep,
+    validateInvertersStep,
+    validateMountingStep,
+    validateMiscEquipmentStep,
+    validateReportStep,
+  ] as const;
+
   const steps = [
     { title: 'Location', component: LocationStep },
-    { title: 'System Attributes', component: SystemAttributesStep },
-    { title: 'PV Panels', component: PVPanelStep },
+    { title: 'Array Attributes', component: ArrayStep },
     { title: 'Inverters', component: InverterStep },
     { title: 'Mounting', component: MountingStep },
     { title: 'Misc Equipment', component: MiscEquipmentStep },
-    { title: 'Report', component: ReportStep },
+    { title: 'Report', component: ReportStep1 },
   ];
 
   const handleNext = async () => {
-    const fieldsToValidate = stepValidationFields[currentStep];
-    const isValid = await methods.trigger(fieldsToValidate);
+    const validateCurrentStep = stepValidationFunctions[currentStep];
+    const isValid = await validateCurrentStep();
     console.log('Form state:', methods.formState);
     console.log('Current step errors:', methods.formState.errors);
+    console.log('PV Project:', pvProject);
 
-    if (isValid && currentStep < steps.length - 1) {
-      setCurrentStep((prev) => prev + 1);
+
+    if (isValid) {
+      if (currentStep === steps.length - 1) {
+        // On the report step, trigger report generation
+        const formValues = methods.getValues();
+        try {
+          const response = await fetch('http://localhost:8001/simulate-and-report', {
+              method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sim_request: formValues,
+              report_request: formValues
+            })
+          });
+          if (!response.ok) throw new Error('Failed to generate report');
+          const result = await response.json();
+          if (!result.success) throw new Error(result.error);
+          // Update project data with simulation results and report
+          // setProjectData({
+          //   ...formValues,
+          //   simulationResults: result.simulation_results,
+          //   reportContent: result.report_content
+          // });
+        } catch (error) {
+          console.error('Error generating report:', error);
+        }
+      } else {
+        setCurrentStep((prev: number) => prev + 1);
+      }
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 0) {
-      setCurrentStep((prev) => prev - 1);
+      setCurrentStep((prev: number) => prev - 1);
     }
   };
 
@@ -91,14 +128,13 @@ export function ProjectWizard() {
     if (isValid) {
       const formValues = methods.getValues();
       console.log('Saving project:', formValues);
-      
-      // Convert form values to SolarProject type
-      const solarProject: SolarProject = {
+
+      const project: PVProject = {
         ...formValues,
-        id: formValues.id || 0, // Ensure id is always set
+        id: formValues.id || 0,
       };
-      
-      await createSolarProject(solarProject);
+
+      await createPVProject(project);
     }
   };
 
@@ -115,10 +151,8 @@ export function ProjectWizard() {
           <Card className="p-6 mt-6">
             <CurrentStepComponent
               form={methods}
-              projectData={projectData}
-              setSolarProject={setSolarProject}
-              pvPanels={pvPanels}
-              inverters={inverters}
+              pvProject={pvProject}
+              setPVProject={setPVProject}
             />
           </Card>
 
@@ -137,9 +171,8 @@ export function ProjectWizard() {
               </Button>
               <Button
                 onClick={handleNext}
-                disabled={currentStep === steps.length - 1}
               >
-                {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
+                {currentStep === steps.length - 1 ? 'Generate Report' : 'Next'}
               </Button>
             </div>
           </div>

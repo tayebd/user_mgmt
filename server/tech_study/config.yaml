@@ -1,0 +1,37 @@
+# Solar PV Technical Project Report Generator Configuration
+
+# Project Information
+project:
+  name: "Solar PV Technical Analysis"
+  version: "1.0.0"
+  description: "Technical analysis and report generation for solar PV installations"
+
+# Paths Configuration
+paths:
+  data_dir: "data"
+  scripts_dir: "scripts"
+  templates_dir: "templates"
+  output_dir: "output"
+
+# Calculation Parameters
+calculations:
+  voltage_drop_limit: 2.0  # percentage
+  temperature_correction: true
+  safety_factor: 1.25
+
+# Document Generation
+document:
+  template_format: "markdown"
+  include_sections:
+    - equipment
+    - cable_sizing
+    - grounding
+    - calculations
+    - protection
+  output_format: "md"
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  file: "report_generation.log"
+  format: "%(asctime)s - %(levelname)s - %(message)s"

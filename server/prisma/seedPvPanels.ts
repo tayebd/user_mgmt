@@ -23,8 +23,8 @@ async function seedPvPanels() {
     for (const panel of panels) {
       await prisma.pVPanel.create({
         data: {
-          manufacturer: panel.manufacturer,
-          modelNumber: panel.modelNumber,
+          maker: panel.maker,
+          model: panel.model,
           description: panel.description,
           tempCoeffPmax: parseFloat(panel.tempCoeffPmax),
           tempCoeffIsc: parseFloat(panel.tempCoeffIsc),

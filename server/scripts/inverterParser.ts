@@ -5,9 +5,9 @@ import * as csv from 'fast-csv';
 // Define the Inverter interface matching the database model
 type Inverter = {
   id?: number;
-  modelNumber: string;
+  model: string;
   description?: string | null;
-  manufacturer?: string | null;
+  maker?: string | null;
   
   // AC Output Parameters
   phaseType?: string | null;
@@ -63,10 +63,10 @@ interface RawInverterData {
 
 // Abstract parser class
 abstract class InverterParser {
-  protected manufacturer: string;
+  protected maker: string;
   
-    constructor(manufacturer: string) {
-    this.manufacturer = manufacturer;
+    constructor(maker: string) {
+    this.maker = maker;
   }
   
     abstract parseData(data: string): Inverter[];
@@ -94,7 +94,7 @@ class ParserFactory {
     if (filePath.includes('Growatt')) {
       return new GrowattParser();
     } else {
-      throw new Error('Unsupported manufacturer format');
+      throw new Error('Unsupported maker format');
     }
   }
 }
@@ -188,13 +188,13 @@ function inferPhaseType(gridConnectionType: string | undefined): string | null {
 }
 
 // Infer phase type from model number for GoodWe inverters
-function inferPhaseTypeFromModel(modelNumber: string | undefined): string | null {
-  if (!modelNumber) return null;
+function inferPhaseTypeFromModel(model: string | undefined): string | null {
+  if (!model) return null;
   
   // GoodWe typically uses:
   // - DT, ET, BT, etc. series for three-phase inverters
   // - DNS, GW, etc. series for single-phase inverters
-  const model = modelNumber.toUpperCase();
+  const model = model.toUpperCase();
   
   if (model.includes('DT') || model.includes('ET') || model.includes('BT') || 
       model.includes('SMT') || model.includes('MT') || model.includes('HT') || 
@@ -240,8 +240,8 @@ class GrowattParser extends InverterParser {
   
       inverters.push({
         id: undefined, // Will be set by the database
-        manufacturer: 'Growatt',
-        modelNumber: inverterData['Inverter Model'],
+        maker: 'Growatt',
+        model: inverterData['Inverter Model'],
         description: `Growatt ${inverterData['Inverter Model']}`,
         
         // AC Output Parameters
@@ -326,8 +326,8 @@ class GoodWeParser extends InverterParser {
 
       inverters.push({
         id: undefined, // Will be set by the database
-        manufacturer: "GoodWe",
-        modelNumber: inverterData["Inverter Model"],
+        maker: "GoodWe",
+        model: inverterData["Inverter Model"],
         description: `GoodWe ${inverterData["Inverter Model"]} inverter`,
 
         // AC Output Parameters

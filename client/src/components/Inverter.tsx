@@ -24,7 +24,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const inverterSchema = z.object({
-  manufacturer: z.string().min(1, "Manufacturer is required"),
+  maker: z.string().min(1, "Manufacturer is required"),
   model: z.string().min(1, "Model is required"),
   type: z.string().min(1, "Inverter type is required"),
   powerRating: z.string().min(1, "Power rating is required"),
@@ -41,7 +41,7 @@ export default function Inverter() {
   const form = useForm<InverterFormValues>({
     resolver: zodResolver(inverterSchema),
     defaultValues: {
-      manufacturer: "",
+      maker: "",
       model: "",
       type: "",
       powerRating: "",
@@ -73,12 +73,12 @@ export default function Inverter() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="manufacturer"
+                name="maker"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Manufacturer</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter manufacturer" {...field} />
+                      <Input placeholder="Enter maker" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

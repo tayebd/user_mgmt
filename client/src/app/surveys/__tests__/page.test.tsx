@@ -26,14 +26,14 @@ describe('SurveysPage Component', () => {
     {
       id: '1',
       title: 'Customer Satisfaction Survey',
-      status: SurveyStatus.ACTIVE,
+      status: SurveyStatus.PUBLISHED,
       responses: [{ id: 'r1' }, { id: 'r2' }],
       createdAt: '2025-03-01T12:00:00Z',
     },
     {
       id: '2',
       title: 'Employee Feedback Survey',
-      status: SurveyStatus.ACTIVE, // Using ACTIVE as INACTIVE doesn't exist in the enum
+      status: SurveyStatus.PUBLISHED,
       responses: [],
       createdAt: '2025-03-05T14:30:00Z',
     },

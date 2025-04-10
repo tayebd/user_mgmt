@@ -24,7 +24,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const PVPanelSchema = z.object({
-  manufacturer: z.string().min(1, "Manufacturer is required"),
+  maker: z.string().min(1, "Manufacturer is required"),
   model: z.string().min(1, "Model is required"),
   wattage: z.string().min(1, "Wattage is required"),
   efficiency: z.string().min(1, "Efficiency is required"),
@@ -40,7 +40,7 @@ export default function PVPanel() {
   const form = useForm<PVPanelFormValues>({
     resolver: zodResolver(PVPanelSchema),
     defaultValues: {
-      manufacturer: "",
+      maker: "",
       model: "",
       wattage: "",
       efficiency: "",
@@ -71,12 +71,12 @@ export default function PVPanel() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="manufacturer"
+                name="maker"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Manufacturer</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter manufacturer" {...field} />
+                      <Input placeholder="Enter maker" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

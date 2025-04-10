@@ -1,9 +1,17 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
-import { Company, Review, PVPanel, Inverter, SolarProject, Project, Task,
+import { Company, Review, Project, Task, 
   Survey, CreateSurveyParams, SurveyResponse, User} from '@/types';
+import type { PVPanel, Inverter, PVProject } from '@/shared/types';
 // import { ProcessedMetrics, EnhancedSurveyResponse } from '@/types/metrics';
 import { SurveyMetricService } from '@/services/surveyMetricService';
+
+import {
+  INITIAL_PVPROJECT,
+  INITIAL_PROJECT,
+  INITIAL_SURVEY_DATA,
+  INITIAL_TASK_DATA
+} from '../types/initialData';
 import { getAuthToken } from '@/utils/auth';
 
 const REQUEST_TIMEOUT = 10000; // 10 seconds
@@ -25,13 +33,6 @@ export interface SearchResults {
   companies?: Company[];
 }
 
-import {
-  INITIAL_SOLARPROJECT_DATA,
-  INITIAL_PROJECT_DATA,
-  INITIAL_SURVEY_DATA,
-  INITIAL_TASK_DATA
-} from '../types/initialData';
-
 // Cache configuration
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 const FAILED_LOOKUP_TTL = 60 * 1000; // 1 minute
@@ -43,20 +44,22 @@ const failedLookupCache: { [uid: string]: { timestamp: number } } = {};
 export interface ApiState {
   projects: Project[];
   tasks: Task[];
-  solarProjects: SolarProject[];
+  pvProjects: PVProject[];
   users: User[];
   companies: Company[];
   surveys: Survey[];
   survey: Survey;
   pvPanels: PVPanel[];
   inverters: Inverter[];
-  solarProject: SolarProject;
+  pvProject: PVProject;
   project: Project;
   searchResults: SearchResults;
   isLoading: boolean;
 
 
   fetchPVPanels: (page: number, limit: number) => Promise<PVPanel[]>;
+  fetchPVPanelById: (panelId: number) => Promise<PVPanel>;
+
   fetchInverters: (page: number, limit: number) => Promise<Inverter[]>;
 
   fetchTasks: (page: number, limit: number) => Promise<Task[]>;
@@ -70,10 +73,10 @@ export interface ApiState {
   updateProject: (projectId: number, project: Partial<Project>) => Promise<void>;
   
 
-  fetchSolarProject: () => Promise<SolarProject>;
-  createSolarProject: (project: SolarProject) => Promise<SolarProject>;
-  deleteSolarProject: (projectId: number) => Promise<void>;
-  updateSolarProject: (projectId: number, project: Partial<SolarProject>) => Promise<void>;
+  fetchPVProject: () => Promise<PVProject>;
+  createPVProject: (project: PVProject) => Promise<PVProject>;
+  deletePVProject: (projectId: number) => Promise<void>;
+  updatePVProject: (projectId: number, project: Partial<PVProject>) => Promise<void>;
 
   fetchCompanies: () => Promise<Company[]>;
   fetchCompanyById: (companyId: number) => Promise<Company>;
@@ -108,11 +111,11 @@ const apiStore = create<ApiState>((set, get) => ({
   pvPanels: [],
   inverters: [],
   projects: [],
-  project: INITIAL_PROJECT_DATA,
+  project: INITIAL_PROJECT,
   survey: INITIAL_SURVEY_DATA,
   searchResults: {},
-  solarProjects: [],  
-  solarProject: INITIAL_SOLARPROJECT_DATA,
+  pvProjects: [],  
+  pvProject: INITIAL_PVPROJECT,
   tasks: [],
   task: INITIAL_TASK_DATA,
   isLoading: false,
@@ -183,7 +186,15 @@ const apiStore = create<ApiState>((set, get) => ({
     set({ pvPanels: data });
     return data;
   },
-
+  fetchPVPanelById:  async (panelId: number) => {
+    const response = await fetch(`${API_BASE_URL}/pv-panels/${panelId}`, {
+      method: 'GET',
+      credentials: 'include',
+    });
+    const data = await response.json();
+    set({ surveys: data });
+    return data;
+  },
   fetchInverters: async (page = 1, limit = 50) => {
     const response = await fetch(`${API_BASE_URL}/inverters?page=${page}&limit=${limit}`, {
       method: 'GET',
@@ -297,8 +308,8 @@ const apiStore = create<ApiState>((set, get) => ({
     }));
   },
 
-  fetchSolarProject: async () => {
-    const response = await fetch(`${API_BASE_URL}/solarProjects`, {
+  fetchPVProject: async () => {
+    const response = await fetch(`${API_BASE_URL}/pv-projects`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -306,9 +317,9 @@ const apiStore = create<ApiState>((set, get) => ({
     set({ project: data });
     return data;
   },
-  createSolarProject: async (project: SolarProject) => {
+  createPVProject: async (project: PVProject) => {
     const token = await getAuthToken();
-    const response = await fetch(`${API_BASE_URL}/solarProjects`, {
+    const response = await fetch(`${API_BASE_URL}/pv-projects`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -318,12 +329,12 @@ const apiStore = create<ApiState>((set, get) => ({
       credentials: 'include',
     });
     const data = await response.json();
-    set({ solarProject: data });
+    set({ pvProject: data });
     return data;
   },
-  updateSolarProject: async (projectId: number, project: Partial<SolarProject>) => {
+  updatePVProject: async (projectId: number, project: Partial<PVProject>) => {
     const token = await getAuthToken();
-    const response = await fetch(`${API_BASE_URL}/solarProjects/${projectId}`, {
+    const response = await fetch(`${API_BASE_URL}/pv-projects/${projectId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -333,11 +344,11 @@ const apiStore = create<ApiState>((set, get) => ({
       credentials: 'include',
     });
     const data = await response.json();
-    set({ solarProject: data });
+    set({ pvProject: data });
   },
-  deleteSolarProject: async (projectId: number) => {
+  deletePVProject: async (projectId: number) => {
     const token = await getAuthToken();
-    await fetch(`${API_BASE_URL}/solarProjects/${projectId}`, {
+    await fetch(`${API_BASE_URL}/pv-projects/${projectId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -345,7 +356,7 @@ const apiStore = create<ApiState>((set, get) => ({
       credentials: 'include',
     });
     set((state) => ({
-      solarProjects: state.solarProjects.filter((p) => p.id !== projectId),
+      pvProjects: state.pvProjects.filter((p) => p.id !== projectId),
     }));
   },
 
@@ -1037,6 +1048,3 @@ const apiStore = create<ApiState>((set, get) => ({
 }));
 
 export const useApiStore = apiStore;
-
-// export const fetchPVPanels = apiStore.getState().fetchPVPanels;
-// export const fetchInverters = apiStore.getState().fetchInverters;

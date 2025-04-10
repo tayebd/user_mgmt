@@ -1,10 +1,8 @@
 import { UseFormReturn } from 'react-hook-form';
-import { PVPanel, Inverter, SolarProject } from '@/types';
+import type { PVProject, PVPanel, Inverter } from '@/shared/types';
 
 export interface StepProps {
-  form: UseFormReturn<SolarProject>;
-  projectData: SolarProject;
-  setSolarProject: React.Dispatch<React.SetStateAction<SolarProject>>;
-  pvPanels?: PVPanel[];
-  inverters?: Inverter[];
+  form: UseFormReturn<PVProject>;
+  pvProject: PVProject;
+  setPVProject?: React.Dispatch<React.SetStateAction<PVProject>>;
 }

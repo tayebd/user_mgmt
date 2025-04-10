@@ -21,8 +21,8 @@ describe('Inverter Controller', () => {
             const response = await request(app)
                 .post('/api/inverters')
                 .send({
-                    manufacturer: 'SolarTech',
-                    modelNumber: 'ST-1000',
+                    maker: 'SolarTech',
+                    model: 'ST-1000',
                     description: 'High-efficiency inverter',
                     outputVoltage: 240,
                     maxCurrent: 40,
@@ -31,8 +31,8 @@ describe('Inverter Controller', () => {
 
             expect(response.status).toBe(201);
             expect(response.body).toHaveProperty('id');
-            expect(response.body.manufacturer).toBe('SolarTech');
-            expect(response.body.modelNumber).toBe('ST-1000');
+            expect(response.body.maker).toBe('SolarTech');
+            expect(response.body.model).toBe('ST-1000');
             testInverterId = response.body.id;
         });
 
@@ -40,7 +40,7 @@ describe('Inverter Controller', () => {
             const response = await request(app)
                 .post('/api/inverters')
                 .send({
-                    manufacturer: 'SolarTech'
+                    maker: 'SolarTech'
                     // Missing other required fields
                 });
 
@@ -55,8 +55,8 @@ describe('Inverter Controller', () => {
             if (!testInverterId) {
                 const inverter = await prisma.inverter.create({
                     data: {
-                        manufacturer: 'TestMaker',
-                        modelNumber: 'TM-2000',
+                        maker: 'TestMaker',
+                        model: 'TM-2000',
                         description: 'Test inverter',
                         outputVoltage: 220,
                         maxCurrent: 30,
@@ -83,8 +83,8 @@ describe('Inverter Controller', () => {
 
             expect(response.status).toBe(200);
             expect(response.body).toHaveProperty('id', testInverterId);
-            expect(response.body).toHaveProperty('manufacturer');
-            expect(response.body).toHaveProperty('modelNumber');
+            expect(response.body).toHaveProperty('maker');
+            expect(response.body).toHaveProperty('model');
         });
 
         it('should return 404 for non-existent inverter ID', async () => {
@@ -101,8 +101,8 @@ describe('Inverter Controller', () => {
             const response = await request(app)
                 .put(`/api/inverters/${testInverterId}`)
                 .send({
-                    manufacturer: 'UpdatedMaker',
-                    modelNumber: 'UM-3000',
+                    maker: 'UpdatedMaker',
+                    model: 'UM-3000',
                     description: 'Updated description',
                     outputVoltage: 230,
                     maxCurrent: 35,
@@ -110,16 +110,16 @@ describe('Inverter Controller', () => {
                 });
 
             expect(response.status).toBe(200);
-            expect(response.body).toHaveProperty('manufacturer', 'UpdatedMaker');
-            expect(response.body).toHaveProperty('modelNumber', 'UM-3000');
+            expect(response.body).toHaveProperty('maker', 'UpdatedMaker');
+            expect(response.body).toHaveProperty('model', 'UM-3000');
         });
 
         it('should return 404 when updating non-existent inverter', async () => {
             const response = await request(app)
                 .put('/api/inverters/99999')
                 .send({
-                    manufacturer: 'UpdatedMaker',
-                    modelNumber: 'UM-3000',
+                    maker: 'UpdatedMaker',
+                    model: 'UM-3000',
                     description: 'Updated description',
                     outputVoltage: 230,
                     maxCurrent: 35,

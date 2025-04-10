@@ -28,8 +28,8 @@ const fileConfig: Record<ModelName, { skipRows: number }> = {
 // Define field mappings for each model
 const fieldMappings: Record<ModelName, ExcelMapping[]> = {
   inverter: [
-    { excelField: 'Manufacturer Name', modelField: 'manufacturer', required: true },
-    { excelField: 'Model Number', modelField: 'modelNumber', transform: (v) => String(v), required: true },
+    { excelField: 'Manufacturer Name', modelField: 'maker', required: true },
+    { excelField: 'Model Number', modelField: 'model', transform: (v) => String(v), required: true },
     { excelField: 'Description', modelField: 'description' },
     { excelField: 'Phase', modelField: 'phaseType' },
     { excelField: 'Output Voltage', modelField: 'outputVoltage', transform: (v) => parseFloat(v) },
@@ -37,8 +37,8 @@ const fieldMappings: Record<ModelName, ExcelMapping[]> = {
     { excelField: 'Max Continuous Power', modelField: 'maxPower', transform: (v) => parseFloat(v) },
   ],
   pVPanel: [
-    { excelField: 'Manufacturer', modelField: 'manufacturer', required: true },
-    { excelField: 'Model Number', modelField: 'modelNumber', transform: (v) => String(v), required: true },
+    { excelField: 'Manufacturer', modelField: 'maker', required: true },
+    { excelField: 'Model Number', modelField: 'model', transform: (v) => String(v), required: true },
     { excelField: 'Description', modelField: 'description' },
     { excelField: 'Nameplate Max Power', modelField: 'power', transform: (v) => parseFloat(v) },
     { excelField: 'PTC Rating', modelField: 'ptcRating', transform: (v) => parseFloat(v) },
@@ -48,9 +48,9 @@ const fieldMappings: Record<ModelName, ExcelMapping[]> = {
     { excelField: 'Notes', modelField: 'notes' }
   ],
   // energyStorageSystem: [
-  //   { excelField: 'Manufacturer Name', modelField: 'manufacturer', required: true },
+  //   { excelField: 'Manufacturer Name', modelField: 'maker', required: true },
   //   { excelField: 'Brand', modelField: 'brand' },
-  //   { excelField: 'Model Number', modelField: 'modelNumber', transform: (v) => String(v), required: true },
+  //   { excelField: 'Model Number', modelField: 'model', transform: (v) => String(v), required: true },
   //   { excelField: 'Technology', modelField: 'technology' },
   //   { excelField: 'Description', modelField: 'description' },
   //   { excelField: 'Nameplate Energy Capacity', modelField: 'nameplateEnergyCapacity', transform: (v) => parseFloat(v) },
@@ -117,13 +117,13 @@ function transformExcelData<T extends ModelName>(
       });
 
       // Type guard based on model
-      if (modelName === 'inverter' && (!transformedRow.manufacturer || !transformedRow.modelNumber)) {
+      if (modelName === 'inverter' && (!transformedRow.maker || !transformedRow.model)) {
         return null;
       }
-      if (modelName === 'pVPanel' && (!transformedRow.manufacturer || !transformedRow.modelNumber)) {
+      if (modelName === 'pVPanel' && (!transformedRow.maker || !transformedRow.model)) {
         return null;
       }
-      // if (modelName === 'energyStorageSystem' && (!transformedRow.manufacturer || !transformedRow.modelNumber)) {
+      // if (modelName === 'energyStorageSystem' && (!transformedRow.maker || !transformedRow.model)) {
       //   return null;
       // }
 

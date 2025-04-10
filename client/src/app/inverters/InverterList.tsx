@@ -2,11 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { useApiStore } from '@/state/api';
-import { Inverter } from '@/types';
+import type { Inverter } from '@/../../server/shared/types';
 import Sidebar from '@/components/Sidebar';
 
 const InverterList = () => {
-  const { inverters, fetchInverters }: { inverters: Inverter[]; fetchInverters: (page: number, limit: number) => void } = useApiStore();
+  const { inverters, fetchInverters } = useApiStore() as {
+    inverters: Inverter[];
+    fetchInverters: (page: number, limit: number) => void;
+  };
   const [page, setPage] = useState(1);
   const [limit] = useState(50);
 
@@ -42,9 +45,9 @@ const InverterList = () => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {inverters.map((inverter) => (
-              <tr key={inverter.id}>
-                <td className="py-4 px-6 text-sm font-medium text-gray-900">{inverter.manufacturer}</td>
-                <td className="py-4 px-6 text-sm text-gray-500">{inverter.modelNumber}</td>
+              <tr key={inverter.id || 0}>
+                <td className="py-4 px-6 text-sm font-medium text-gray-900">{inverter.maker}</td>
+                <td className="py-4 px-6 text-sm text-gray-500">{inverter.model}</td>
                 <td className="py-4 px-6 text-sm text-gray-500">{inverter.description}</td>
                 <td className="py-4 px-6 text-sm text-gray-500">{inverter.phaseType}</td>
                 <td className="py-4 px-6 text-sm text-gray-500">{inverter.outputVoltage}</td>

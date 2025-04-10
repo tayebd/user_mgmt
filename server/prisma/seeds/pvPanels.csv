@@ -1,4 +1,4 @@
-manufacturer,modelNumber,description,maxPower,openCircuitVoltage,voltageAtPmax,shortCircuitCurrent,currentAtPmax,efficiency,tempCoeffIsc,tempCoeffVoc,tempCoeffPmax,moduleType
+maker,model,description,maxPower,openCircuitVoltage,voltageAtPmax,shortCircuitCurrent,currentAtPmax,efficiency,tempCoeffIsc,tempCoeffVoc,tempCoeffPmax,moduleType
 JASolar,JAM66D45 595/LB,JASolar JAM66D45 595/LB PV Panel,595,47.5,39.27,15.9,15.15,0.22,0.046,-0.26,-0.29,Monocrystalline
 JASolar,JAM66D45 600/LB,JASolar JAM66D45 600/LB PV Panel,600,47.7,39.44,15.95,15.21,0.222,0.046,-0.26,-0.29,Monocrystalline
 JASolar,JAM66D45 605/LB,JASolar JAM66D45 605/LB PV Panel,605,47.9,39.6,16,15.28,0.224,0.046,-0.26,-0.29,Monocrystalline

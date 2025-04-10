@@ -1,0 +1,28 @@
+certifications:
+  panel:
+    standards:
+    - IEC61215
+    - IEC61730
+    - UL 61730
+    - ISO9001:2015
+    - ISO14001:2015
+    - ISO45001:2018
+    - TS62941
+    warranty:
+      performance: 30
+      product: 12
+project:
+  acCableLength_1: 3
+  acCableLength_2: 0.5
+  arrayPower: 3045
+  arrayPowerkW: 3,045
+  customer: Leonardo Borji
+  dcCableLength: 10
+  latitude: 36.8065
+  longitude: 10.1815
+  numberPanels: 7
+temperature:
+  Tmax: 85
+  Tmin: -10
+  tempDiffCold: -35
+  tempDiffHot: 60

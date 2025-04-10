@@ -1,0 +1,35 @@
+array:
+  Imp_85: 17.93
+  Isc_85: 19.08
+  Npmax: 0
+  Npoptimal: 0
+  Nsmax: 9
+  Nsmin: 3
+  Nsoptimal: 11
+  Vmp_10: 42.14
+  Vmp_85: 32.26
+  Voc_10: 50.68
+  array_power: 3500
+  power_ratio: 0.7
+cable_sizing:
+  ac_Iz_prime_25C: 33.63
+  ac_Iz_prime_50C: 26.52
+  ac_Iz_prime_80C: 13.26
+  ac_delta_u_1: 65.8336
+  ac_delta_u_2: 10.9723
+  ac_delta_u_perc: 33.39
+  ac_delta_u_perc_1: 28.62
+  ac_delta_u_perc_2: 4.77
+  dc_Iz_prime_25C: 33.63
+  dc_Iz_prime_50C: 26.52
+  dc_Iz_prime_80C: 13.26
+  dc_delta_u: 1.4641
+  dc_delta_u_perc: 3.8
+protection:
+  Iscmax: 23.19
+  Ncmax_lmt: 1.94
+  Npmax_lmt: 1.5
+  Vocmax: 55.56
+  fuse_IscSTC: 25.51
+  fuse_Vocmax_val: 50.68
+  switch_IscSTC: 23.19

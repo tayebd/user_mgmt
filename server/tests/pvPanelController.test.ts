@@ -8,8 +8,8 @@ describe('PV Panel Controller', () => {
 
     // Updated sample PV panel with fields matching the new schema
     const samplePvPanel = {
-        manufacturer: 'SunPower',
-        modelNumber: 'SPR-X22-360-' + Date.now(), // Make unique to avoid conflicts
+        maker: 'SunPower',
+        model: 'SPR-X22-360-' + Date.now(), // Make unique to avoid conflicts
         description: 'High-efficiency solar panel',
         safetyCertification: 'UL 1703',
         ptcRating: 345.5,
@@ -70,8 +70,8 @@ describe('PV Panel Controller', () => {
 
             expect(response.status).toBe(201);
             expect(response.body).toHaveProperty('id');
-            expect(response.body.manufacturer).toBe(samplePvPanel.manufacturer);
-            expect(response.body.modelNumber).toBe(samplePvPanel.modelNumber);
+            expect(response.body.maker).toBe(samplePvPanel.maker);
+            expect(response.body.model).toBe(samplePvPanel.model);
             expect(response.body.maxPower).toBe(samplePvPanel.maxPower);
             testPvPanelId = response.body.id;
         });
@@ -80,8 +80,8 @@ describe('PV Panel Controller', () => {
             const response = await request(app)
                 .post('/api/pv-panels')
                 .send({
-                    // Missing manufacturer which is required
-                    modelNumber: 'TEST-MODEL-' + Date.now()
+                    // Missing maker which is required
+                    model: 'TEST-MODEL-' + Date.now()
                 });
 
             expect(response.status).toBe(400);
@@ -90,8 +90,8 @@ describe('PV Panel Controller', () => {
 
         it('should validate numeric fields', async () => {
             const invalidPanel = {
-                manufacturer: 'SunPower',
-                modelNumber: 'INVALID-MODEL-' + Date.now(),
+                maker: 'SunPower',
+                model: 'INVALID-MODEL-' + Date.now(),
                 maxPower: 'invalid' as any, // Should be a number
                 tempCoeffPmax: 'invalid' as any
             };
@@ -112,7 +112,7 @@ describe('PV Panel Controller', () => {
                 const pvPanel = await prisma.pVPanel.create({
                     data: {
                         ...samplePvPanel,
-                        modelNumber: 'UNIQUE-MODEL-' + Date.now() // Ensure unique model number
+                        model: 'UNIQUE-MODEL-' + Date.now() // Ensure unique model number
                     }
                 });
                 testPvPanelId = pvPanel.id;
@@ -127,7 +127,7 @@ describe('PV Panel Controller', () => {
             expect(response.status).toBe(200);
             expect(Array.isArray(response.body)).toBe(true);
             expect(response.body.length).toBeGreaterThan(0);
-            expect(response.body[0]).toHaveProperty('manufacturer');
+            expect(response.body[0]).toHaveProperty('maker');
             expect(response.body[0]).toHaveProperty('maxPower');
         });
 
@@ -137,7 +137,7 @@ describe('PV Panel Controller', () => {
 
             expect(response.status).toBe(200);
             expect(response.body).toHaveProperty('id', testPvPanelId);
-            expect(response.body).toHaveProperty('manufacturer', samplePvPanel.manufacturer);
+            expect(response.body).toHaveProperty('maker', samplePvPanel.maker);
             expect(response.body).toHaveProperty('maxPower', samplePvPanel.maxPower);
         });
 
@@ -161,8 +161,8 @@ describe('PV Panel Controller', () => {
 
     describe('PUT /api/pv-panels/:pvPanelId', () => {
         const updatedPanel = {
-            manufacturer: 'Updated Manufacturer',
-            modelNumber: 'UPD-400-' + Date.now(), // Ensure unique model number
+            maker: 'Updated Manufacturer',
+            model: 'UPD-400-' + Date.now(), // Ensure unique model number
             description: 'Updated high-efficiency panel',
             safetyCertification: 'UL 1703 Updated',
             ptcRating: 395.5,
@@ -211,7 +211,7 @@ describe('PV Panel Controller', () => {
                 .send(updatedPanel);
 
             expect(response.status).toBe(200);
-            expect(response.body).toHaveProperty('manufacturer', updatedPanel.manufacturer);
+            expect(response.body).toHaveProperty('maker', updatedPanel.maker);
             expect(response.body).toHaveProperty('maxPower', updatedPanel.maxPower);
             expect(response.body).toHaveProperty('performanceWarranty', updatedPanel.performanceWarranty);
         });
@@ -227,8 +227,8 @@ describe('PV Panel Controller', () => {
 
         it('should validate update data types', async () => {
             const invalidUpdate = {
-                manufacturer: 'Test Manufacturer',
-                modelNumber: 'TEST-MODEL-' + Date.now(),
+                maker: 'Test Manufacturer',
+                model: 'TEST-MODEL-' + Date.now(),
                 maxPower: 'invalid' as any,
                 performanceWarranty: 123 as any // Should be a string
             };

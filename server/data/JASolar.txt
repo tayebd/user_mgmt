@@ -1,7 +1,0 @@
-Module Type,Rated Maximum Power (Pmax),Open Circuit Voltage (Voc),Maximum Power Voltage (Vmp),Short Circuit Current (Isc),Maximum Power Current (Imp),Module Efficiency,Power Tolerance,Temperature Coefficient of Isc/a_Isc,Temperature Coefficient of Voc (ẞ_Voc),Temperature Coefficient of Pmax(y_Pmp)
-JAM66D45 595/LB,595,47.50,39.27,15.90,15.15,22.0,0~+3%,+0.046,-0.260,-0.290
-JAM66D45 600/LB,600,47.70,39.44,15.95,15.21,22.2,0~+3%,+0.046,-0.260,-0.290
-JAM66D45 605/LB,605,47.90,39.60,16.00,15.28,22.4,0~+3%,+0.046,-0.260,-0.290
-JAM66D45 610/LB,610,48.10,39.77,16.05,15.34,22.6,0~+3%,+0.046,-0.260,-0.290
-JAM66D45 615/LB,615,48.30,39.96,16.10,15.39,22.8,0~+3%,+0.046,-0.260,-0.290
-JAM66D45 620/LB,620,48.50,40.21,16.13,15.42,23.0,0~+3%,+0.046,-0.260,-0.290

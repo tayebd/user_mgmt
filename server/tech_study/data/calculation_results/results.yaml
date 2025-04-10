@@ -1,0 +1,19 @@
+# Calculation results
+
+temperature_effects:
+  Vmp_minus_10C: 41.96  # Vmp at -10°C
+  Voc_minus_10C: 50.54  # Voc at -10°C
+  Vmp_at_85C: 27.29     # Vmp at 85°C
+  Isc_at_85C: 20.67     # Isc at 85°C
+  Imp_at_85C: 19.42     # Imp at 85°C
+
+panel_configuration:
+  Nsoptimal: 11    # Optimal number of panels in series
+  Nsmax: 9         # Maximum number of panels in series
+  Nsmin: 3         # Minimum number of panels in series
+  Npmax: 1         # Maximum number of parallel strings
+  Npoptimal: 0     # Optimal number of parallel strings
+
+power_compatibility:
+  power_ratio: 0.61  # Total panel power / inverter nominal power
+  is_compatible: true  # Whether the power ratio is between 0.9 and 1.3

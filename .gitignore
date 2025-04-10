@@ -1,10 +1,50 @@
-client/node_modules
-server/node_modules
-client/dist/
-server/dist/
-client/.env
-server/.env
-client/.next/
+# Node.js
+node_modules/
+dist/
+*.tsbuildinfo
+pnpm-lock.yaml
+package-lock.json
 
-# windsurf rules
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyd
+*.pyo
+
+# Environment files
+.env
+!.env.example
+.env.local
+
+# Build/output directories
+.next/
+.server/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+pv_service.log
+report_generation.log
+generated_report.md
+
+# Editor/IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test artifacts
+coverage/
+.nyc_output/
+
+# Windsurf
 .windsurfrules
+
+# OS generated files
+ehthumbs.db
+Desktop.ini

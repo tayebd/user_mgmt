@@ -3,17 +3,20 @@ import { StepProps } from './types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { getInverters } from '@/services/equipment';
-import { Inverter } from '@/types';
+import { getInverters } from '@/types/initialData'
+import type { Inverter } from '@/shared/types';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // eslint-disable-next-line no-unused-vars
-export function InverterStep({ form, projectData, setSolarProject }: StepProps) {
+export function InverterStep({ form, pvProject, setPVProject }: StepProps) {
   const [inverters, setInverters] = useState<Inverter[]>([]);
   const [loading, setLoading] = useState(true);
   const { register, setValue, watch, formState: { errors } } = form;
-  const selectedInverterId = watch('selectedInverterId');
+  const formValues = watch();
+  const selectedInverterModel = formValues.inverters?.[0]?.model;
+  const numberInverters = formValues.numberInverters || 1;
+
 
   useEffect(() => {
     const loadInverters = async () => {
@@ -30,7 +33,7 @@ export function InverterStep({ form, projectData, setSolarProject }: StepProps) 
     loadInverters();
   }, []);
 
-  const selectedInverter = inverters.find(i => i.id === selectedInverterId);
+  const selectedInverter = inverters.find(i => i.model === selectedInverterModel);
 
   if (loading) {
     return <div className="space-y-4">
@@ -45,23 +48,34 @@ export function InverterStep({ form, projectData, setSolarProject }: StepProps) 
         <div className="space-y-2">
           <Label>Select Inverter Model</Label>
           <Select
-            onValueChange={(value) => setValue('selectedInverterId', Number(value), { shouldValidate: true })}
-            defaultValue={selectedInverterId.toString()}
+            onValueChange={(value) => {
+              const inverter = inverters.find(i => i.id === Number(value));
+              if (inverter) {
+                setPVProject?.(prev => ({
+                  ...prev,
+                  inverters: [inverter]
+                }));
+                setValue('inverters.0', {
+                  ...inverter,
+                }, { shouldValidate: true });
+              }
+            }}
+            defaultValue={selectedInverter?.id?.toString()}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select an inverter model" />
             </SelectTrigger>
             <SelectContent>
               {inverters.map(inverter => (
-                <SelectItem key={inverter.id} value={inverter.id.toString()}>
-                  {inverter.manufacturer} - {inverter.modelNumber} ({inverter.maxPower/1000}kW)
+                <SelectItem key={inverter.id} value={String(inverter.id)}>
+                  {inverter.maker} - {inverter.model} ({(inverter.maxOutputPower || 0)/1000}kW)
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          {errors.selectedInverterId?.message && (
-            <p className="text-sm text-red-500">{String(errors.selectedInverterId.message)}</p>
-          )}
+          {/* {errors.inverters?.[0]?.id?.message && (
+            <p className="text-sm text-red-500">{String(errors.inverters[0].id.message)}</p>
+          )} */}
         </div>
 
         {selectedInverter && (
@@ -70,7 +84,7 @@ export function InverterStep({ form, projectData, setSolarProject }: StepProps) 
             <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
               <div>
                 <span className="text-muted-foreground">Power Output:</span>
-                <span className="ml-2">{selectedInverter.maxPower/1000}kW</span>
+                <span className="ml-2">{selectedInverter.maxOutputPower/1000}kW</span>
               </div>
               <div>
                 <span className="text-muted-foreground">Efficiency:</span>
@@ -79,7 +93,7 @@ export function InverterStep({ form, projectData, setSolarProject }: StepProps) 
               <div>
                 <span className="text-muted-foreground">Input Voltage:</span>
                 <span className="ml-2">
-                  {selectedInverter.inputVoltage.min}-{selectedInverter.inputVoltage.max}V DC
+                  {selectedInverter.minInputVoltage}-{selectedInverter.maxInputVoltage}V DC
                 </span>
               </div>
               <div>
@@ -87,12 +101,8 @@ export function InverterStep({ form, projectData, setSolarProject }: StepProps) 
                 <span className="ml-2">{selectedInverter.outputVoltage}V AC</span>
               </div>
               <div>
-                <span className="text-muted-foreground">Warranty:</span>
-                <span className="ml-2">{selectedInverter.warranty} years</span>
-              </div>
-              <div>
                 <span className="text-muted-foreground">Price:</span>
-                <span className="ml-2">${selectedInverter.price}</span>
+                <span className="ml-2">${selectedInverter.price || 'N/A'}</span>
               </div>
             </div>
           </Card>
@@ -107,11 +117,16 @@ export function InverterStep({ form, projectData, setSolarProject }: StepProps) 
               id="quantity"
               type="number"
               min="1"
-              {...register('inverterQuantity', { valueAsNumber: true })}
-              className={errors.inverterQuantity ? 'border-red-500' : ''}
+              {...register('numberInverters', { valueAsNumber: true })}
+              className={errors.numberInverters ? 'border-red-500' : ''}
+              value={pvProject.numberInverters || ''}
+              onChange={(e) => setPVProject?.(prev => ({
+                ...prev,
+                numberInverters: Number(e.target.value)
+              }))}
             />
-            {errors.inverterQuantity?.message && (
-              <p className="text-sm text-red-500">{String(errors.inverterQuantity.message)}</p>
+            {errors.numberInverters?.message && (
+              <p className="text-sm text-red-500">{String(errors.numberInverters.message)}</p>
             )}
           </div>
 
@@ -120,7 +135,7 @@ export function InverterStep({ form, projectData, setSolarProject }: StepProps) 
               <Label>Total Power</Label>
               <Input
                 type="text"
-                value={`${((watch('inverterQuantity') || 0) * selectedInverter.maxPower/1000).toFixed(1)}kW`}
+                value={`${((numberInverters || 0) * (selectedInverter.maxOutputPower || 0)/1000).toFixed(1)}kW`}
                 readOnly
               />
             </div>
@@ -128,7 +143,7 @@ export function InverterStep({ form, projectData, setSolarProject }: StepProps) 
               <Label>Total Cost</Label>
               <Input
                 type="text"
-                value={`$${(watch('inverterQuantity') || 0) * selectedInverter.price}`}
+                value={`$${(numberInverters || 0) * (selectedInverter.price || 0)}`}
                 readOnly
               />
             </div>
@@ -137,4 +152,4 @@ export function InverterStep({ form, projectData, setSolarProject }: StepProps) 
       )}
     </div>
   );
-} 
+}

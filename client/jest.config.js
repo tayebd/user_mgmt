@@ -7,6 +7,7 @@ const createJestConfig = nextJest({
 
 /** @type {import('jest').Config} */
 const customJestConfig = {
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleNameMapper: {
@@ -14,15 +15,17 @@ const customJestConfig = {
     '\.(css|less|scss|sass)$': 'identity-obj-proxy',
     // Explicitly map the dynamic routes
     '@/app/surveys/\[id\]/respond/theme': '<rootDir>/src/app/surveys/[id]/respond/theme.ts',
-    '@/app/surveys/\[id\]/respond/page': '<rootDir>/src/app/surveys/[id]/respond/page.tsx'
+    '@/app/surveys/\[id\]/respond/page': '<rootDir>/src/app/surveys/[id]/respond/page.tsx',
+    'react-markdown': '<rootDir>/src/__mocks__/react-markdown.js'
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   testMatch: ['**/__tests__/**/*.[jt]s?(x)', '**/?(*.)+(spec|test).[jt]s?(x)'],
   transform: {
-    '^.+\.(ts|tsx|js|jsx)$': ['babel-jest', { presets: ['next/babel'] }]
+    '^.+\.(ts|tsx|js|jsx|mjs)$': ['babel-jest', { presets: ['next/babel'] }],
+    '^.+\.m?js$': ['babel-jest', { presets: ['@babel/preset-env'] }]
   },
   transformIgnorePatterns: [
-    '/node_modules/(survey-core|survey-react-ui)/'
+    '/node_modules/(?!(survey-core|survey-react-ui|react-markdown|remark-math|rehype-mathjax|unified|micromark|mdast-util-.*|unist-util-.*|vfile.*|bail|trough|is-plain-obj|decode-named-character-reference|character-entities|property-information|space-separated-tokens|comma-separated-tokens|hast-util-whitespace|@types/mdast|@types/unist|@types/hast|@types/estree|@types/unist|@types/vfile|@types/vfile-message|@types/react-markdown)/).*'
   ],
   testEnvironmentOptions: {
     customExportConditions: ['react-jsx']

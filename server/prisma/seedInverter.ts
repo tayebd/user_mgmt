@@ -11,8 +11,8 @@ async function main() {
     .pipe(csv())
     .on('data', (row) => {
       inverters.push({
-        manufacturer: row.manufacturer || null,
-        modelNumber: row.modelNumber || null,
+        maker: row.maker || null,
+        model: row.model || null,
         description: row.description || null,
         phaseType: row.phaseType || null,
         outputVoltage: row.outputVoltage ? parseFloat(row.outputVoltage) : null,
