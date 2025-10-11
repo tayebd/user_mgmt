@@ -9,7 +9,7 @@ This is a Next.js 15 client application for a solar PV (photovoltaic) project ma
 ## Common Commands
 
 ### Development
-- `pnpm dev` - Start development server on port 3000
+- `pnpm dev` - Start development server on port 3000 (may use 3001 if occupied)
 - `pnpm build` - Build production bundle
 - `pnpm start` - Start production server
 - `pnpm lint` - Run ESLint
@@ -103,9 +103,54 @@ This is a Next.js 15 client application for a solar PV (photovoltaic) project ma
 - PV project calculations depend on array configuration and equipment selection
 - The app uses Next.js App Router (not Pages Router)
 - Client-side rendering required for most pages due to auth context (`'use client'` directive)
+- Development server may run on port 3001 if 3000 is occupied
+
+### Recent UI Improvements (October 2025)
+
+#### Phase 1: Navigation & Branding (Completed)
+- **Navbar**: Updated branding to "Solar PV Designer" with solar-themed navigation
+  - Added solar icons (Zap, PanelTop, Calculator)
+  - Enhanced search with solar-specific placeholder
+  - Orange accent color scheme for solar theme
+- **Landing Page**: Complete redesign with:
+  - Hero section with clear value proposition
+  - Feature grid highlighting solar-specific capabilities
+  - Quick action cards for easy navigation
+  - Professional solar-themed design
+- **Layout**: Added gradient background and improved page structure
+
+#### Ongoing Development Plan
+- **Phase 2**: Enhanced Progress Indicator (src/components/ProjectWizard/ProgressIndicator.tsx)
+  - Visual step completion with checkmarks
+  - Step descriptions and solar icons
+  - Progress percentage display
+  - Interactive step navigation
+- **Phase 3**: Step Component Enhancements
+  - Add step-specific guidance text
+  - Visual equipment comparison cards
+  - Real-time calculation previews
+  - Enhanced validation feedback
+- **Phase 4**: Solar-Themed Visual Elements
+  - Solar color palette refinement
+  - Energy-themed visual elements
+  - Consistent solar styling across components
 
 ### Common Patterns
 - API functions return promises and throw errors on failure - handle with try/catch
 - Form validation uses react-hook-form + Zod schemas
 - Loading states managed locally in components
 - Error handling typically logs to console and re-throws for component handling
+- Solar-themed UI uses orange (#f97316) as primary accent color
+
+### Development Environment Notes
+- Current dev server: http://localhost:3001 (port 3000 may be occupied)
+- Mock Supabase client in use for development
+- Backend API: http://localhost:5000/api
+- Report generation: http://localhost:8001/simulate-and-report
+
+### Key Files for UI Development
+- `src/components/Navbar/index.tsx` - Main navigation with solar branding
+- `src/app/page.tsx` - Solar-focused landing page
+- `src/app/layout.tsx` - Root layout with gradient background
+- `src/components/ProjectWizard/` - All wizard components
+- `src/components/ProjectWizard/ProgressIndicator.tsx` - Next enhancement target

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import useStore from "@/state";
 import { GlobalState } from "@/state";
-import { Moon, Search, Settings, Sun } from "lucide-react";
+import { Moon, Search, Settings, Sun, Zap, PanelTop, Calculator } from "lucide-react";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -27,59 +27,78 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="flex items-center justify-between bg-white px-4 py-3 dark:bg-gray-800 ml-64">
-      {/* Left side */}
-      <div className="flex items-center gap-4">
-        <Link href="/" className="text-lg font-semibold">
-          Solar Companies
+    <nav className="flex items-center justify-between bg-white px-6 py-4 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      {/* Left side - Branding and main navigation */}
+      <div className="flex items-center gap-8">
+        <Link href="/" className="flex items-center gap-2 text-xl font-bold text-orange-600 dark:text-orange-400">
+          <Zap className="h-6 w-6" />
+          Solar PV Designer
         </Link>
-        <div className="relative flex h-min w-[200px]">
-          <Search className="absolute left-[4px] top-1/2 h-5 w-5 -translate-y-1/2 transform cursor-pointer dark:text-white" />
-          <input
-            type="text"
-            className="h-8 w-full rounded-md border border-gray-300 bg-white pl-8 pr-4 text-sm focus:border-blue-500 focus:outline-hidden dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-            placeholder="Search..."
-          />
+
+        <div className="flex items-center gap-6">
+          <Link
+            href="/test"
+            className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+              pathname === "/test" ? "text-orange-600 dark:text-orange-400" : "text-gray-700 dark:text-gray-300 hover:text-orange-500"
+            }`}
+          >
+            <Calculator className="h-4 w-4" />
+            Project Wizard
+          </Link>
+          <Link
+            href="/pvpanels"
+            className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+              pathname === "/pvpanels" ? "text-orange-600 dark:text-orange-400" : "text-gray-700 dark:text-gray-300 hover:text-orange-500"
+            }`}
+          >
+            <PanelTop className="h-4 w-4" />
+            PV Panels
+          </Link>
+          <Link
+            href="/inverters"
+            className={`text-sm font-medium transition-colors ${
+              pathname === "/inverters" ? "text-orange-600 dark:text-orange-400" : "text-gray-700 dark:text-gray-300 hover:text-orange-500"
+            }`}
+          >
+            Inverters
+          </Link>
         </div>
       </div>
 
-      {/* Right side */}
+      {/* Right side - Search and user actions */}
       <div className="flex items-center gap-4">
-        <Link
-          href="/inverters"
-          className={`text-sm ${
-            pathname === "/projects" ? "text-blue-500" : "text-gray-700 dark:text-white"
-          } hover:text-blue-500`}
-        >
-          Inverters
-        </Link>
-        <Link
-          href="/pvpanels"
-          className={`text-sm ${
-            pathname === "/tasks" ? "text-blue-500" : "text-gray-700 dark:text-white"
-          } hover:text-blue-500`}
-        >
-          PV Panels
-        </Link>
+        <div className="relative flex h-min w-[250px]">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+          <input
+            type="text"
+            className="h-9 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-4 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-orange-400"
+            placeholder="Search equipment, projects..."
+          />
+        </div>
+
         <button
           onClick={() => setIsDarkMode(!isDarkMode)}
-          className="rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+          title={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
         >
           {isDarkMode ? (
-            <Sun className="h-5 w-5 text-gray-700 dark:text-white" />
+            <Sun className="h-5 w-5" />
           ) : (
-            <Moon className="h-5 w-5 text-gray-700" />
+            <Moon className="h-5 w-5" />
           )}
         </button>
+
         <Link
           href="/settings"
-          className="rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="rounded-lg p-2 text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors"
+          title="Settings"
         >
-          <Settings className="h-5 w-5 text-gray-700 dark:text-white" />
+          <Settings className="h-5 w-5" />
         </Link>
+
         <button
           onClick={handleSignOut}
-          className="rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600"
+          className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600 transition-colors"
         >
           Sign Out
         </button>
