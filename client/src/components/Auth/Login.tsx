@@ -37,7 +37,7 @@ export const Login = () => {
 
   useEffect(() => {
     if (user && isAuthenticated) {
-      router.push('/welcome');
+      router.push('/dashboard');
     }
   }, [user, isAuthenticated, router]);
 

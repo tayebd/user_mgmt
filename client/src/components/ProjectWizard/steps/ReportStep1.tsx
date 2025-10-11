@@ -20,26 +20,31 @@ import { calculateArrayConfiguration, calculateProtectionDevices,
     calculateDCCableSizing, calculateACCableSizing, PVCONSTANTS as constants } from '../calculations/ArrayCalculatorUtils';
 
 // Helper function to interpolate values in our templates
-function interpolateTemplate<T extends Record<string, any>>(template: string, context: T): string {
+function interpolateTemplate<T extends Record<string, unknown>>(template: string, context: T): string {
   if (typeof template !== 'string') return '';
   
   // Replace {{variable}} with actual values from the context
   return template.replace(/\{\{([^}]+)\}\}/g, (match, path) => {
     const keys = path.trim().split('.');
-    let value: any = context;
+    let value: unknown = context;
     
     for (const key of keys) {
       if (value === undefined || value === null) return '';
-      if (typeof value !== 'object') return '';
-      if (!(key in value)) return '';
-      const nextValue = value[key];
-      if (nextValue === undefined || nextValue === null) return '';
-      value = nextValue;
+      if (typeof value !== 'object' && typeof value !== 'function') return '';
+      
+      // Check if the key exists in the value
+      if (value && typeof value === 'object' && key in value) {
+        const nextValue = (value as Record<string, unknown>)[key];
+        if (nextValue === undefined || nextValue === null) return '';
+        value = nextValue;
+      } else {
+        return '';
+      }
     }
     
     if (value === undefined || value === null) return '';
     try {
-      if (typeof value === 'object' && 'toString' in value && typeof value.toString === 'function') {
+      if (typeof value === 'object' && value !== null && 'toString' in value && typeof value.toString === 'function') {
         return value.toString();
       }
       return String(value);

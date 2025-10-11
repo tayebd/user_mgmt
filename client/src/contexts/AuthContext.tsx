@@ -19,9 +19,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabase) {
+      console.warn('Supabase client not configured');
+      setLoading(false);
+      return;
+    }
+
+    // Store in local variable for TypeScript
+    const client = supabase;
+
     console.log('Setting up auth state listener...');
-    
-    const { data: authListener } = supabase.auth.onAuthStateChange(
+
+    const { data: authListener } = client.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state changed:', event);
 
@@ -41,7 +50,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Check existing session
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await client.auth.getSession();
       if (session?.user) {
         setUser(session.user);
       }
@@ -58,11 +67,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      if (!supabase) {
+        throw new Error('Supabase client not configured');
+      }
       console.log('Attempting sign in for:', email);
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) throw error;
-      
+
       console.log('Sign in successful for user:', data.user?.id);
       return data.user!;
     } catch (error) {
@@ -73,6 +85,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signUp = async (email: string, password: string) => {
     try {
+      if (!supabase) {
+        throw new Error('Supabase client not configured');
+      }
       console.log('Attempting sign up for:', email);
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -83,7 +98,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (error) throw error;
-      
+
       console.log('Sign up successful for user:', data.user?.id);
       window.location.href = '/login';
     } catch (error) {
@@ -94,10 +109,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
+      if (!supabase) {
+        throw new Error('Supabase client not configured');
+      }
       console.log('Attempting sign out...');
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      
+
       console.log('Sign out successful');
       window.location.href = '/login';
     } catch (error) {

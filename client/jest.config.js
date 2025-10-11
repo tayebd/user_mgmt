@@ -38,10 +38,6 @@ const customJestConfig = {
   testTimeout: 10000,
   maxWorkers: '50%',
   errorOnDeprecated: true,
-  // Handle JSON serialization issues
-  snapshotSerializers: [
-    '<rootDir>/src/test/customSerializer.js'
-  ]
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

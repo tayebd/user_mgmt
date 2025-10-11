@@ -15,6 +15,10 @@ const Navbar = () => {
 
   const handleSignOut = async () => {
     try {
+      if (!supabase) {
+        console.warn('Supabase client not configured');
+        return;
+      }
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
     } catch (error) {

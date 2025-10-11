@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { PVProject, PVPanel, Inverter, PVArray } from '@/shared/types';
 
 interface ArrayCalculatorProps {
@@ -18,11 +18,7 @@ interface CalculationResults {
 export function ArrayCalculator({ project, panel, inverter, array }: ArrayCalculatorProps) {
   const [calculationResults, setCalculationResults] = useState<CalculationResults | null>(null);
 
-  useEffect(() => {
-    calculateArrayConfiguration();
-  }, [project,  panel, inverter, array]);
-
-  const calculateArrayConfiguration = () => {
+  const calculateArrayConfiguration = useCallback(() => {
     // Temperature coefficients
     const betaFactor = panel.tempCoeffVoc / 100.0; // %/°C
     const alphaFactor = panel.tempCoeffIsc / 100.0; // %/°C
@@ -40,7 +36,11 @@ export function ArrayCalculator({ project, panel, inverter, array }: ArrayCalcul
       vocAtLowTemp,
       maxPanelsInSeries
     });
-  };
+  }, [project, panel, inverter, array]);
+
+  useEffect(() => {
+    calculateArrayConfiguration();
+  }, [calculateArrayConfiguration]);
 
   if (!calculationResults) {
     return <div>Calculating...</div>;

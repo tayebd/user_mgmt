@@ -60,6 +60,12 @@ export const useUserAuth = (): UseUserAuthResult => {
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabase) {
+      console.warn('[Auth] Supabase client not configured');
+      setAuthLoading(false);
+      return;
+    }
+
     console.log('[Auth] Setting up auth state listener');
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       console.log('[Auth] Auth state changed:', event, session);

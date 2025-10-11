@@ -512,6 +512,9 @@ const apiStore = create<ApiState>((set, get) => ({
       // Use provided token or get a fresh one
       let token = authToken;
       if (!token) {
+        if (!supabase) {
+          throw new Error('Supabase client not configured');
+        }
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
           console.error('No authenticated user found when attempting to create survey response');

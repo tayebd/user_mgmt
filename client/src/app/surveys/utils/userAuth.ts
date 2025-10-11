@@ -60,6 +60,12 @@ export const useUserAuth = (): UseUserAuthResult => {
   const [authLoading, setAuthLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabase) {
+      console.warn('Supabase client not configured');
+      setAuthLoading(false);
+      return;
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       setAuthLoading(false);

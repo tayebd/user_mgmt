@@ -226,7 +226,7 @@ export default function SurveyEvaluate({ surveyId }: SurveyEvaluateProps): JSX.E
     };
 
     loadSurvey();
-  }, [surveyId, fetchSurveyById, router]);
+  }, [surveyId, fetchSurveyById, createSurveyResponse, router]);
 
   if (loading) {
     return (
