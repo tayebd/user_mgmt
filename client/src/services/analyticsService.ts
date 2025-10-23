@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { z } from 'zod';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
@@ -95,12 +94,14 @@ export type ProcessedMetrics = z.infer<typeof processedMetricsSchema>;
 export type EnhancedSurveyResponse = z.infer<typeof enhancedSurveyResponseSchema>;
 
 export class AnalyticsService {
-  private static handleApiError(error: unknown): never {
-    if (axios.isAxiosError(error)) {
-      const apiError = error.response?.data as ApiError;
-      throw new Error(apiError?.error || error.message);
+  private static async handleApiError(response: Response): Promise<never> {
+    let errorData: ApiError;
+    try {
+      errorData = await response.json();
+    } catch {
+      errorData = { error: `HTTP ${response.status}: ${response.statusText}` };
     }
-    throw error;
+    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
   }
 
   private static validateMetrics(data: unknown): DashboardMetrics {
@@ -113,25 +114,39 @@ export class AnalyticsService {
   }
 
   static async getDashboardMetrics(companyId: number): Promise<DashboardMetrics> {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/dashboard/metrics`, {
-        params: { companyId }
-      });
-      return this.validateMetrics(response.data.data);
-    } catch (error) {
-      return this.handleApiError(error);
+    const url = new URL(`${API_BASE_URL}/dashboard/metrics`);
+    url.searchParams.append('companyId', companyId.toString());
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      await this.handleApiError(response);
     }
+
+    const data = await response.json();
+    return this.validateMetrics(data.data);
   }
 
   static async exportDashboardMetrics(companyId: number): Promise<Blob> {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/dashboard/metrics/export`, {
-        params: { companyId },
-        responseType: 'blob'
-      });
-      return response.data;
-    } catch (error) {
-      return this.handleApiError(error);
+    const url = new URL(`${API_BASE_URL}/dashboard/metrics/export`);
+    url.searchParams.append('companyId', companyId.toString());
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      await this.handleApiError(response);
     }
+
+    return await response.blob();
   }
 }
