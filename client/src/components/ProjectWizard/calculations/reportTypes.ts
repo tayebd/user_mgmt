@@ -6,10 +6,21 @@ export interface ProjectSpecs {
     latitude: number;
     longitude: number;
     numberPanels: number;
+    numberInverters?: number;
     reference: string;
     dcCableLength?: number;
     acCableLength_1?: number;
     acCableLength_2?: number;
+    certifications?: {
+        panel: {
+            standards: string[];
+            warranty: {
+                product: string;
+                performance: string;
+                type: string;
+            };
+        };
+    };
 }
 
 export interface ArrayConfig {
@@ -26,6 +37,11 @@ export interface ArrayConfig {
     power_ratio: number;
     array_power: number;
     is_compatible: boolean;
+    Nsmax_calc?: number;
+    Nsoptimal_calc?: number;
+    Nsmin_calc?: number;
+    Npmax_calc?: number;
+    Npoptimal_calc?: number;
 }
 
 export interface ProtectionCalc {

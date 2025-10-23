@@ -2,18 +2,13 @@ import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import type { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import MathJax from 'react-mathjax';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
 import { ArrayCalculator } from '../calculations/ArrayCalculator';
 import { StepProps } from './types';
 
 
-type MarkdownComponents = Components & {
-  math: React.ComponentType<{ value: string }>
-  inlineMath: React.ComponentType<{ value: string }>
-};
+type MarkdownComponents = Components;
 
 export function ReportStep({ form, pvProject, setPVProject }: StepProps) {
   const [reportContent, setReportContent] = useState<string>('');
@@ -45,9 +40,7 @@ export function ReportStep({ form, pvProject, setPVProject }: StepProps) {
     td: ({ children }) => <td className="border border-gray-300 dark:border-gray-700 px-4 py-2">{children}</td>,
     code: ({ children }) => <code className="bg-gray-100 dark:bg-gray-800 rounded px-1 py-0.5">{children}</code>,
     pre: ({ children }) => <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto mb-4">{children}</pre>,
-    blockquote: ({ children }) => <blockquote className="border-l-4 border-gray-200 pl-4 italic mb-4">{children}</blockquote>,
-    math: ({ value }: { value: string }) => <MathJax.Node formula={value} />,
-    inlineMath: ({ value }: { value: string }) => <MathJax.Node inline formula={value} />
+    blockquote: ({ children }) => <blockquote className="border-l-4 border-gray-200 pl-4 italic mb-4">{children}</blockquote>
   };
 
   return (
@@ -66,14 +59,12 @@ export function ReportStep({ form, pvProject, setPVProject }: StepProps) {
             </div>
           )}
           <div className="prose prose-sm dark:prose-invert max-w-none">
-            <MathJax.Provider input="tex">
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm, remarkMath]}
-                components={markdownComponents}
-              >
-                {reportContent}
-              </ReactMarkdown>
-            </MathJax.Provider>
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={markdownComponents}
+            >
+              {reportContent}
+            </ReactMarkdown>
           </div>
         </ScrollArea>
       </Card>

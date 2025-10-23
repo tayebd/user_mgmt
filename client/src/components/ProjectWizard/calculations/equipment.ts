@@ -1,6 +1,6 @@
 export const equipmentTemplate = `
 
-# <center> Dossier technique d’une installation photovoltaïque raccordée au réseau Basse tension </center>
+# Dossier technique d'une installation photovoltaïque raccordée au réseau Basse tension
 
 
 Client BT : {{ project.customer }}
@@ -56,7 +56,7 @@ Les fiches techniques de chaque élément figurent dans l'annexe à la fin de ce
 | Désignation   | Nombre | Marque        | Référence        | Annexe |
 | --------------| ------ | ------------- | ---------------- | ------ |
 | Modules       | {{ project.numberPanels }} | {{ panel.maker }} | {{ panel.model }} | N°11 |
-| Onduleur      | 1 | {{ inverter.maker }} | {{ inverter.model }} | N°12 |
+| Onduleur      | {{ project.numberInverters }} | {{ inverter.maker }} | {{ inverter.model }} | N°12 |
 | Fusibles      | 1 | {{ dc_protection.fuse.maker }} | {{ dc_protection.fuse.ref_type }} | N°13 |
 | Parafoudre DC | 1 | {{ dc_protection.lightning.maker }} | {{ dc_protection.lightning.ref_type }} | N°14 |
 | Interrupteurs Sectionneur DC | 1 | {{ dc_protection.switch.maker }} | {{ dc_protection.switch.ref_type }} | N°15 |
@@ -97,11 +97,11 @@ Garantie de rendement: {{ project_specs.certifications.panel.warranty.product }}
 
 ## 2. Onduleur
 
-### Onduleur N°1
+### Onduleur N°{{ project.numberInverters }}
 
 | Numéro onduleur | Nombre panneaux | Puissance crête DC | Rapport de puissance |
 | -- | -- | -- | -- |
-| 1 | {{ project.numberPanels }} | {{ project.arrayPowerkW }} | 1 |
+| 1-{{ project.numberInverters }} | {{ project.numberPanels }} | {{ project.arrayPowerkW }} | 1 |
 
 
 | Onduleur 1 | Onduleur 1 |

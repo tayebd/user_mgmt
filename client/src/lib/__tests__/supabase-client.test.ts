@@ -77,14 +77,14 @@ describe('Supabase Client', () => {
       it('should throw error when client is not configured', async () => {
         // Temporarily set supabase to null
         const originalSupabase = supabase;
-        (supabase as unknown as { [key: string]: unknown }) = null;
+        (supabase as unknown as null) = null;
 
         await expect(AuthService.signIn('test@example.com', 'password')).rejects.toThrow(
           'Supabase client not configured'
         );
 
         // Restore
-        (supabase as unknown as { [key: string]: unknown }) = originalSupabase;
+        (supabase as unknown as typeof originalSupabase) = originalSupabase;
       });
     });
 
@@ -226,7 +226,7 @@ describe('Supabase Client', () => {
 
       it('should handle unconfigured client gracefully', () => {
         const originalSupabase = supabase;
-        (supabase as unknown as { [key: string]: unknown }) = null;
+        (supabase as unknown as null) = null;
 
         const callback = jest.fn();
         const result = AuthService.onAuthStateChange(callback);
@@ -236,7 +236,7 @@ describe('Supabase Client', () => {
         });
 
         // Restore
-        (supabase as unknown as { [key: string]: unknown }) = originalSupabase;
+        (supabase as unknown as typeof originalSupabase) = originalSupabase;
       });
     });
   });

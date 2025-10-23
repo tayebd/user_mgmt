@@ -169,6 +169,9 @@ export interface Survey {
   userId: number;
   expiresAt?: Date;
   responses?: SurveyResponse[];
+  active?: boolean;
+  responseCount?: number;
+  companyId?: number;
 }
 
 import { SurveyStatus, ProjectStatus, TaskStatus, TaskPriority } from './enums';
@@ -204,6 +207,9 @@ export interface Project {
   endDate: Date;
   tasks: Task[];
   members: User[];
+  companyId?: number;
+  userId?: number;
+  budget?: number;
 }
 
 export interface Task {

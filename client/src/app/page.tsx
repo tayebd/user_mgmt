@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { Calculator, PanelTop, Zap, TrendingUp, Shield, Users } from "lucide-react";
+import { Calculator, PanelTop, Zap, TrendingUp, Shield, Users, Brain } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -13,15 +13,22 @@ export default function HomePage() {
           <span className="text-orange-600 dark:text-orange-400 block">Solar PV System</span>
         </h1>
         <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
-          Professional-grade solar project design made simple. Calculate, configure, and optimize your solar installation with our intuitive wizard.
+          Professional-grade solar project design made simple. Choose between our manual wizard or AI-powered design for instant results.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="/ai-wizard"
+            className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold px-8 py-4 rounded-lg transition-colors shadow-lg"
+          >
+            <Brain className="h-5 w-5" />
+            AI Project Wizard
+          </Link>
           <Link
             href="/test"
             className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg transition-colors shadow-lg"
           >
             <Calculator className="h-5 w-5" />
-            Start Project Wizard
+            Manual Wizard
           </Link>
           <Link
             href="/pvpanels"
@@ -34,14 +41,24 @@ export default function HomePage() {
       </div>
 
       {/* Features Grid */}
-      <div className="grid md:grid-cols-3 gap-8 mb-12">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+          <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mb-4">
+            <Brain className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">AI-Powered Design</h3>
+          <p className="text-gray-600 dark:text-gray-300">
+            Instant solar system design using intelligent algorithms and real-time optimization for optimal performance.
+          </p>
+        </div>
+
         <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
           <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center mb-4">
             <Calculator className="h-6 w-6 text-orange-600 dark:text-orange-400" />
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Step-by-Step Wizard</h3>
           <p className="text-gray-600 dark:text-gray-300">
-            Guided design process from site assessment to final system configuration with real-time calculations.
+            Manual design process from site assessment to final system configuration with full control.
           </p>
         </div>
 
@@ -61,7 +78,7 @@ export default function HomePage() {
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Code Compliance</h3>
           <p className="text-gray-600 dark:text-gray-300">
-            Automatic validation against NEC standards and local regulations for safe, compliant installations.
+            Automatic validation against UTE 15-712-1 standards and local regulations for safe, compliant installations.
           </p>
         </div>
       </div>

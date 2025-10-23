@@ -5,7 +5,7 @@ export const arrayConfigurationTemplate = `
 
 | Equipement | Caractéristiques techniques |
 | -- | -- |
-| Fusibles | U~fusible~ = {{ dc_protection.fuse.Vn }}<br> I~fusible~ = {{ dc_protection.fuse.In }} |
+| Fusibles | U~fusible~ = {{ dc_protection.fuse.Vn }}<br>I~fusible~ = {{ dc_protection.fuse.In }} |
 | Parafoudre DC | Type 2<br>Ucpv = {{ dc_protection.lightning.Ucpv }}<br>Up = {{ dc_protection.lightning.Up }}<br>In = {{ dc_protection.lightning.In }} {{ dc_protection.lightning.InUnit }}<br>Iscpv = {{ dc_protection.lightning.Iscpv }} {{ dc_protection.lightning.IscpvUnit }} |
 | Interrupteur sectionneur DC | Usec = {{ dc_protection.switch.Usec }}<br>Isec = {{ dc_protection.switch.Isec }} |
 | Disjoncteur (différentiel) AC | Udis = {{ ac_protection.switch.Usec }}<br>In = {{ ac_protection.fuse.In }}<br>Pouvoir de coupure = 6kA<br>Sensibilité = 30mA |
@@ -31,7 +31,7 @@ Isc: le courant de court circuit du panneau
 ## Nombre maximal de panneau en série (protection onduleur – champ PV)
 ##Maximum Number of Panels in Series (Inverter Protection)
 
-Nsmax = $E^{-}(\frac{Udcmax}{Voc (at -10^{\circ}C)})$
+Nsmax = floor(Udcmax / Voc(at -10°C))
 
 Where:
 - Voc (à -10°C) = Voc × (1 + β/100 × (-10 - 25°C))
@@ -47,7 +47,7 @@ Nsmax = E⁻({{ inverter.maxDcVoltage }} / {{ array.Voc_10 }}) = {{ array.Nsmax 
 ### Nombre optimal de panneau en série
 ##Optimal Number of Panels in Series
 
-Nsoptimal = $E^{-}(\frac{Umpptmax}{Vmp (at -10^{\circ}C)})$
+Nsoptimal = floor(Umpptmax / Vmp(at -10°C))
 
 Ou:
 - Vmp (à -10°C) = Vmp × (1 + β/100 × (-10 - 25°C))
@@ -63,7 +63,7 @@ Nsoptimal = E⁻({{ inverter.maxDcVoltage }} / {{ array.Vmp_10 }}) = {{ array.Ns
 ### Nombre minimal de panneau en série
 ##Minimum Number of Panels in Series
 
-Nsmin = $E^{+}(\frac{Umpptmin}{Vmp (at 85^{\circ}C)})$
+Nsmin = ceil(Umpptmin / Vmp(at 85°C))
 
 Ou:
 - Vmp (à 85°C) = Vmp × (1 + β/100 × (85 - 25°C))
@@ -79,7 +79,7 @@ Nsmin = E⁺({{ inverter.mpptVoltageRangeMin }} / {{ array.Vmp_85 }}) = {{ array
 ## Nombre maximal de chaines en parallèle (protection - cas cc)
 ##Maximum Number of Parallel Strings (Short Circuit Protection)
 
-Npmax = $E^{-}(\frac{Icconduleur}{Isc (at 85^{\circ}C)})$
+Npmax = floor(Icconduleur / Isc(at 85°C))
 
 Ou:
 - Isc (à 85°C) = Isc × (1 + α/100 × (Tmax - 25°C))
@@ -95,7 +95,7 @@ Npmax = E⁻({{ inverter.maxShortCircuitCurrent }} / {{ array.Isc_85 }}) = {{ ar
 ### Nombre optimal de chaines en parallele
 ##Optimal Number of Parallel Strings
 
-Npoptimal = $E^{-}(\frac{Imax}{Imp (at 85^{\circ}C)})$
+Npoptimal = floor(Imax / Imp(at 85°C))
 
 Where:
 - Imp (à 85°C) = Imp × (1 + α/100 × (Tmax - 25°C))
@@ -114,7 +114,7 @@ Les puissances du générateur photovoltaïque et de l’onduleur doivent être 
 Le rapport entre La puissance du générateur photovoltaïque et la puissance nominale AC des onduleurs 
 doit être compris entre 0.9 et 1.3.
 
-$0.9 \leq \frac{Pcpv}{Pac_ond} \leq 1.3$
+0.9 ≤ (Pcpv / Pac_ond) ≤ 1.3
 
 **Application Numérique:**
 

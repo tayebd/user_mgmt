@@ -3,16 +3,18 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
-import { useApiStore } from '@/state/api';
+import { useCompanies, useCompanyStore } from '@/stores/company-store';
 import { Toaster, toast } from 'sonner';
 
 const ManageCompaniesPage = () => {
   const router = useRouter();
-  const { companies, fetchCompanies, deleteCompany } = useApiStore();
+  const companies = useCompanies();
+  const { fetchCompanies, deleteCompany } = useCompanyStore();
 
   useEffect(() => {
     fetchCompanies();
@@ -86,11 +88,13 @@ const ManageCompaniesPage = () => {
                 <div className="grid grid-cols-8 gap-4 items-center">
                   {/* Column 1: Logo (1/8) */}
                   <div className="col-span-1 flex justify-center">
-                  <img
-                      src={company.iconUrl || company.logo}
+                  <Image
+                      src={company.iconUrl || company.logo || '/placeholder-logo.png'}
                       alt={`${company.name}`}
-                      className="w-full h-full object-contain p-1 "
-                      // className="w-16 h-16 rounded-lg object-cover"
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-contain p-1"
+                      loading="lazy"
                     />
                   </div>
 

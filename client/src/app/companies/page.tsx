@@ -2,16 +2,18 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Star } from 'lucide-react';
 
 import Sidebar from '@/components/Sidebar';
 // import CompanyManagement from '@/components/Company/CompanyManagement';
-import { useApiStore } from '@/state/api';
+import { useCompanies, useCompanyStore } from '@/stores/company-store';
 import { Company } from '@/types';
 
 const CompaniesPage = () => {
-  const { companies, fetchCompanies } = useApiStore();
+  const companies = useCompanies();
+  const { fetchCompanies } = useCompanyStore();
 
   useEffect(() => {
     fetchCompanies();
@@ -31,11 +33,20 @@ const CompaniesPage = () => {
                 <div className="grid grid-cols-8 gap-4 items-center">
                   {/* Column 1: Logo (1/8) */}
                   <div className="col-span-1 flex justify-center">
-                    <img
-                      src={company.iconUrl || company.logo}
+                    <Image
+                      src={
+                        company.iconUrl || company.logo
+                          ? (company.iconUrl || company.logo)!.startsWith('/')
+                            ? (company.iconUrl || company.logo)!
+                            : `/${company.iconUrl || company.logo}`
+                          : '/placeholder-logo.png'
+                      }
                       alt={`${company.name} logo`}
-                      className="w-full h-full object-contain p-1 "
-                      // className="w-16 h-16 rounded-lg object-cover"
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-contain p-1"
+                      loading="lazy"
+                      unoptimized
                     />
                   </div>
 

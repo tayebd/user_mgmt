@@ -9,6 +9,7 @@ import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { useApiStore } from '@/state/api';
 import { Survey } from '@/types';
 import { themeConfig } from './theme';
+import { JSX } from 'react/jsx-runtime';
 
 /**
  * Thank you page displayed after survey completion
@@ -61,7 +62,7 @@ export default function ThankYouPage({ params }: { params: { id: string } }): JS
     };
 
     validateSurvey();
-  }, [params.id, fetchSurveyById, router]);
+  }, [surveyId, fetchSurveyById, router]);
 
   // Loading state with skeleton UI
   if (loading) {

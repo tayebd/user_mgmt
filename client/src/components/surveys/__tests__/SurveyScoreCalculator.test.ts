@@ -5,6 +5,7 @@ import {
   calculateTotalScore,
   setupSurveyCompletion,
 } from '../SurveyScoreCalculator';
+import { Model } from 'survey-core';
 
 // Define types for test objects
 interface Choice {
@@ -16,14 +17,15 @@ interface Question {
   choices?: Choice[] | undefined;
 }
 
-interface SurveyModel {
-  getAllQuestions: jest.Mock<Question[]>;
+// Mock SurveyModel that implements the minimum required interface
+const createMockSurveyModel = () => ({
+  getAllQuestions: jest.fn(),
   onComplete: {
-    add: jest.Mock<() => void>;
-  };
-  completedHtml: string;
-  data: Record<string, unknown>;
-}
+    add: jest.fn(),
+  },
+  completedHtml: '',
+  data: {},
+});
 
 interface SurveySender {
   data: Record<string, unknown> | null;
@@ -31,14 +33,7 @@ interface SurveySender {
 }
 
 // Mock SurveyJS Model
-const mockModel: SurveyModel = {
-  getAllQuestions: jest.fn(),
-  onComplete: {
-    add: jest.fn(),
-  },
-  completedHtml: '',
-  data: {},
-};
+const mockModel = createMockSurveyModel();
 
 describe('SurveyScoreCalculator', () => {
   describe('getChoiceScore', () => {
@@ -109,7 +104,7 @@ describe('SurveyScoreCalculator', () => {
 
       mockModel.getAllQuestions.mockReturnValue(questions);
 
-      const maxScore = calculateMaxScore(mockModel as any);
+      const maxScore = calculateMaxScore(mockModel as unknown as Model);
 
       expect(maxScore).toBe(7); // 3 + 4
     });
@@ -122,7 +117,7 @@ describe('SurveyScoreCalculator', () => {
 
       mockModel.getAllQuestions.mockReturnValue(questions);
 
-      const maxScore = calculateMaxScore(mockModel as any);
+      const maxScore = calculateMaxScore(mockModel as unknown as Model);
 
       expect(maxScore).toBe(2);
     });
@@ -132,7 +127,7 @@ describe('SurveyScoreCalculator', () => {
         throw new Error('Test error');
       });
 
-      const maxScore = calculateMaxScore(mockModel as any);
+      const maxScore = calculateMaxScore(mockModel as unknown as Model);
 
       expect(maxScore).toBe(0);
     });
@@ -207,7 +202,7 @@ describe('SurveyScoreCalculator', () => {
     it('should setup completion handler with score display', () => {
       const maxScore = 10;
 
-      setupSurveyCompletion(mockModel as any, maxScore);
+      setupSurveyCompletion(mockModel as unknown as Model, maxScore);
 
       expect(mockModel.onComplete.add).toHaveBeenCalled();
 
@@ -229,7 +224,7 @@ describe('SurveyScoreCalculator', () => {
     it('should handle missing survey data gracefully', () => {
       const maxScore = 10;
 
-      setupSurveyCompletion(mockModel as any, maxScore);
+      setupSurveyCompletion(mockModel as unknown as Model, maxScore);
 
       const completionHandler = mockModel.onComplete.add.mock.calls[0][0];
       const sender = {
@@ -246,7 +241,7 @@ describe('SurveyScoreCalculator', () => {
     it('should adjust max score when total exceeds it', () => {
       const maxScore = 5;
 
-      setupSurveyCompletion(mockModel as any, maxScore);
+      setupSurveyCompletion(mockModel as unknown as Model, maxScore);
 
       const completionHandler = mockModel.onComplete.add.mock.calls[0][0];
       const sender = {
@@ -272,7 +267,7 @@ describe('SurveyScoreCalculator', () => {
     it('should handle errors in completion handler', () => {
       const maxScore = 10;
 
-      setupSurveyCompletion(mockModel as any, maxScore);
+      setupSurveyCompletion(mockModel as unknown as Model, maxScore);
 
       const completionHandler = mockModel.onComplete.add.mock.calls[0][0];
       const sender = {

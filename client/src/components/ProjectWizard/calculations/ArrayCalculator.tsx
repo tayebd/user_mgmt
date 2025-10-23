@@ -36,7 +36,7 @@ export function ArrayCalculator({ project, panel, inverter, array }: ArrayCalcul
       vocAtLowTemp,
       maxPanelsInSeries
     });
-  }, [project, panel, inverter, array]);
+  }, [panel, inverter]);
 
   useEffect(() => {
     calculateArrayConfiguration();

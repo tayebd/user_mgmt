@@ -91,7 +91,17 @@ export interface ApiState {
   updateSurvey: (surveyId: number, survey: Partial<Survey>) => Promise<void>;
 
   createSurveyResponse: (surveyId: number, replyJson: string, userId: number, authToken?: string) => Promise<SurveyResponse>;
-  
+
+  // AI Design Functions
+  createAIDesign: (designData: {
+    requirements: Record<string, unknown>;
+    locationContext: Record<string, unknown>;
+  }) => Promise<{ id: string }>;
+  getAIDesigns: (page?: number, limit?: number, status?: string) => Promise<Record<string, unknown>[]>;
+  getAIDesign: (designId: string) => Promise<Record<string, unknown>>;
+  updateAIDesign: (designId: string, updateData: Record<string, unknown>) => Promise<Record<string, unknown>>;
+  deleteAIDesign: (designId: string) => Promise<boolean>;
+
   fetchReviews: (companyId: number) => Promise<Review[]>;
   fetchSurveyResponses: (surveyId: number) => Promise<SurveyResponse[]>;
   fetchSurveysByUserId: (userId: number) => Promise<Survey[]>;
@@ -1045,6 +1055,173 @@ const apiStore = create<ApiState>((set, get) => ({
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error('[API] Error deleting user:', errorMessage);
+      throw error;
+    }
+  },
+
+  // AI Design Functions
+  createAIDesign: async (designData: {
+    requirements: Record<string, unknown>;
+    locationContext: Record<string, unknown>;
+  }) => {
+    const requestId = Math.random().toString(36).substring(2, 8);
+    console.log(`[API:${requestId}] Creating AI design`);
+
+    try {
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/ai/designs`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(designData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to create AI design: ${response.status} ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log(`[API:${requestId}] AI design created successfully:`, data);
+      return data;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`[API:${requestId}] Error creating AI design:`, errorMessage);
+      throw error;
+    }
+  },
+
+  getAIDesigns: async (page = 1, limit = 10, status?: string) => {
+    const requestId = Math.random().toString(36).substring(2, 8);
+    console.log(`[API:${requestId}] Fetching AI designs`);
+
+    try {
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(status && { status }),
+      });
+
+      const response = await fetch(`${API_BASE_URL}/ai/designs?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch AI designs: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(`[API:${requestId}] Successfully fetched ${data.designs?.length || 0} AI designs`);
+      return data;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`[API:${requestId}] Error fetching AI designs:`, errorMessage);
+      throw error;
+    }
+  },
+
+  getAIDesign: async (designId: string) => {
+    const requestId = Math.random().toString(36).substring(2, 8);
+    console.log(`[API:${requestId}] Fetching AI design: ${designId}`);
+
+    try {
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/ai/designs/${designId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch AI design: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(`[API:${requestId}] Successfully fetched AI design:`, data);
+      return data;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`[API:${requestId}] Error fetching AI design:`, errorMessage);
+      throw error;
+    }
+  },
+
+  updateAIDesign: async (designId: string, updateData: Record<string, unknown>) => {
+    const requestId = Math.random().toString(36).substring(2, 8);
+    console.log(`[API:${requestId}] Updating AI design: ${designId}`);
+
+    try {
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/ai/designs/${designId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update AI design: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(`[API:${requestId}] AI design updated successfully:`, data);
+      return data;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`[API:${requestId}] Error updating AI design:`, errorMessage);
+      throw error;
+    }
+  },
+
+  deleteAIDesign: async (designId: string) => {
+    const requestId = Math.random().toString(36).substring(2, 8);
+    console.log(`[API:${requestId}] Deleting AI design: ${designId}`);
+
+    try {
+      const token = await getAuthToken();
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/ai/designs/${designId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete AI design: ${response.status}`);
+      }
+
+      console.log(`[API:${requestId}] AI design deleted successfully: ${designId}`);
+      return true;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error(`[API:${requestId}] Error deleting AI design:`, errorMessage);
       throw error;
     }
   },

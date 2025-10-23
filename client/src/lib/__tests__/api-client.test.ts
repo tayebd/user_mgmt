@@ -13,6 +13,14 @@ global.fetch = jest.fn();
 
 const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
 
+// Define mock response types
+interface MockResponse {
+  ok: boolean;
+  status: number;
+  json: jest.Mock;
+  text?: jest.Mock;
+}
+
 describe('ApiClient', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -27,12 +35,12 @@ describe('ApiClient', () => {
       });
     });
 
-    it('should use environment variable for base URL', () => {
+    it('should use environment variable for base URL', async () => {
       const originalEnv = process.env.NEXT_PUBLIC_API_URL;
       process.env.NEXT_PUBLIC_API_URL = 'http://custom-api:3000/api';
 
       // Create a new instance to test environment variable usage
-      const { apiClient: newClient } = require('../api-client');
+      const { apiClient: newClient } = await import('../api-client');
       expect(newClient['baseURL']).toBe('http://custom-api:3000/api');
 
       process.env.NEXT_PUBLIC_API_URL = originalEnv;
@@ -78,7 +86,7 @@ describe('ApiClient', () => {
         ok: true,
         status: 200,
         json: jest.fn().mockResolvedValue({ data: 'test' }),
-      } as any;
+      } as MockResponse as unknown as Response;
 
       const result = await apiClient['handleResponse'](mockResponse);
 
@@ -97,7 +105,7 @@ describe('ApiClient', () => {
           message: 'Bad request',
           code: 'VALIDATION_ERROR',
         }),
-      } as any;
+      } as MockResponse as unknown as Response;
 
       await expect(apiClient['handleResponse'](mockResponse)).rejects.toThrow();
 
@@ -122,7 +130,7 @@ describe('ApiClient', () => {
         status: 500,
         json: jest.fn().mockRejectedValue(new Error('Not JSON')),
         text: jest.fn().mockResolvedValue('Internal server error'),
-      } as any;
+      } as MockResponse as unknown as Response;
 
       await expect(apiClient['handleResponse'](mockResponse)).rejects.toThrow();
 
@@ -149,7 +157,7 @@ describe('ApiClient', () => {
           ok: true,
           status: 200,
           json: jest.fn().mockResolvedValue({ data: 'test' }),
-        } as any);
+        } as MockResponse as unknown as Response);
 
         await apiClient.get('/test');
 
@@ -168,7 +176,7 @@ describe('ApiClient', () => {
           ok: true,
           status: 200,
           json: jest.fn().mockResolvedValue({ data: 'test' }),
-        } as any);
+        } as MockResponse as unknown as Response);
 
         await apiClient.get('/public', false);
 
@@ -188,7 +196,7 @@ describe('ApiClient', () => {
           ok: true,
           status: 201,
           json: jest.fn().mockResolvedValue({ id: 1 }),
-        } as any);
+        } as MockResponse as unknown as Response);
 
         const data = { name: 'test' };
         await apiClient.post('/test', data);
@@ -211,7 +219,7 @@ describe('ApiClient', () => {
           ok: true,
           status: 200,
           json: jest.fn().mockResolvedValue({ updated: true }),
-        } as any);
+        } as MockResponse as unknown as Response);
 
         const data = { name: 'updated' };
         await apiClient.put('/test/1', data);
@@ -234,7 +242,7 @@ describe('ApiClient', () => {
           ok: true,
           status: 204,
           json: jest.fn().mockResolvedValue({}),
-        } as any);
+        } as MockResponse as unknown as Response);
 
         await apiClient.delete('/test/1');
 
@@ -256,7 +264,7 @@ describe('ApiClient', () => {
         ok: true,
         status: 200,
         json: jest.fn().mockResolvedValue({ data: [] }),
-      } as any);
+      } as MockResponse as unknown as Response);
     });
 
     it('should call getUsers with correct endpoint', async () => {

@@ -23,10 +23,10 @@ export const protectionTemplate = `
 
 ## 1. Nombre maximal de chaînes en parallèle sans protection
 #Maximum Number of Parallel Strings Without Protection
-$$Ncmax ≤ (1+\frac{I_{RM}}{I_{scSTC}})$$
+Ncmax ≤ (1 + (IRM / IscSTC))
 
 **Nombre maximal de chaînes en parallèle par dispositif de protection**
-$$Npmax ≤ (0.5 * (1+\frac{I_{RM}}{I_{sc-max}})$$
+Npmax ≤ 0.5 × (1 + (IRM / Isc-max))
 
 **Application Numérique:**
 

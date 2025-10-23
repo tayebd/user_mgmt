@@ -16,11 +16,11 @@ const env = envSchema.safeParse({
 // Create mock client for development
 const createMockClient = () => {
   console.warn('Using mock Supabase client for development');
-  const mockSession = {
+  const mockSession: Session = {
     access_token: 'mock-access-token',
     refresh_token: 'mock-refresh-token',
     expires_in: 3600,
-    token_type: 'bearer',
+    token_type: 'bearer' as const,
     user: {
       id: 'mock-user-id',
       email: 'mock@example.com',
@@ -40,7 +40,7 @@ const createMockClient = () => {
       getSession: async () => ({ data: { session: mockSession }, error: null }),
       getUser: async () => ({ data: { user: mockSession.user }, error: null }),
       refreshSession: async () => ({ data: { session: mockSession }, error: null }),
-      onAuthStateChange: (callback: any) => {
+      onAuthStateChange: (callback: (event: AuthChangeEvent, session: Session | null) => void) => {
         // Immediately trigger with mock session
         setTimeout(() => callback('SIGNED_IN', mockSession), 100);
         return { data: { subscription: { unsubscribe: () => {} } } };

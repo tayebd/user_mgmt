@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { useApiStore } from '@/state/api';
+import { useCompanyStore, useCompanies, useCompanyReviews } from '@/stores/company-store';
 import { Company, Review } from '@/types';
 
 const CompanyManagement = () => {
-  const { companies, fetchCompanies, createCompany, updateCompany, deleteCompany, createReview, fetchReviews } = useApiStore();
+  const companies = useCompanies();
+  const reviews = useCompanyReviews();
+  const { fetchCompanies, createCompany, updateCompany, deleteCompany, createCompanyReview, fetchCompanyReviews } = useCompanyStore();
   const [newCompany, setNewCompany] = useState<Partial<Company>>({ descriptions: [], iconUrl: '' });
   const [editingCompany, setEditingCompany] = useState<Partial<Company> | null>(null);
-  const [reviews, setReviews] = useState<Review[]>([]);
   const [newReview, setNewReview] = useState<Partial<Review>>({ rating: 0, comment: '' });
 
   const handleCreateCompany = async () => {
-    await createCompany(newCompany);
+    await createCompany({
+      name: newCompany.name || '',
+      description: newCompany.descriptions?.[0]?.text || '',
+      website: newCompany.website || '',
+      phone: newCompany.phone || '',
+      address: newCompany.address || '',
+      industry: '',
+      size: ''
+    });
     setNewCompany({});
   };
 
@@ -21,19 +30,15 @@ const CompanyManagement = () => {
     if (!company.name) {
       throw new Error('Company name is required');
     }
-    const updatedCompany: Company = {
-      id: companyId,
+    await updateCompany(companyId, {
       name: company.name,
-      address: company.address || '',
+      description: company.descriptions?.[0]?.text || '',
       website: company.website || '',
-      descriptions: company.descriptions || [],
       phone: company.phone || '',
-      logo: company.logo || '',
-      established: company.established || new Date(),
-      badge: company.badge || '',
-      rating: company.rating || 0,
-    };
-    await updateCompany(companyId, updatedCompany);
+      address: company.address || '',
+      industry: '',
+      size: ''
+    });
   };
 
   const handleDeleteCompany = async (companyId: number | undefined) => {
@@ -44,14 +49,15 @@ const CompanyManagement = () => {
   };
 
   const handleCreateReview = async (companyId: number) => {
-    await createReview(companyId, newReview);
+    await createCompanyReview(companyId, {
+      rating: newReview.rating || 0,
+      content: newReview.comment || '',
+      title: 'Review',
+      pros: [],
+      cons: []
+    });
     setNewReview({ rating: 0, comment: '' });
     fetchCompanyReviews(companyId);
-  };
-
-  const fetchCompanyReviews = async (companyId: number) => {
-    const data = await fetchReviews(companyId);
-    setReviews(data);
   };
 
   useEffect(() => {
@@ -209,7 +215,7 @@ const CompanyManagement = () => {
               <li key={review.id}>
                 <p>Rating: {review.rating}</p>
                 <p>Comment: {review.comment}</p>
-                <p>By: {review.user.name}</p>
+                <p>By: {review.user?.name || 'Unknown User'}</p>
               </li>
             ))}
           </ul>

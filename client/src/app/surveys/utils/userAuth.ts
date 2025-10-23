@@ -73,7 +73,7 @@ export const useUserAuth = (): UseUserAuthResult => {
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+      setSession(session as Session | null);
       setAuthLoading(false);
     });
 

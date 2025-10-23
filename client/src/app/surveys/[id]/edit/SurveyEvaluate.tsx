@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { useApiStore } from '@/state/api';
 import { toast } from 'sonner';
 import "survey-core/defaultV2.min.css";
+import { JSX } from 'react/jsx-runtime';
 
 // Add a custom `score` property to choice options
 Serializer.addProperty("itemvalue", {

@@ -122,6 +122,11 @@ function calculateArrayConfiguration(panel: PVPanel, inverter: Inverter, numPane
         power_ratio: Number(powerRatio.toFixed(2)),
         array_power: Number(totalPower.toFixed(2)),
         is_compatible: is_compatible, // Whether the power ratio is between 0.9 and 1.3
+        Nsmax_calc: NsmaxCalc,
+        Nsoptimal_calc: NsoptimalCalc,
+        Nsmin_calc: NsminCalc,
+        Npmax_calc: NpmaxCalc,
+        Npoptimal_calc: NpoptimalCalc
     };
     
     return array;
