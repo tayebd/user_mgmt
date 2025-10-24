@@ -12,7 +12,7 @@ describe('Survey Response Submission', () => {
     Object.defineProperty(window, 'localStorage', {
       value: {
         getItem: jest.fn().mockImplementation((key) => {
-          return key === 'companyId' ? '263' : null;
+          return key === 'organizationId' ? '263' : null;
         }),
         setItem: jest.fn(),
       },
@@ -33,7 +33,7 @@ describe('Survey Response Submission', () => {
         { name: 'erp_crm', value: 'full' },
         { name: 'erp_scm', value: 'partial' }
       ],
-      companyId: 1
+      organizationId: 1
     };
 
     // Convert to JSON string as would happen in the app
@@ -87,7 +87,7 @@ describe('Survey Response Submission', () => {
         id: 1,
         surveyId: 9,
         userId: 1,
-        companyId: 1,
+        organizationId: 1,
         responseJson: responseJsonString,
         processedMetrics: {
           timestamp: new Date(),
@@ -131,8 +131,8 @@ describe('Survey Response Submission', () => {
           throw new Error('Invalid survey response format');
         }
 
-        // Ensure companyId exists in the parsed response
-        const companyId = parsedResponse.companyId || 1;
+        // Ensure organizationId exists in the parsed response
+        const organizationId = parsedResponse.organizationId || 1;
 
         // Process metrics from survey response
         const processedResponse = SurveyMetricService.processSurveyResponse({
@@ -140,7 +140,7 @@ describe('Survey Response Submission', () => {
           surveyId,
           responseJson: surveyResponse,
           userId,
-          companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 10)
+          organizationId: typeof organizationId === 'number' ? organizationId : parseInt(String(organizationId), 10)
         });
 
         // Get auth token
@@ -160,7 +160,7 @@ describe('Survey Response Submission', () => {
             },
             body: JSON.stringify({
               userId,
-              companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 10),
+              organizationId: typeof organizationId === 'number' ? organizationId : parseInt(String(organizationId), 10),
               responseJson: surveyResponse,
               processedMetrics: processedResponse.processedMetrics
             }),
@@ -201,7 +201,7 @@ describe('Survey Response Submission', () => {
     const requestBody = JSON.parse(options.body);
     expect(requestBody).toEqual({
       userId: 1,
-      companyId: 1,
+      organizationId: 1,
       responseJson: responseJsonString,
       processedMetrics: expect.any(Object)
     });
@@ -211,14 +211,14 @@ describe('Survey Response Submission', () => {
       id: 1,
       surveyId: 9,
       userId: 1,
-      companyId: 1,
+      organizationId: 1,
       responseJson: responseJsonString,
       processedMetrics: expect.any(Object)
     });
   });
 
-  it('should handle missing companyId by using a default value', async () => {
-    // Sample response without companyId
+  it('should handle missing organizationId by using a default value', async () => {
+    // Sample response without organizationId
     const sampleResponseData = {
       question1: 'answer1',
       question2: 'answer2'
@@ -274,7 +274,7 @@ describe('Survey Response Submission', () => {
         id: 2,
         surveyId: 9,
         userId: 1,
-        companyId: 1,
+        organizationId: 1,
         responseJson: responseJsonString
       })
     });
@@ -306,8 +306,8 @@ describe('Survey Response Submission', () => {
           throw new Error('Invalid survey response format');
         }
 
-        // Ensure companyId exists in the parsed response
-        const companyId = parsedResponse.companyId || 1;
+        // Ensure organizationId exists in the parsed response
+        const organizationId = parsedResponse.organizationId || 1;
 
         // Process metrics from survey response
         const processedResponse = SurveyMetricService.processSurveyResponse({
@@ -315,7 +315,7 @@ describe('Survey Response Submission', () => {
           surveyId,
           responseJson: surveyResponse,
           userId,
-          companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 10)
+          organizationId: typeof organizationId === 'number' ? organizationId : parseInt(String(organizationId), 10)
         });
 
         // Get auth token
@@ -335,7 +335,7 @@ describe('Survey Response Submission', () => {
             },
             body: JSON.stringify({
               userId,
-              companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 10),
+              organizationId: typeof organizationId === 'number' ? organizationId : parseInt(String(organizationId), 10),
               responseJson: surveyResponse,
               processedMetrics: processedResponse.processedMetrics
             }),
@@ -375,7 +375,7 @@ describe('Survey Response Submission', () => {
     const requestBody = JSON.parse(options.body);
     expect(requestBody).toEqual({
       userId: 1,
-      companyId: 1, // Default value should be used
+      organizationId: 1, // Default value should be used
       responseJson: responseJsonString,
       processedMetrics: expect.any(Object)
     });
@@ -385,7 +385,7 @@ describe('Survey Response Submission', () => {
       id: 2,
       surveyId: 9,
       userId: 1,
-      companyId: 1,
+      organizationId: 1,
       responseJson: responseJsonString
     });
   });

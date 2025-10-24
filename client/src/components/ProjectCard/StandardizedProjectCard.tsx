@@ -134,11 +134,11 @@ const StandardizedProjectCard = ({
           </div>
         )}
 
-        {/* Company information if available */}
-        {project.companyId && (
+        {/* Organization information if available */}
+        {project.organizationId && (
           <div className="text-sm">
-            <span className="font-medium">Company ID:</span>
-            <span className="ml-2">#{project.companyId}</span>
+            <span className="font-medium">Organization ID:</span>
+            <span className="ml-2">#{project.organizationId}</span>
           </div>
         )}
       </div>

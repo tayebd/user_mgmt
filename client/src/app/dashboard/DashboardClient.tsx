@@ -187,7 +187,7 @@ export default function DashboardClient() {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        // TODO: Replace with actual company ID from user context/session
+        // TODO: Replace with actual organization ID from user context/session
         const metrics = await AnalyticsService.getDashboardMetrics(266);
         setKpis(transformMetricsToKPIs(metrics));
         setError(null);

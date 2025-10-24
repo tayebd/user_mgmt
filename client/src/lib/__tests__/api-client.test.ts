@@ -277,10 +277,10 @@ describe('ApiClient', () => {
       });
     });
 
-    it('should call getCompanies without auth', async () => {
-      await apiClient.getCompanies();
+    it('should call getOrganizations without auth', async () => {
+      await apiClient.getOrganizations();
 
-      expect(mockFetch).toHaveBeenCalledWith('http://localhost:5000/api/companies', {
+      expect(mockFetch).toHaveBeenCalledWith('http://localhost:5000/api/organizations', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

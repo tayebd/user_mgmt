@@ -11,7 +11,7 @@ import type { PVProject } from '@/shared/types';
 export interface CreateProjectParams {
   name: string;
   description?: string;
-  companyId?: number;
+  organizationId?: number;
   userId?: number;
   status?: 'planning' | 'active' | 'completed' | 'cancelled';
   startDate?: string;
@@ -39,7 +39,7 @@ export interface CreateTaskParams {
 export interface ProjectSearchParams {
   query?: string;
   status?: string;
-  companyId?: number;
+  organizationId?: number;
   userId?: number;
   page?: number;
   limit?: number;
@@ -139,7 +139,7 @@ export class ProjectService {
 
     if (params.query) queryParams.append('query', params.query);
     if (params.status) queryParams.append('status', params.status);
-    if (params.companyId) queryParams.append('companyId', params.companyId.toString());
+    if (params.organizationId) queryParams.append('organizationId', params.organizationId.toString());
     if (params.userId) queryParams.append('userId', params.userId.toString());
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.limit) queryParams.append('limit', params.limit.toString());

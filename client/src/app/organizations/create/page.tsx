@@ -9,15 +9,15 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Save, Plus, X } from 'lucide-react';
 import { useApiStore } from '@/state/api';
-import { Company } from '@/types';
+import { Organization } from '@/types';
 import Sidebar from '@/components/Sidebar';
 import { toast } from 'sonner';
 
-const CreateCompanyPage = () => {
+const CreateOrganizationPage = () => {
   const router = useRouter();
-  const { createCompany } = useApiStore();
+  const { createOrganization } = useApiStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [company, setCompany] = useState<Partial<Company>>({
+  const [organization, setOrganization] = useState<Partial<Organization>>({
     name: '',
     address: '',
     website: '',
@@ -30,49 +30,49 @@ const CreateCompanyPage = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setCompany({ ...company, [name]: value });
+    setOrganization({ ...organization, [name]: value });
   };
 
   const handleAddDescription = () => {
-    setCompany({
-      ...company,
+    setOrganization({
+      ...organization,
       descriptions: [
-        ...(company.descriptions || []),
+        ...(organization.descriptions || []),
         { id: Date.now(), language: 'en', text: '' }
       ]
     });
   };
 
   const handleDescriptionChange = (index: number, field: 'language' | 'text', value: string) => {
-    const updatedDescriptions = [...(company.descriptions || [])];
+    const updatedDescriptions = [...(organization.descriptions || [])];
     updatedDescriptions[index] = {
       ...updatedDescriptions[index],
       [field]: value
     };
-    setCompany({ ...company, descriptions: updatedDescriptions });
+    setOrganization({ ...organization, descriptions: updatedDescriptions });
   };
 
   const handleRemoveDescription = (index: number) => {
-    const updatedDescriptions = (company.descriptions || []).filter((_, i) => i !== index);
-    setCompany({ ...company, descriptions: updatedDescriptions });
+    const updatedDescriptions = (organization.descriptions || []).filter((_, i) => i !== index);
+    setOrganization({ ...organization, descriptions: updatedDescriptions });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!company.name) {
-      toast.error('Company name is required');
+    if (!organization.name) {
+      toast.error('Organization name is required');
       return;
     }
     
     try {
       setIsSubmitting(true);
-      await createCompany(company);
-      toast.success('Company created successfully');
-      router.push('/companies/manage');
+      await createOrganization(organization);
+      toast.success('Organization created successfully');
+      router.push('/organizations/manage');
     } catch (error) {
-      console.error('Failed to create company:', error);
-      toast.error('Failed to create company');
+      console.error('Failed to create organization:', error);
+      toast.error('Failed to create organization');
     } finally {
       setIsSubmitting(false);
     }
@@ -83,30 +83,30 @@ const CreateCompanyPage = () => {
       <Sidebar />
       <div className="flex-1 p-4 ml-64">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Create New Company</h1>
+          <h1 className="text-3xl font-bold">Create New Organization</h1>
           <Button 
             variant="outline"
-            onClick={() => router.push('/companies/manage')}
+            onClick={() => router.push('/organizations/manage')}
             className="flex items-center gap-2"
           >
             <ArrowLeft size={18} />
-            Back to Companies
+            Back to Organizations
           </Button>
         </div>
         
         <Card className="bg-blue-50">
           <CardContent className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Company Information</h2>
+            <h2 className="text-xl font-semibold mb-4">Organization Information</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Company Name *</Label>
+                  <Label htmlFor="name">Organization Name *</Label>
                   <Input
                     id="name"
                     name="name"
-                    value={company.name || ''}
+                    value={organization.name || ''}
                     onChange={handleChange}
-                    placeholder="Enter company name"
+                    placeholder="Enter organization name"
                     required
                   />
                 </div>
@@ -116,9 +116,9 @@ const CreateCompanyPage = () => {
                   <Input
                     id="address"
                     name="address"
-                    value={company.address || ''}
+                    value={organization.address || ''}
                     onChange={handleChange}
-                    placeholder="Enter company address"
+                    placeholder="Enter organization address"
                   />
                 </div>
                 
@@ -127,7 +127,7 @@ const CreateCompanyPage = () => {
                   <Input
                     id="website"
                     name="website"
-                    value={company.website || ''}
+                    value={organization.website || ''}
                     onChange={handleChange}
                     placeholder="https://example.com"
                   />
@@ -138,7 +138,7 @@ const CreateCompanyPage = () => {
                   <Input
                     id="phone"
                     name="phone"
-                    value={company.phone || ''}
+                    value={organization.phone || ''}
                     onChange={handleChange}
                     placeholder="Enter phone number"
                   />
@@ -149,7 +149,7 @@ const CreateCompanyPage = () => {
                   <Input
                     id="email"
                     name="email"
-                    value={company.email || ''}
+                    value={organization.email || ''}
                     onChange={handleChange}
                     placeholder="contact@example.com"
                     type="email"
@@ -161,7 +161,7 @@ const CreateCompanyPage = () => {
                   <Input
                     id="iconUrl"
                     name="iconUrl"
-                    value={company.iconUrl || ''}
+                    value={organization.iconUrl || ''}
                     onChange={handleChange}
                     placeholder="https://example.com/logo.png"
                   />
@@ -173,9 +173,9 @@ const CreateCompanyPage = () => {
                 <Textarea
                   id="capabilities"
                   name="capabilities"
-                  value={company.capabilities || ''}
+                  value={organization.capabilities || ''}
                   onChange={handleChange}
-                  placeholder="Enter company capabilities"
+                  placeholder="Enter organization capabilities"
                   rows={3}
                 />
               </div>
@@ -195,7 +195,7 @@ const CreateCompanyPage = () => {
                   </Button>
                 </div>
                 
-                {(company.descriptions || []).map((desc, index) => (
+                {(organization.descriptions || []).map((desc, index) => (
                   <div key={desc.id || index} className="grid grid-cols-12 gap-4 items-start p-4 border rounded-md">
                     <div className="col-span-2">
                       <Label htmlFor={`language-${index}`}>Language</Label>
@@ -213,7 +213,7 @@ const CreateCompanyPage = () => {
                         id={`text-${index}`}
                         value={desc.text || ''}
                         onChange={(e) => handleDescriptionChange(index, 'text', e.target.value)}
-                        placeholder="Enter company description"
+                        placeholder="Enter organization description"
                         rows={2}
                       />
                     </div>
@@ -237,7 +237,7 @@ const CreateCompanyPage = () => {
                 <Button 
                   type="button" 
                   variant="outline"
-                  onClick={() => router.push('/companies/manage')}
+                  onClick={() => router.push('/organizations/manage')}
                   className="flex items-center gap-1"
                 >
                   Cancel
@@ -250,7 +250,7 @@ const CreateCompanyPage = () => {
                   {isSubmitting ? 'Creating...' : (
                     <>
                       <Save size={16} />
-                      Create Company
+                      Create Organization
                     </>
                   )}
                 </Button>
@@ -263,4 +263,4 @@ const CreateCompanyPage = () => {
   );
 };
 
-export default CreateCompanyPage;
+export default CreateOrganizationPage;

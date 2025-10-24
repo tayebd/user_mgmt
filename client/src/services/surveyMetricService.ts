@@ -373,7 +373,7 @@ export class SurveyMetricService {
         id: 0,
         userId: 0,
         surveyId: 0,
-        companyId: 1, // Default company ID
+        organizationId: 1, // Default organization ID
         responseJson: '{}',
         processedMetrics: emptyMetrics
       };
@@ -447,7 +447,7 @@ export class SurveyMetricService {
         id: response.id || 0,
         surveyId: response.surveyId || 0,
         userId: response.userId || 0,
-        companyId: response.companyId !== undefined ? response.companyId : 1, // Always ensure a valid companyId
+        organizationId: response.organizationId !== undefined ? response.organizationId : 1, // Always ensure a valid organizationId
         responseJson: response.responseJson,
         processedMetrics: {
           timestamp: processedMetrics.timestamp || new Date(),
@@ -644,7 +644,7 @@ export class SurveyMetricService {
     return this.questionMetricMap;
   }
 
-  static aggregateCompanyMetrics(responses: EnhancedSurveyResponse[]): DashboardMetrics {
+  static aggregateOrganizationMetrics(responses: EnhancedSurveyResponse[]): DashboardMetrics {
     return MetricCalculationService.aggregateHistoricalData(responses);
   }
 }

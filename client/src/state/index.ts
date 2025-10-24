@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 // Export all stores for easy imports
 export { useUserStore } from './user-store';
-export { useCompanyStore } from './company-store';
+export { useOrganizationStore } from './organization-store';
 export { useSurveyStore } from './survey-store';
 export { useProjectStore } from './project-store';
 

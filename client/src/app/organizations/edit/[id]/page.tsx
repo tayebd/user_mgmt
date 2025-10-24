@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import EditCompanyForm from './EditCompanyForm';
+import EditOrganizationForm from './EditOrganizationForm';
 import { notFound } from 'next/navigation';
 
 // Define strict types for page parameters
@@ -8,9 +8,9 @@ type Props = {
 }
 
 /**
- * Company edit page component.
- * Handles validation and rendering of the company edit form.
- * Shows 404 page for invalid company IDs.
+ * Organization edit page component.
+ * Handles validation and rendering of the organization edit form.
+ * Shows 404 page for invalid organization IDs.
  */
 export default function Page({ params }: Props) {
   // Validate and sanitize ID parameter
@@ -18,20 +18,20 @@ export default function Page({ params }: Props) {
     // Validate ID presence
     const id = params?.id;
     if (!id) {
-      console.error('Company ID is missing in URL parameters');
-      throw new Error('Company ID is required');
+      console.error('Organization ID is missing in URL parameters');
+      throw new Error('Organization ID is required');
     }
 
     // Validate ID format and value
     const parsedId = parseInt(id, 10);
     if (isNaN(parsedId)) {
-      console.error(`Invalid company ID format: ${id}`);
-      throw new Error('Company ID must be a number');
+      console.error(`Invalid organization ID format: ${id}`);
+      throw new Error('Organization ID must be a number');
     }
 
     if (parsedId <= 0) {
-      console.error(`Invalid company ID value: ${parsedId}`);
-      throw new Error('Company ID must be a positive number');
+      console.error(`Invalid organization ID value: ${parsedId}`);
+      throw new Error('Organization ID must be a positive number');
     }
 
     // Return the edit form with loading state
@@ -46,12 +46,12 @@ export default function Page({ params }: Props) {
           </div>
         </div>
       }>
-        <EditCompanyForm companyId={id} />
+        <EditOrganizationForm organizationId={id} />
       </Suspense>
     );
   } catch (error) {
     // Log detailed error for debugging
-    console.error('Company page access error:', {
+    console.error('Organization page access error:', {
       error: error instanceof Error ? error.message : 'Unknown error',
       params,
       timestamp: new Date().toISOString()

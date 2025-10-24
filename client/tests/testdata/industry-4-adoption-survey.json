@@ -4,20 +4,20 @@
   "logoPosition": "right",
   "pages": [
     {
-      "name": "companyInfo",
-      "title": "Company Information",
+      "name": "organizationInfo",
+      "title": "Organization Information",
       "description": "Please provide basic information about your organization.",
       "elements": [
         {
           "type": "text",
-          "name": "companyName",
-          "title": "Company Name",
+          "name": "organizationName",
+          "title": "Organization Name",
           "isRequired": true
         },
         {
           "type": "dropdown",
-          "name": "companySize",
-          "title": "Company Size (Number of Employees)",
+          "name": "organizationSize",
+          "title": "Organization Size (Number of Employees)",
           "isRequired": true,
           "choices": [
             { "value": "micro", "text": "Micro (1-9 employees)" },

@@ -20,7 +20,7 @@ export interface ApiResponse<T> {
 // API endpoints based on server routes
 const API_ENDPOINTS = {
   USERS: '/users',
-  COMPANIES: '/companies',
+  COMPANIES: '/organizations',
   SURVEYS: '/surveys',
   PV_PANELS: '/pv-panels',
   INVERTERS: '/inverters',
@@ -151,17 +151,17 @@ class ApiClient {
     return this.post<unknown>(API_ENDPOINTS.USERS, user);
   }
 
-  // Companies
-  async getCompanies() {
+  // Organizations
+  async getOrganizations() {
     return this.get<Array<unknown>>(API_ENDPOINTS.COMPANIES, false);
   }
 
-  async getCompanyById(id: number) {
+  async getOrganizationById(id: number) {
     return this.get<unknown>(`${API_ENDPOINTS.COMPANIES}/${id}`, false);
   }
 
-  async createCompany(company: unknown) {
-    return this.post<unknown>(API_ENDPOINTS.COMPANIES, company);
+  async createOrganization(organization: unknown) {
+    return this.post<unknown>(API_ENDPOINTS.COMPANIES, organization);
   }
 
   // Surveys

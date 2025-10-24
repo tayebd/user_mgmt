@@ -10,7 +10,7 @@ export const testSurveyResponse = {
     responseJson: JSON.stringify({
       question1: 'answer1',
       question2: 'answer2',
-      companyId: 263
+      organizationId: 263
     }),
     userId: 1
   },
@@ -42,7 +42,7 @@ export const testSurveyResponse = {
         { name: 'analytical', value: 'medium' }
       ],
       strategyMaturity: 'advanced',
-      companyId: 263
+      organizationId: 263
     }),
     userId: 1
   }
@@ -69,7 +69,7 @@ export async function createTestSurveyResponse(
         },
         body: JSON.stringify({
           userId,
-          companyId: 263,
+          organizationId: 263,
           responseJson
         }),
         credentials: 'include'

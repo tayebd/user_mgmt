@@ -6,12 +6,12 @@ const mockProjectData: {
   panel: PVPanel;
   inverter: Inverter;
   array: PVArray;
-    name: 'Sample Site',
-    address: '123 Solar Street',
-    latitude: 48.8566,
-    longitude: 2.3522,
-    timezone: 'Europe/Paris',
-    elevation: 35
+  name: string;
+  address: string;
+  latitude: number;
+  longitude: number;
+  timezone: string;
+  elevation: number;
 } = {
   panel: {
     maker: 'SunPower',

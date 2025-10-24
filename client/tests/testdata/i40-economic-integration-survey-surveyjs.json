@@ -1,16 +1,16 @@
 {
   "title": "Industry 4.0 Economic Integration Survey",
-  "description": "This survey aims to measure the maturity and integration of Industry 4.0 economic principles in your organization. Your responses will help benchmark your company's progress and identify opportunities for further development.",
+  "description": "This survey aims to measure the maturity and integration of Industry 4.0 economic principles in your organization. Your responses will help benchmark your organization's progress and identify opportunities for further development.",
   "logoPosition": "right",
   "pages": [
     {
-      "name": "companyInformation",
-      "title": "Company Information",
+      "name": "organizationInformation",
+      "title": "Organization Information",
       "elements": [
         {
           "type": "text",
-          "name": "companyName",
-          "title": "Company name:",
+          "name": "organizationName",
+          "title": "Organization name:",
           "isRequired": true
         },
         {
@@ -31,8 +31,8 @@
         },
         {
           "type": "radiogroup",
-          "name": "companySize",
-          "title": "Company size (number of employees):",
+          "name": "organizationSize",
+          "title": "Organization size (number of employees):",
           "isRequired": true,
           "choices": [
             "Small (1-49)",

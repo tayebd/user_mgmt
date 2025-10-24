@@ -11,7 +11,7 @@ const SearchPage = () => {
   const [rating, setRating] = useState('');
 
   const handleSearch = async () => {
-    // await searchCompanies({ searchTerm, location, capability, rating });
+    // await searchOrganizations({ searchTerm, location, capability, rating });
   };
 
   return (
@@ -62,18 +62,18 @@ const SearchPage = () => {
           <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
             <thead className="bg-gray-100">
               <tr>
-                <th className="py-2 px-4 text-left">Company Name</th>
+                <th className="py-2 px-4 text-left">Organization Name</th>
                 <th className="py-2 px-4 text-left">Location</th>
                 <th className="py-2 px-4 text-left">Capability</th>
                 <th className="py-2 px-4 text-left">Rating</th>
               </tr>
             </thead>
             <tbody>
-              {searchResults.companies?.map((company) => (
-                <tr key={company.id} className="hover:bg-gray-50">
-                  <td className="py-2 px-4">{company.name}</td>
-                  <td className="py-2 px-4">{company.address}</td>
-                  <td className="py-2 px-4">{company.rating}</td>
+              {searchResults.organizations?.map((organization) => (
+                <tr key={organization.id} className="hover:bg-gray-50">
+                  <td className="py-2 px-4">{organization.name}</td>
+                  <td className="py-2 px-4">{organization.address}</td>
+                  <td className="py-2 px-4">{organization.rating}</td>
                 </tr>
               ))}
             </tbody>

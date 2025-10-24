@@ -86,11 +86,11 @@ const menuItems = [
     ],
   },
   {
-    title: "Companies",
+    title: "Organizations",
     list: [
       {
-        title: "Companies",
-        href: "/companies",
+        title: "Organizations",
+        href: "/organizations",
         icon: Sun,
       },
     ],

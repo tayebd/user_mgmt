@@ -4,8 +4,8 @@
   "logoPosition": "right",
   "pages": [
     {
-      "name": "companyInfo",
-      "title": "Company Information",
+      "name": "organizationInfo",
+      "title": "Organization Information",
       "elements": [
         {
           "type": "dropdown",
@@ -26,8 +26,8 @@
         },
         {
           "type": "dropdown",
-          "name": "companySize",
-          "title": "Company Size",
+          "name": "organizationSize",
+          "title": "Organization Size",
           "isRequired": true,
           "choices": [
             "Small (1-50 employees)",

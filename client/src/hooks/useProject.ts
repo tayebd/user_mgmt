@@ -93,7 +93,7 @@ export function useProject(): UseProjectReturn {
       const filteredData: CreateProjectParams = {
         name: data.name || '',
         description: data.description || undefined, // Convert null to undefined
-        companyId: data.companyId,
+        organizationId: data.organizationId,
         userId: data.userId,
         status: mapProjectStatusToApi(data.status) || 'planning',
         startDate: data.startDate?.toISOString(),
@@ -113,7 +113,7 @@ export function useProject(): UseProjectReturn {
       const filteredData: Partial<CreateProjectParams> = {
         name: data.name,
         description: data.description || undefined, // Convert null to undefined
-        companyId: data.companyId,
+        organizationId: data.organizationId,
         userId: data.userId,
         status: data.status ? mapProjectStatusToApi(data.status) : undefined,
         startDate: data.startDate?.toISOString(),
@@ -146,14 +146,14 @@ export function useProject(): UseProjectReturn {
     // Validation
     validateOnCreate: (data) => {
       if (!data.name) return 'Project name is required';
-      if (!data.companyId) return 'Company is required';
+      if (!data.organizationId) return 'Organization is required';
       if (!data.startDate) return 'Start date is required';
       return null;
     },
 
     validateOnUpdate: (data) => {
       if (!data.name) return 'Project name is required';
-      if (!data.companyId) return 'Company is required';
+      if (!data.organizationId) return 'Organization is required';
       return null;
     },
 

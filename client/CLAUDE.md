@@ -62,7 +62,7 @@ This is a sophisticated solar PV (photovoltaic) project management and design sy
 #### Survey System
 - **SurveyJS Integration**: Professional survey creation and management with rich question types
 - **Advanced Response Processing**: Comprehensive metrics calculation with technology assessments
-- **Company Integration**: Surveys linked to company profiles with response analytics
+- **Organization Integration**: Surveys linked to organization profiles with response analytics
 - **Results Analytics**: Aggregated response data visualization with industry insights
 - **Technology Maturity Assessment**: Digital process and personnel skill evaluations
 - **Comprehensive Testing**: Extensive test coverage for survey components and calculation logic
@@ -142,15 +142,15 @@ cd ../server/pvlib_api
 - `src/components/Navbar/` - Solar-branded navigation with search functionality
 
 #### State Management & Services
-- `src/stores/` - Domain-specific Zustand stores (company-store.ts, survey-store.ts, equipment-store.ts)
-- `src/services/` - Modular API services (auth-service.ts, project-service.ts, survey-service.ts, company-service.ts, equipment-service.ts)
+- `src/stores/` - Domain-specific Zustand stores (organization-store.ts, survey-store.ts, equipment-store.ts)
+- `src/services/` - Modular API services (auth-service.ts, project-service.ts, survey-service.ts, organization-service.ts, equipment-service.ts)
 - `src/contexts/AuthContext.tsx` - Comprehensive authentication context with enhanced error handling
 - `src/services/api-client.ts` - Base HTTP client with interceptors and error handling
 - User cache with 5-minute TTL, failed lookup cache with 1-minute TTL
 
 #### Authentication & Service Layer
 - `src/lib/supabase-client.ts` - Supabase client configuration
-- `src/hooks/` - Reusable hooks (useCRUD.ts, useCompany.ts, useSurvey.ts, useProject.ts)
+- `src/hooks/` - Reusable hooks (useCRUD.ts, useOrganization.ts, useSurvey.ts, useProject.ts)
 - `src/components/forms/` - Generic form components (GenericForm.tsx, FormActions.tsx, ValidationSummary.tsx)
 - `src/utils/auth.ts` - Authentication utilities and token management
 - Auth tokens passed as `Authorization: Bearer` headers
@@ -231,18 +231,18 @@ cd ../server/pvlib_api
   - Proper Prisma client cleanup
 
 #### API Routes Structure
-- `/api/companies` - Company management with reviews sub-routes
+- `/api/organizations` - Organization management with reviews sub-routes
 - `/api/pv-panels` - PV panel CRUD with pagination
 - `/api/inverters` - Inverter management with pagination
 - `/api/surveys` - Survey creation, response handling, and analytics
 - `/api/users` - User management with authentication
-- `/api/search` - Global search across companies and equipment
+- `/api/search` - Global search across organizations and equipment
 - `/api/ai` - AI-powered solar design endpoints
 - `/api/enhanced` - Enhanced equipment with AI intelligence
 - `/api/dashboard` - Dashboard analytics and KPIs
 
 #### Controllers & Business Logic
-- `companyController.ts` - Company CRUD, review management, search functionality
+- `organizationController.ts` - Organization CRUD, review management, search functionality
 - `pvPanelController.ts` - Panel management with pagination and filtering
 - `inverterController.ts` - Inverter management with technical specifications
 - `surveyController.ts` - Survey lifecycle, response processing, metrics calculation
@@ -253,10 +253,10 @@ cd ../server/pvlib_api
 #### Database Schema (Prisma)
 **Core Entities:**
 - **User**: Authentication, profile, role-based access (USER/ADMIN), AI preferences
-- **Company**: Renewable energy companies with detailed profiles, certifications, reviews
+- **Organization**: Renewable energy organizations with detailed profiles, certifications, reviews
 - **Survey**: Dynamic surveys with JSON configuration, expiration, response tracking
 - **PVPanel/Inverter**: Equipment database with technical specifications
-- **SurveyResponse**: User responses with processed metrics and company associations
+- **SurveyResponse**: User responses with processed metrics and organization associations
 
 **AI-Enhanced Tables:**
 - **AiDesign**: Complete AI design results with processing history
@@ -266,10 +266,10 @@ cd ../server/pvlib_api
 - **AiDesignAnalytics**: Usage analytics and confidence score tracking
 
 **Assessment & Analytics:**
-- **Industry**: Industry classification for companies
+- **Industry**: Industry classification for organizations
 - **TechnologyType**: Technology implementation tracking
 - **DigitalProcess**: Industry 4.0 digital maturity assessments
-- **PersonnelSkill**: Company skill and proficiency tracking
+- **PersonnelSkill**: Organization skill and proficiency tracking
 - **StrategyAssessment**: Digital strategy maturity evaluation
 
 #### AI Services & Intelligence Layer
@@ -284,7 +284,7 @@ cd ../server/pvlib_api
 - Migration system for schema evolution
 - **Comprehensive Seeding Scripts**:
   - `prisma/seed.ts` - Main seeding orchestrator
-  - `prisma/seedCompany.ts` - Company data with logos and descriptions
+  - `prisma/seedOrganization.ts` - Organization data with logos and descriptions
   - `prisma/seedPvPanels.ts` - PV panel specifications from manufacturers
   - `prisma/seedInverter.ts` - Inverter technical specifications
   - `prisma/seedUser.ts` - User authentication and role data
@@ -298,7 +298,7 @@ cd ../server/pvlib_api
 
 #### Testing Infrastructure
 - **Unit Tests**: Jest-based testing for controllers and services
-  - `tests/companyController.test.ts` - Company management API tests
+  - `tests/organizationController.test.ts` - Organization management API tests
   - `tests/pvPanelController.test.ts` - PV panel CRUD tests
   - `tests/surveyController.test.ts` - Survey lifecycle tests
   - `tests/analyticsService.test.ts` - Analytics calculation tests
@@ -488,7 +488,7 @@ cd server && pnpm dev
 
 ### Security Considerations
 - All API mutations require valid authentication token
-- Survey response submission requires valid auth token and companyId
+- Survey response submission requires valid auth token and organizationId
 - Input validation on all API endpoints using Zod schemas
 - Rate limiting and CORS properly configured
 
@@ -605,7 +605,7 @@ cd server && pnpm dev
 - ✅ **Testing Infrastructure**: Implemented comprehensive test suite with 275 tests
 
 **Known Challenges:**
-- Company logo and asset management
+- Organization logo and asset management
 - Excel structure consistency for data imports
 - Multi-language support (EN/FR templates exist but not fully implemented)
 - PVLib service dependencies (requires Python environment setup)
@@ -613,9 +613,9 @@ cd server && pnpm dev
 ## Project Evolution & Current Status
 
 ### Historical Context
-The application began as a company directory focused on renewable energy businesses and evolved into a comprehensive solar PV design platform. Key evolutionary phases:
+The application began as a organization directory focused on renewable energy businesses and evolved into a comprehensive solar PV design platform. Key evolutionary phases:
 
-1. **Initial Phase**: Company management with Excel data import
+1. **Initial Phase**: Organization management with Excel data import
 2. **Expansion Phase**: Added equipment management (PV panels, inverters)
 3. **Design Phase**: Implemented manual project wizard with technical calculations
 4. **AI Phase**: Added AI-powered solar design capabilities
@@ -623,7 +623,7 @@ The application began as a company directory focused on renewable energy busines
 
 ### Current Development Status (from memory-bank)
 **Completed Features:**
-- Company data CRUD with Excel import/export
+- Organization data CRUD with Excel import/export
 - PV panel and inverter database with pagination
 - Manual project wizard with multi-step configuration
 - Enhanced authentication with centralized context
@@ -647,7 +647,7 @@ The application began as a company directory focused on renewable energy busines
 - ✅ **Testing Infrastructure**: 275 tests with 191 passing (70% success rate)
 
 **Known Challenges:**
-- Company logo and asset management
+- Organization logo and asset management
 - Excel structure consistency for data imports
 - Multi-language support (EN/FR templates exist but not fully implemented)
 - PVLib service dependencies (requires Python environment setup)
@@ -655,7 +655,7 @@ The application began as a company directory focused on renewable energy busines
 ### Development Patterns & Rules (from .clinerules)
 **Critical Implementation Paths:**
 - Authentication: `Login.tsx` → `AuthContext.tsx` → Supabase → `auth.ts` middleware
-- Company Data: `CompanyManagement.tsx` → `api.ts` → `companyRoutes.ts` → `companyController.ts` → Prisma → Database
+- Organization Data: `OrganizationManagement.tsx` → `api.ts` → `organizationRoutes.ts` → `organizationController.ts` → Prisma → Database
 - Equipment Data: Similar pattern for PV panels and inverters
 
 **Project-Specific Patterns:**

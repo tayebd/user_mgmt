@@ -96,7 +96,7 @@ export interface ProjectInfoStepData {
   expectedStartDate?: string;
   projectType: 'residential' | 'commercial' | 'industrial' | 'utility';
   // Additional project details
-  companyName?: string;
+  organizationName?: string;
   projectReference?: string;
   installerNotes?: string;
   customerRequirements?: string[];
@@ -341,7 +341,7 @@ export interface ReportConfiguration {
   language: string;
   branding?: {
     logo?: string;
-    companyName?: string;
+    organizationName?: string;
     colors?: {
       primary: string;
       secondary: string;

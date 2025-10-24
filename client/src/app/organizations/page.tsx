@@ -7,41 +7,41 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Star } from 'lucide-react';
 
 import Sidebar from '@/components/Sidebar';
-// import CompanyManagement from '@/components/Company/CompanyManagement';
-import { useCompanies, useCompanyStore } from '@/stores/company-store';
-import { Company } from '@/types';
+// import OrganizationManagement from '@/components/Organization/OrganizationManagement';
+import { useOrganizations, useOrganizationStore } from '@/stores/organization-store';
+import { Organization } from '@/types';
 
-const CompaniesPage = () => {
-  const companies = useCompanies();
-  const { fetchCompanies } = useCompanyStore();
+const OrganizationsPage = () => {
+  const organizations = useOrganizations();
+  const { fetchOrganizations } = useOrganizationStore();
 
   useEffect(() => {
-    fetchCompanies();
-  }, [fetchCompanies]);
+    fetchOrganizations();
+  }, [fetchOrganizations]);
 
   return (
     <div className="flex">
       <Sidebar />
       <div className="flex-1 p-4 ml-64">
-        <h1 className="text-3xl font-bold mb-6">Solar Companies</h1>
+        <h1 className="text-3xl font-bold mb-6">Solar Organizations</h1>
 
 
         <div className="space-y-4">
-          {companies.map((company) => (
-            <Card key={company.id} className="hover:shadow-lg transition-shadow duration-200 bg-blue-50">
+          {organizations.map((organization) => (
+            <Card key={organization.id} className="hover:shadow-lg transition-shadow duration-200 bg-blue-50">
               <CardContent className="p-4">
                 <div className="grid grid-cols-8 gap-4 items-center">
                   {/* Column 1: Logo (1/8) */}
                   <div className="col-span-1 flex justify-center">
                     <Image
                       src={
-                        company.iconUrl || company.logo
-                          ? (company.iconUrl || company.logo)!.startsWith('/')
-                            ? (company.iconUrl || company.logo)!
-                            : `/${company.iconUrl || company.logo}`
+                        organization.iconUrl || organization.logo
+                          ? (organization.iconUrl || organization.logo)!.startsWith('/')
+                            ? (organization.iconUrl || organization.logo)!
+                            : `/${organization.iconUrl || organization.logo}`
                           : '/placeholder-logo.png'
                       }
-                      alt={`${company.name} logo`}
+                      alt={`${organization.name} logo`}
                       width={64}
                       height={64}
                       className="w-full h-full object-contain p-1"
@@ -50,23 +50,23 @@ const CompaniesPage = () => {
                     />
                   </div>
 
-                  {/* Column 2: Company Info (5/8) */}
+                  {/* Column 2: Organization Info (5/8) */}
                   <div className="col-span-5">
                     <h2 className="text-lg font-semibold">
                       <Link
-                        href={`/companies/${company.id}`}
+                        href={`/organizations/${organization.id}`}
                         className="text-blue-600 hover:text-blue-800 hover:underline"
                       >
-                        {company.name}
+                        {organization.name}
                       </Link>
                     </h2>
                     <div className="flex gap-2 text-sm text-gray-600">
-                      <span>{company.address}</span>
+                      <span>{organization.address}</span>
                       <span>•</span>
-                      <span>Est. {company.established?.toDateString()}</span>
+                      <span>Est. {organization.established?.toDateString()}</span>
                     </div>
                     <p className="text-sm text-gray-700 mt-1">
-                      {company.descriptions?.find((desc) => desc.language === 'en')?.text}
+                      {organization.descriptions?.find((desc) => desc.language === 'en')?.text}
                       <button className="text-blue-600 font-medium ml-1 hover:underline">
                         Show More
                       </button>
@@ -76,7 +76,7 @@ const CompaniesPage = () => {
                   {/* Column 3: Badge (1/8) */}
                   <div className="col-span-1 flex flex-col items-center justify-center">
                     <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium whitespace-nowrap">
-                      {company.badge}
+                      {organization.badge}
                     </span>
                     <span className="text-gray-600 text-xs mt-1 text-center">Screened & Verified</span>
                   </div>
@@ -84,7 +84,7 @@ const CompaniesPage = () => {
                   {/* Column 4: Rating (1/8) */}
                   <div className="col-span-1 flex flex-col items-center justify-center">
                     <div className="flex items-center gap-1">
-                      <span className="font-bold text-lg">{company.rating}</span>
+                      <span className="font-bold text-lg">{organization.rating}</span>
                       <div className="flex">
                         {[...Array(5)].map((_, i) => (
                           <Star
@@ -94,7 +94,7 @@ const CompaniesPage = () => {
                         ))}
                       </div>
                     </div>
-                    <span className="text-blue-600 text-sm whitespace-nowrap">{company.reviews} Reviews</span>
+                    <span className="text-blue-600 text-sm whitespace-nowrap">{organization.reviews} Reviews</span>
                   </div>
                 </div>
               </CardContent>
@@ -106,4 +106,4 @@ const CompaniesPage = () => {
   );
 };
 
-export default CompaniesPage;
+export default OrganizationsPage;

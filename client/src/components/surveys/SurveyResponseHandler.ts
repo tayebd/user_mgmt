@@ -32,11 +32,11 @@ export const useSurveyResponseHandler = ({ surveyId, currentUserId }: SurveyResp
         throw new Error('Invalid response format');
       }
 
-      // Get companyId from localStorage or use a default value
-      const companyId = localStorage.getItem('companyId') || '263';
+      // Get organizationId from localStorage or use a default value
+      const organizationId = localStorage.getItem('organizationId') || '263';
 
-      // Add companyId to the survey data for metrics processing
-      cleanData.companyId = parseInt(companyId, 10);
+      // Add organizationId to the survey data for metrics processing
+      cleanData.organizationId = parseInt(organizationId, 10);
 
       // Convert the cleaned data back to a JSON string
       const responseJsonString = JSON.stringify(cleanData);

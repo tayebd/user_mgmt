@@ -112,7 +112,7 @@
 //   numberPanels: number; // Added property
 // };
 
-export type Company = {
+export type Organization = {
   id : number;
   name: string;
   address: string;
@@ -142,7 +142,7 @@ export type Description = {
 export type Review = {
   id : number;
   userId: number;
-  companyId: number;
+  organizationId: number;
   rating: number;
   comment?: string;
   user: User;
@@ -171,7 +171,7 @@ export interface Survey {
   responses?: SurveyResponse[];
   active?: boolean;
   responseCount?: number;
-  companyId?: number;
+  organizationId?: number;
 }
 
 import { SurveyStatus, ProjectStatus, TaskStatus, TaskPriority } from './enums';
@@ -194,7 +194,7 @@ export interface SurveyResponse {
   surveyId: number;
   responseJson: string;
   userId: number;
-  companyId: number;
+  organizationId: number;
   processedMetrics?: ProcessedMetrics;
 }
 
@@ -207,7 +207,7 @@ export interface Project {
   endDate: Date;
   tasks: Task[];
   members: User[];
-  companyId?: number;
+  organizationId?: number;
   userId?: number;
   budget?: number;
 }

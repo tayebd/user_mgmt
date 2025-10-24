@@ -69,7 +69,7 @@ export interface EnhancedSurveyResponse {
   surveyId: number;
   responseJson: string;
   userId: number;
-  companyId: number; // Changed to required field
+  organizationId: number; // Changed to required field
   processedMetrics?: ProcessedMetrics;
 }
 

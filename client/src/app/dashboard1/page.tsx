@@ -49,9 +49,9 @@ interface ChartWidget {
 const generateSampleData = (): KPI[] => {
   return [
     {
-      id: 'companies-with-i40',
-      title: 'Companies with Industry 4.0 Solutions',
-      description: 'Proportion of companies that have integrated at least one Industry 4.0 technology',
+      id: 'organizations-with-i40',
+      title: 'Organizations with Industry 4.0 Solutions',
+      description: 'Proportion of organizations that have integrated at least one Industry 4.0 technology',
       value: 42.7,
       previousValue: 38.2,
       format: 'percentage',
@@ -62,7 +62,7 @@ const generateSampleData = (): KPI[] => {
     {
       id: 'adoption-rate',
       title: 'Adoption Rate of I4.0 Solutions',
-      description: 'Percentage of companies implementing I4.0 technologies in processes',
+      description: 'Percentage of organizations implementing I4.0 technologies in processes',
       value: 38.5,
       previousValue: 35.8,
       format: 'percentage',
@@ -95,7 +95,7 @@ const generateSampleData = (): KPI[] => {
     {
       id: 'strategy-adoption',
       title: 'I4.0 Strategy Adoption Rate',
-      description: 'Companies with I4.0 strategy in business plan',
+      description: 'Organizations with I4.0 strategy in business plan',
       value: 28.6,
       previousValue: 24.8,
       format: 'percentage',
@@ -106,7 +106,7 @@ const generateSampleData = (): KPI[] => {
     {
       id: 'economic-integration',
       title: 'I4.0 Economic Model Integration',
-      description: 'Maturity of I4.0 economic principles integration in companies',
+      description: 'Maturity of I4.0 economic principles integration in organizations',
       value: 3.2,
       previousValue: 2.9,
       format: 'rating',
@@ -244,7 +244,7 @@ const defaultCharts: ChartWidget[] = [
     id: 'adoption-trend',
     type: 'line',
     title: 'Industry 4.0 Adoption Trend',
-    kpiId: 'companies-with-i40',
+    kpiId: 'organizations-with-i40',
     visible: true
   },
   {
@@ -471,7 +471,7 @@ const Dashboard: React.FC = () => {
                     <Label htmlFor="kpi" className="text-right">
                       KPI
                     </Label>
-                    <Select defaultValue="companies-with-i40">
+                    <Select defaultValue="organizations-with-i40">
                       <SelectTrigger id="kpi" className="col-span-3">
                         <SelectValue placeholder="Select KPI" />
                       </SelectTrigger>
@@ -484,7 +484,7 @@ const Dashboard: React.FC = () => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit" onClick={() => addNewChart('bar', 'companies-with-i40')}>
+                  <Button type="submit" onClick={() => addNewChart('bar', 'organizations-with-i40')}>
                     Add Widget
                   </Button>
                 </DialogFooter>

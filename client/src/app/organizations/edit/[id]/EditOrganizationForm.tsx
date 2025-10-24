@@ -9,22 +9,22 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ArrowLeft, Save, Plus, X } from 'lucide-react';
 import { useApiStore } from '@/state/api';
-import { Company } from '@/types';
+import { Organization } from '@/types';
 import Sidebar from '@/components/Sidebar';
 import { toast } from 'sonner';
 
-interface EditCompanyFormProps {
-  companyId: string;
+interface EditOrganizationFormProps {
+  organizationId: string;
 }
 
-const EditCompanyForm = ({ companyId }: EditCompanyFormProps) => {
-  const parsedCompanyId = parseInt(companyId);
+const EditOrganizationForm = ({ organizationId }: EditOrganizationFormProps) => {
+  const parsedOrganizationId = parseInt(organizationId);
   const router = useRouter();
-  const { updateCompany, fetchCompanyById } = useApiStore();
+  const { updateOrganization, fetchOrganizationById } = useApiStore();
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [company, setCompany] = useState<Partial<Company>>({
-    id: parsedCompanyId,
+  const [organization, setOrganization] = useState<Partial<Organization>>({
+    id: parsedOrganizationId,
     name: '',
     address: '',
     website: '',
@@ -36,67 +36,67 @@ const EditCompanyForm = ({ companyId }: EditCompanyFormProps) => {
   });
 
   useEffect(() => {
-    const loadCompany = async () => {
+    const loadOrganization = async () => {
       try {
         setIsLoading(true);
-        console.log(`Loading company with ID: ${parsedCompanyId}`);
-        const companyData = await fetchCompanyById(parsedCompanyId);
-        console.log('Company data loaded:', companyData);
+        console.log(`Loading organization with ID: ${parsedOrganizationId}`);
+        const organizationData = await fetchOrganizationById(parsedOrganizationId);
+        console.log('Organization data loaded:', organizationData);
         
         // Ensure all fields are properly set with the loaded data
-        setCompany({
-          id: companyData.id,
-          name: companyData.name || '',
-          address: companyData.address || '',
-          website: companyData.website || '',
-          phone: companyData.phone || '',
-          iconUrl: companyData.iconUrl || companyData.logo || '',
-          logo: companyData.logo || '',
-          capabilities: companyData.capabilities || '',
-          established: companyData.established ? new Date(companyData.established) : new Date(),
-          badge: companyData.badge || '',
-          rating: companyData.rating || 0,
+        setOrganization({
+          id: organizationData.id,
+          name: organizationData.name || '',
+          address: organizationData.address || '',
+          website: organizationData.website || '',
+          phone: organizationData.phone || '',
+          iconUrl: organizationData.iconUrl || organizationData.logo || '',
+          logo: organizationData.logo || '',
+          capabilities: organizationData.capabilities || '',
+          established: organizationData.established ? new Date(organizationData.established) : new Date(),
+          badge: organizationData.badge || '',
+          rating: organizationData.rating || 0,
           // Ensure descriptions is an array
-          descriptions: Array.isArray(companyData.descriptions) ? companyData.descriptions : [],
+          descriptions: Array.isArray(organizationData.descriptions) ? organizationData.descriptions : [],
         });
       } catch (error) {
-        console.error('Failed to fetch company:', error);
-        toast.error('Failed to load company data');
+        console.error('Failed to fetch organization:', error);
+        toast.error('Failed to load organization data');
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (parsedCompanyId) {
-      loadCompany();
+    if (parsedOrganizationId) {
+      loadOrganization();
     }
-  }, [parsedCompanyId, fetchCompanyById]);
+  }, [parsedOrganizationId, fetchOrganizationById]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setCompany({ ...company, [name]: value });
+    setOrganization({ ...organization, [name]: value });
   };
 
   const handleAddDescription = () => {
-    setCompany({
-      ...company,
+    setOrganization({
+      ...organization,
       descriptions: [
-        ...(company.descriptions || []),
+        ...(organization.descriptions || []),
         { id: Date.now(), language: 'en', text: '' },
       ],
     });
   };
 
   const handleDescriptionChange = (index: number, value: string) => {
-    const descriptions = [...(company.descriptions || [])];
+    const descriptions = [...(organization.descriptions || [])];
     descriptions[index] = { ...descriptions[index], text: value };
-    setCompany({ ...company, descriptions });
+    setOrganization({ ...organization, descriptions });
   };
 
   const handleRemoveDescription = (index: number) => {
-    const descriptions = [...(company.descriptions || [])];
+    const descriptions = [...(organization.descriptions || [])];
     descriptions.splice(index, 1);
-    setCompany({ ...company, descriptions });
+    setOrganization({ ...organization, descriptions });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -104,12 +104,12 @@ const EditCompanyForm = ({ companyId }: EditCompanyFormProps) => {
     setIsSubmitting(true);
 
     try {
-      await updateCompany(parsedCompanyId, company);
-      toast.success('Company updated successfully');
-      router.push('/companies/manage');
+      await updateOrganization(parsedOrganizationId, organization);
+      toast.success('Organization updated successfully');
+      router.push('/organizations/manage');
     } catch (error) {
-      console.error('Failed to update company:', error);
-      toast.error('Failed to update company');
+      console.error('Failed to update organization:', error);
+      toast.error('Failed to update organization');
     } finally {
       setIsSubmitting(false);
     }
@@ -133,24 +133,24 @@ const EditCompanyForm = ({ companyId }: EditCompanyFormProps) => {
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-2xl font-bold">Edit Company</h1>
+              <h1 className="text-2xl font-bold">Edit Organization</h1>
               <Button
                 variant="outline"
-                onClick={() => router.push('/companies/manage')}
+                onClick={() => router.push('/organizations/manage')}
               >
                 <ArrowLeft size={16} className="mr-2" />
-                Back to Companies
+                Back to Organizations
               </Button>
             </div>
 
             <form onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="name">Company Name</Label>
+                  <Label htmlFor="name">Organization Name</Label>
                   <Input
                     id="name"
                     name="name"
-                    value={company.name}
+                    value={organization.name}
                     onChange={handleChange}
                     required
                   />
@@ -161,7 +161,7 @@ const EditCompanyForm = ({ companyId }: EditCompanyFormProps) => {
                   <Input
                     id="address"
                     name="address"
-                    value={company.address}
+                    value={organization.address}
                     onChange={handleChange}
                     required
                   />
@@ -172,7 +172,7 @@ const EditCompanyForm = ({ companyId }: EditCompanyFormProps) => {
                   <Input
                     id="website"
                     name="website"
-                    value={company.website}
+                    value={organization.website}
                     onChange={handleChange}
                     required
                   />
@@ -183,7 +183,7 @@ const EditCompanyForm = ({ companyId }: EditCompanyFormProps) => {
                   <Input
                     id="phone"
                     name="phone"
-                    value={company.phone}
+                    value={organization.phone}
                     onChange={handleChange}
                     required
                   />
@@ -195,7 +195,7 @@ const EditCompanyForm = ({ companyId }: EditCompanyFormProps) => {
                     id="email"
                     name="email"
                     type="email"
-                    value={company.email || ''}
+                    value={organization.email || ''}
                     onChange={handleChange}
                   />
                 </div>
@@ -205,7 +205,7 @@ const EditCompanyForm = ({ companyId }: EditCompanyFormProps) => {
                   <Input
                     id="iconUrl"
                     name="iconUrl"
-                    value={company.iconUrl}
+                    value={organization.iconUrl}
                     onChange={handleChange}
                   />
                 </div>
@@ -215,7 +215,7 @@ const EditCompanyForm = ({ companyId }: EditCompanyFormProps) => {
                   <Textarea
                     id="capabilities"
                     name="capabilities"
-                    value={company.capabilities}
+                    value={organization.capabilities}
                     onChange={handleChange}
                   />
                 </div>
@@ -234,7 +234,7 @@ const EditCompanyForm = ({ companyId }: EditCompanyFormProps) => {
                     </Button>
                   </div>
                   <div className="space-y-2">
-                    {company.descriptions?.map((description, index) => (
+                    {organization.descriptions?.map((description, index) => (
                       <div key={description.id} className="flex gap-2">
                         <Textarea
                           value={description.text}
@@ -277,4 +277,4 @@ const EditCompanyForm = ({ companyId }: EditCompanyFormProps) => {
   );
 };
 
-export default EditCompanyForm;
+export default EditOrganizationForm;

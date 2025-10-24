@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
-import { Company, Review, Project, Task, 
+import { Organization, Review, Project, Task, 
   Survey, CreateSurveyParams, SurveyResponse, User} from '@/types';
 import type { PVPanel, Inverter, PVProject } from '@/shared/types';
 // import { ProcessedMetrics, EnhancedSurveyResponse } from '@/types/metrics';
@@ -30,7 +30,7 @@ const isUser = (data: unknown): data is User => {
 };
 
 export interface SearchResults {
-  companies?: Company[];
+  organizations?: Organization[];
 }
 
 // Cache configuration
@@ -46,7 +46,7 @@ export interface ApiState {
   tasks: Task[];
   pvProjects: PVProject[];
   users: User[];
-  companies: Company[];
+  organizations: Organization[];
   surveys: Survey[];
   survey: Survey;
   pvPanels: PVPanel[];
@@ -78,12 +78,12 @@ export interface ApiState {
   deletePVProject: (projectId: number) => Promise<void>;
   updatePVProject: (projectId: number, project: Partial<PVProject>) => Promise<void>;
 
-  fetchCompanies: () => Promise<Company[]>;
-  fetchCompanyById: (companyId: number) => Promise<Company>;
-  createCompany: (company: Partial<Company>) => Promise<Company>;
-  updateCompany: (companyId: number, company: Partial<Company>) => Promise<void>;
-  deleteCompany: (companyId: number) => Promise<void>;
-  createReview: (companyId: number, review: Partial<Review>) => Promise<Review>;
+  fetchOrganizations: () => Promise<Organization[]>;
+  fetchOrganizationById: (organizationId: number) => Promise<Organization>;
+  createOrganization: (organization: Partial<Organization>) => Promise<Organization>;
+  updateOrganization: (organizationId: number, organization: Partial<Organization>) => Promise<void>;
+  deleteOrganization: (organizationId: number) => Promise<void>;
+  createReview: (organizationId: number, review: Partial<Review>) => Promise<Review>;
   
   fetchSurveys: () => Promise<Survey[]>;
   createSurvey: (project: CreateSurveyParams) => Promise<Survey>;
@@ -102,7 +102,7 @@ export interface ApiState {
   updateAIDesign: (designId: string, updateData: Record<string, unknown>) => Promise<Record<string, unknown>>;
   deleteAIDesign: (designId: string) => Promise<boolean>;
 
-  fetchReviews: (companyId: number) => Promise<Review[]>;
+  fetchReviews: (organizationId: number) => Promise<Review[]>;
   fetchSurveyResponses: (surveyId: number) => Promise<SurveyResponse[]>;
   fetchSurveysByUserId: (userId: number) => Promise<Survey[]>;
 
@@ -116,7 +116,7 @@ export interface ApiState {
 
 const apiStore = create<ApiState>((set, get) => ({
   users:[],
-  companies: [],
+  organizations: [],
   surveys: [],
   pvPanels: [],
   inverters: [],
@@ -370,10 +370,10 @@ const apiStore = create<ApiState>((set, get) => ({
     }));
   },
 
-  fetchCompanies: async () => {
+  fetchOrganizations: async () => {
     try {
-      console.log('Fetching companies from client...');
-      const response = await fetch(`${API_BASE_URL}/companies`, {
+      console.log('Fetching organizations from client...');
+      const response = await fetch(`${API_BASE_URL}/organizations`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -381,19 +381,19 @@ const apiStore = create<ApiState>((set, get) => ({
         throw new Error(`API error: ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
-      console.log(`Received ${data.length} companies from API`);
-      set({ companies: data });
+      console.log(`Received ${data.length} organizations from API`);
+      set({ organizations: data });
       return data;
     } catch (error) {
-      console.error('Error fetching companies:', error);
-      set({ companies: [] });
+      console.error('Error fetching organizations:', error);
+      set({ organizations: [] });
       return [];
     }
   },
-  fetchCompanyById: async (companyId: number) => {
+  fetchOrganizationById: async (organizationId: number) => {
     try {
-      console.log(`Fetching company with ID ${companyId}...`);
-      const response = await fetch(`${API_BASE_URL}/companies/${companyId}`, {
+      console.log(`Fetching organization with ID ${organizationId}...`);
+      const response = await fetch(`${API_BASE_URL}/organizations/${organizationId}`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -403,21 +403,21 @@ const apiStore = create<ApiState>((set, get) => ({
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error(`Error fetching company with ID ${companyId}:`, error);
+      console.error(`Error fetching organization with ID ${organizationId}:`, error);
       throw error;
     }
   },
-  createCompany: async (company: Partial<Company>) => {
+  createOrganization: async (organization: Partial<Organization>) => {
     const token = await getAuthToken();
-    const response = await fetch(`${API_BASE_URL}/companies`, {
+    const response = await fetch(`${API_BASE_URL}/organizations`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        ...company,
-        descriptions: company.descriptions?.map((desc) => ({
+        ...organization,
+        descriptions: organization.descriptions?.map((desc) => ({
           ...desc,
           id: desc.id || crypto.randomUUID(),
         })),
@@ -425,20 +425,20 @@ const apiStore = create<ApiState>((set, get) => ({
       credentials: 'include',
     });
     const data = await response.json();
-    set((state) => ({ companies: [...state.companies, data] }));
+    set((state) => ({ organizations: [...state.organizations, data] }));
     return data;
   },
-  updateCompany: async (companyId: number, company: Partial<Company>) => {
+  updateOrganization: async (organizationId: number, organization: Partial<Organization>) => {
     const token = await getAuthToken();
-    const response = await fetch(`${API_BASE_URL}/companies/${companyId}`, {
+    const response = await fetch(`${API_BASE_URL}/organizations/${organizationId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        ...company,
-        descriptions: company.descriptions?.map((desc) => ({
+        ...organization,
+        descriptions: organization.descriptions?.map((desc) => ({
           ...desc,
           id: desc.id || crypto.randomUUID(),
         })),
@@ -447,12 +447,12 @@ const apiStore = create<ApiState>((set, get) => ({
     });
     const data = await response.json();
     set((state) => ({
-      companies: state.companies.map((c) => (c.id === companyId ? data : c)),
+      organizations: state.organizations.map((c) => (c.id === organizationId ? data : c)),
     }));
   },
-  deleteCompany: async (companyId: number) => {
+  deleteOrganization: async (organizationId: number) => {
     const token = await getAuthToken();
-    await fetch(`${API_BASE_URL}/companies/${companyId}`, {
+    await fetch(`${API_BASE_URL}/organizations/${organizationId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -460,12 +460,12 @@ const apiStore = create<ApiState>((set, get) => ({
       credentials: 'include',
     });
     set((state) => ({
-      companies: state.companies.filter((c) => c.id !== companyId),
+      organizations: state.organizations.filter((c) => c.id !== organizationId),
     }));
   },
-  createReview: async (companyId: number, review: Partial<Review>) => {
+  createReview: async (organizationId: number, review: Partial<Review>) => {
     const token = await getAuthToken();
-    const response = await fetch(`${API_BASE_URL}/companies/${companyId}/reviews`, {
+    const response = await fetch(`${API_BASE_URL}/organizations/${organizationId}/reviews`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -477,8 +477,8 @@ const apiStore = create<ApiState>((set, get) => ({
     const data = await response.json();
     return data;
   },
-  fetchReviews: async (companyId: number) => {
-    const response = await fetch(`${API_BASE_URL}/companies/${companyId}/reviews`, {
+  fetchReviews: async (organizationId: number) => {
+    const response = await fetch(`${API_BASE_URL}/organizations/${organizationId}/reviews`, {
       method: 'GET',
       credentials: 'include',
     });
@@ -506,16 +506,16 @@ const apiStore = create<ApiState>((set, get) => ({
         throw new Error('Invalid survey response format');
       }
 
-      // Ensure companyId exists in the parsed response
-      const companyId = parsedResponse.companyId || 1; // Default to 1 if not provided
-      console.log(`Using companyId: ${companyId} for survey response`);
+      // Ensure organizationId exists in the parsed response
+      const organizationId = parsedResponse.organizationId || 1; // Default to 1 if not provided
+      console.log(`Using organizationId: ${organizationId} for survey response`);
 
       // Process metrics from survey response
       const processedResponse = SurveyMetricService.processSurveyResponse({
         id: 0, // Temporary ID
         surveyId,
         responseJson: surveyResponse,
-        companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 10),
+        organizationId: typeof organizationId === 'number' ? organizationId : parseInt(String(organizationId), 10),
         userId,
       });
 
@@ -551,7 +551,7 @@ const apiStore = create<ApiState>((set, get) => ({
       
       const requestBody = {
         userId: userId,
-        companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 10),
+        organizationId: typeof organizationId === 'number' ? organizationId : parseInt(String(organizationId), 10),
         responseJson: typeof surveyResponse === 'string' ? surveyResponse : JSON.stringify(surveyResponse),
         processedMetrics: processedResponse.processedMetrics
       };
@@ -595,14 +595,14 @@ const apiStore = create<ApiState>((set, get) => ({
       // Log successful metrics processing
       console.log('Survey response processed successfully:', {
         surveyId,
-        companyId,
+        organizationId,
         hasMetrics: !!data.processedMetrics,
         timestamp: new Date().toISOString()
       });
 
-      // Ensure the returned data has a companyId (required by SurveyResponse interface)
-      if (!data.companyId && data.companyId !== 0) {
-        data.companyId = parsedResponse.companyId || 263;
+      // Ensure the returned data has a organizationId (required by SurveyResponse interface)
+      if (!data.organizationId && data.organizationId !== 0) {
+        data.organizationId = parsedResponse.organizationId || 263;
       }
       
       return data as SurveyResponse;

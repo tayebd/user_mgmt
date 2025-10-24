@@ -17,7 +17,7 @@ const IndustryDashboardDemo = () => {
       try {
         setLoading(true);
         setError(null);
-        // TODO: Replace with actual company ID from user context
+        // TODO: Replace with actual organization ID from user context
         const data = await AnalyticsService.getDashboardMetrics(1);
         setMetrics(data);
       } catch (err) {
@@ -34,7 +34,7 @@ const IndustryDashboardDemo = () => {
   // Handle export
   const handleExport = async () => {
     try {
-      // TODO: Replace with actual company ID from user context
+      // TODO: Replace with actual organization ID from user context
       const data = await AnalyticsService.exportDashboardMetrics(1);
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = window.URL.createObjectURL(blob);

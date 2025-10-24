@@ -8,7 +8,7 @@ import { SurveyStatus } from '@/types';
 
 export interface UseSurveyReturn extends ReturnType<typeof useCRUD<Survey>> {
   // Survey-specific actions
-  createResponse: (surveyId: number, responseJson: string, userId: number, companyId?: number) => Promise<SurveyResponse | null>;
+  createResponse: (surveyId: number, responseJson: string, userId: number, organizationId?: number) => Promise<SurveyResponse | null>;
   getResponses: (surveyId: number) => Promise<SurveyResponse[]>;
   updateResponse: (responseId: number, data: Partial<SurveyResponse>) => Promise<SurveyResponse | null>;
   deleteResponse: (responseId: number) => Promise<boolean>;
@@ -102,7 +102,7 @@ export function useSurvey(): UseSurveyReturn {
     surveyId: number,
     responseJson: string,
     userId: number,
-    companyId?: number
+    organizationId?: number
   ): Promise<SurveyResponse | null> => {
     try {
       const response = await surveyService.createSurveyResponse({

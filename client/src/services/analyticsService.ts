@@ -77,7 +77,7 @@ const dashboardMetricsSchema = z.object({
     nextReviewDate: z.string().or(z.date()).nullable()
   }),
   sectorComparison: z.object({
-    companyMaturity: z.number().nullable(),
+    organizationMaturity: z.number().nullable(),
     sectorAvgMaturity: z.number().nullable(),
     sectorName: z.string()
   })
@@ -113,9 +113,9 @@ export class AnalyticsService {
     }
   }
 
-  static async getDashboardMetrics(companyId: number): Promise<DashboardMetrics> {
+  static async getDashboardMetrics(organizationId: number): Promise<DashboardMetrics> {
     const url = new URL(`${API_BASE_URL}/dashboard/metrics`);
-    url.searchParams.append('companyId', companyId.toString());
+    url.searchParams.append('organizationId', organizationId.toString());
 
     const response = await fetch(url.toString(), {
       method: 'GET',
@@ -132,9 +132,9 @@ export class AnalyticsService {
     return this.validateMetrics(data.data);
   }
 
-  static async exportDashboardMetrics(companyId: number): Promise<Blob> {
+  static async exportDashboardMetrics(organizationId: number): Promise<Blob> {
     const url = new URL(`${API_BASE_URL}/dashboard/metrics/export`);
-    url.searchParams.append('companyId', companyId.toString());
+    url.searchParams.append('organizationId', organizationId.toString());
 
     const response = await fetch(url.toString(), {
       method: 'GET',

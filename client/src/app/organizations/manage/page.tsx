@@ -8,43 +8,43 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Edit, Trash2 } from 'lucide-react';
 import Sidebar from '@/components/Sidebar';
-import { useCompanies, useCompanyStore } from '@/stores/company-store';
+import { useOrganizations, useOrganizationStore } from '@/stores/organization-store';
 import { Toaster, toast } from 'sonner';
 
-const ManageCompaniesPage = () => {
+const ManageOrganizationsPage = () => {
   const router = useRouter();
-  const companies = useCompanies();
-  const { fetchCompanies, deleteCompany } = useCompanyStore();
+  const organizations = useOrganizations();
+  const { fetchOrganizations, deleteOrganization } = useOrganizationStore();
 
   useEffect(() => {
-    fetchCompanies();
-  }, [fetchCompanies]);
+    fetchOrganizations();
+  }, [fetchOrganizations]);
 
-  const handleDeleteCompany = async (id: number) => {
+  const handleDeleteOrganization = async (id: number) => {
     // Show a confirmation toast with action buttons
     toast(
-      'Are you sure you want to delete this company?',
+      'Are you sure you want to delete this organization?',
       {
-        id: `delete-company-${id}`,
+        id: `delete-organization-${id}`,
         duration: Infinity, // Stay until user takes action
         icon: <Trash2 className="text-red-500" size={18} />,
         action: {
           label: 'Delete',
           onClick: async () => {
             // When user confirms, show a loading toast
-            toast.loading('Deleting company...', { id: `deleting-${id}` });
+            toast.loading('Deleting organization...', { id: `deleting-${id}` });
             
             try {
-              // Attempt to delete the company
-              await deleteCompany(id);
+              // Attempt to delete the organization
+              await deleteOrganization(id);
               // On success, update the loading toast to success
-              toast.success('Company deleted successfully', { id: `deleting-${id}` });
-              // Refresh the companies list
-              await fetchCompanies();
+              toast.success('Organization deleted successfully', { id: `deleting-${id}` });
+              // Refresh the organizations list
+              await fetchOrganizations();
             } catch (error) {
               // On error, update the loading toast to error
-              console.error('Failed to delete company:', error);
-              toast.error('Failed to delete company', { id: `deleting-${id}` });
+              console.error('Failed to delete organization:', error);
+              toast.error('Failed to delete organization', { id: `deleting-${id}` });
             }
           },
         },
@@ -52,7 +52,7 @@ const ManageCompaniesPage = () => {
           label: 'Cancel',
           onClick: () => {
             // Dismiss the confirmation toast when canceled
-            toast.dismiss(`delete-company-${id}`);
+            toast.dismiss(`delete-organization-${id}`);
           },
         },
         // Style the toast
@@ -71,26 +71,26 @@ const ManageCompaniesPage = () => {
       <Sidebar />
       <div className="flex-1 p-4 ml-64">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Manage Companies</h1>
+          <h1 className="text-3xl font-bold">Manage Organizations</h1>
           <Button 
-            onClick={() => router.push('/companies/create')}
+            onClick={() => router.push('/organizations/create')}
             className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
           >
             <PlusCircle size={18} />
-            Add New Company
+            Add New Organization
           </Button>
         </div>
         
         <div className="space-y-4">
-          {companies.map((company) => (
-            <Card key={company.id} className="hover:shadow-lg transition-shadow duration-200 bg-blue-50">
+          {organizations.map((organization) => (
+            <Card key={organization.id} className="hover:shadow-lg transition-shadow duration-200 bg-blue-50">
               <CardContent className="p-4">
                 <div className="grid grid-cols-8 gap-4 items-center">
                   {/* Column 1: Logo (1/8) */}
                   <div className="col-span-1 flex justify-center">
                   <Image
-                      src={company.iconUrl || company.logo || '/placeholder-logo.png'}
-                      alt={`${company.name}`}
+                      src={organization.iconUrl || organization.logo || '/placeholder-logo.png'}
+                      alt={`${organization.name}`}
                       width={64}
                       height={64}
                       className="w-full h-full object-contain p-1"
@@ -98,27 +98,27 @@ const ManageCompaniesPage = () => {
                     />
                   </div>
 
-                  {/* Column 2: Company Info (5/8) */}
+                  {/* Column 2: Organization Info (5/8) */}
                   <div className="col-span-5">
                     <h2 className="text-lg font-semibold">
                       <Link
-                        href={`/companies/${company.id}`}
+                        href={`/organizations/${organization.id}`}
                         className="text-blue-600 hover:text-blue-800 hover:underline"
                       >
-                        {company.name}
+                        {organization.name}
                       </Link>
                     </h2>
                     <div className="flex gap-2 text-sm text-gray-600">
-                      <span>{company.address}</span>
-                      {company.established && (
+                      <span>{organization.address}</span>
+                      {organization.established && (
                         <>
                           <span>•</span>
-                          <span>Est. {new Date(company.established).toDateString()}</span>
+                          <span>Est. {new Date(organization.established).toDateString()}</span>
                         </>
                       )}
                     </div>
                     <p className="text-sm text-gray-700 mt-1">
-                      {company.descriptions?.find((desc) => desc.language === 'en')?.text || company.capabilities}
+                      {organization.descriptions?.find((desc) => desc.language === 'en')?.text || organization.capabilities}
                     </p>
                   </div>
 
@@ -128,7 +128,7 @@ const ManageCompaniesPage = () => {
                       variant="outline"
                       size="sm"
                       className="flex items-center gap-1 text-blue-600 border-blue-200 hover:bg-blue-50"
-                      onClick={() => router.push(`/companies/edit/${company.id}`)}
+                      onClick={() => router.push(`/organizations/edit/${organization.id}`)}
                     >
                       <Edit size={16} />
                       Edit
@@ -137,7 +137,7 @@ const ManageCompaniesPage = () => {
                       variant="outline"
                       size="sm"
                       className="flex items-center gap-1 text-red-600 border-red-200 hover:bg-red-50"
-                      onClick={() => handleDeleteCompany(company.id)}
+                      onClick={() => handleDeleteOrganization(organization.id)}
                     >
                       <Trash2 size={16} />
                       Delete
@@ -148,14 +148,14 @@ const ManageCompaniesPage = () => {
             </Card>
           ))}
 
-          {companies.length === 0 && (
+          {organizations.length === 0 && (
             <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <p className="text-gray-500 mb-4">No companies found</p>
+              <p className="text-gray-500 mb-4">No organizations found</p>
               <Button 
-                onClick={() => router.push('/companies/create')}
+                onClick={() => router.push('/organizations/create')}
                 className="bg-blue-600 hover:bg-blue-700"
               >
-                Add Your First Company
+                Add Your First Organization
               </Button>
             </div>
           )}
@@ -165,4 +165,4 @@ const ManageCompaniesPage = () => {
   );
 };
 
-export default ManageCompaniesPage;
+export default ManageOrganizationsPage;

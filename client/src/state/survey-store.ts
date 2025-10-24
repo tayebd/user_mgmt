@@ -128,21 +128,21 @@ export const useSurveyStore = create<SurveyState>((set, get) => ({
         throw new Error('Invalid survey response format');
       }
 
-      // Ensure companyId exists in the parsed response
-      const companyId = parsedResponse.companyId || 1;
+      // Ensure organizationId exists in the parsed response
+      const organizationId = parsedResponse.organizationId || 1;
 
       // Process metrics from survey response
       const processedResponse = SurveyMetricService.processSurveyResponse({
         id: 0, // Temporary ID
         surveyId,
         responseJson,
-        companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 10),
+        organizationId: typeof organizationId === 'number' ? organizationId : parseInt(String(organizationId), 10),
         userId,
       });
 
       const requestBody = {
         userId,
-        companyId: typeof companyId === 'number' ? companyId : parseInt(String(companyId), 10),
+        organizationId: typeof organizationId === 'number' ? organizationId : parseInt(String(organizationId), 10),
         responseJson: typeof responseJson === 'string' ? responseJson : JSON.stringify(responseJson),
         processedMetrics: processedResponse.processedMetrics,
       };
@@ -153,10 +153,10 @@ export const useSurveyStore = create<SurveyState>((set, get) => ({
         throw new Error('No response data received');
       }
 
-      // Ensure the returned data has a companyId
+      // Ensure the returned data has a organizationId
       const surveyResponse = response.data as SurveyResponse;
-      if (!surveyResponse.companyId && surveyResponse.companyId !== 0) {
-        surveyResponse.companyId = parsedResponse.companyId || 263;
+      if (!surveyResponse.organizationId && surveyResponse.organizationId !== 0) {
+        surveyResponse.organizationId = parsedResponse.organizationId || 263;
       }
 
       return surveyResponse;

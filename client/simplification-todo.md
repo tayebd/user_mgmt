@@ -60,12 +60,12 @@
   - [x] Implement token refresh logic
   - [x] Handle authentication errors consistently
 - [x] Create domain-specific API services:
-  - [x] `src/services/company-service.ts`
+  - [x] `src/services/organization-service.ts`
   - [x] `src/services/survey-service.ts`
   - [x] `src/services/equipment-service.ts`
   - [x] `src/services/project-service.ts`
 - [x] Create domain-specific Zustand stores:
-  - [x] `src/stores/company-store.ts`
+  - [x] `src/stores/organization-store.ts`
   - [x] `src/stores/survey-store.ts`
   - [x] `src/stores/equipment-store.ts`
 - [ ] Update all components to use new stores/services (NEXT PHASE)
@@ -138,7 +138,7 @@
 **Actual Impact**: Foundation for 50%+ reduction in wizard duplication
 
 ### ✅ 4. Create Generic CRUD Hooks - COMPLETED
-**Current**: Duplicate form patterns across companies, surveys, projects
+**Current**: Duplicate form patterns across organizations, surveys, projects
 **Target**: Reusable CRUD hooks for consistent behavior
 **Impact**: 50% reduction in form duplication ✅
 
@@ -149,7 +149,7 @@
   - [x] Error handling and validation
   - [x] Optimistic updates
 - [x] Create domain-specific CRUD hooks:
-  - [x] `src/hooks/useCompany.ts` - Company operations
+  - [x] `src/hooks/useOrganization.ts` - Organization operations
   - [x] `src/hooks/useSurvey.ts` - Survey operations
   - [x] `src/hooks/useProject.ts` - Project operations
 - [x] Create generic form components:
@@ -164,7 +164,7 @@
 
 **Key Features Implemented**:
 - Generic CRUD hook with TypeScript safety
-- Domain-specific hooks for companies, surveys, projects
+- Domain-specific hooks for organizations, surveys, projects
 - Dynamic form builder with validation
 - Standardized form actions with loading states
 - Comprehensive validation feedback

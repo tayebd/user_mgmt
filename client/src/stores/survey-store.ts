@@ -25,7 +25,7 @@ export interface SurveyState {
   // Filters
   searchQuery: string;
   statusFilter: 'all' | 'active' | 'inactive' | 'draft' | 'published' | 'archived';
-  companyFilter: number | null;
+  organizationFilter: number | null;
   userFilter: number | null;
 
   // Survey creation/editing state
@@ -82,7 +82,7 @@ export interface SurveyState {
   cancelEditing: () => void;
 
   // Filter actions
-  setFilters: (filters: { query?: string; status?: string; company?: number | null; user?: number | null }) => void;
+  setFilters: (filters: { query?: string; status?: string; organization?: number | null; user?: number | null }) => void;
   setPage: (page: number) => void;
 
   // Utility actions
@@ -106,7 +106,7 @@ const initialState = {
   totalSurveys: 0,
   searchQuery: '',
   statusFilter: 'all' as const,
-  companyFilter: null,
+  organizationFilter: null,
   userFilter: null,
   isEditing: false,
   draftSurvey: null,
@@ -614,12 +614,12 @@ export const useSurveyStore = create<SurveyState>((set, get) => ({
   },
 
   setFilters: (filters) => {
-    const { searchQuery, statusFilter, companyFilter, userFilter } = get();
+    const { searchQuery, statusFilter, organizationFilter, userFilter } = get();
 
     set({
       searchQuery: filters.query ?? searchQuery,
       statusFilter: (filters.status as 'draft' | 'published' | 'archived') ?? statusFilter,
-      companyFilter: filters.company ?? companyFilter,
+      organizationFilter: filters.organization ?? organizationFilter,
       userFilter: filters.user ?? userFilter,
       currentPage: 1, // Reset to first page when filters change
     });
@@ -663,7 +663,7 @@ export const useSurveyError = () => useSurveyStore((state) => state.error);
 export const useSurveyFilters = () => useSurveyStore((state) => ({
   searchQuery: state.searchQuery,
   statusFilter: state.statusFilter,
-  companyFilter: state.companyFilter,
+  organizationFilter: state.organizationFilter,
   userFilter: state.userFilter,
   currentPage: state.currentPage,
   totalPages: state.totalPages,
