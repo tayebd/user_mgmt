@@ -278,4 +278,3 @@ export const MountingHardwareSchema = z.object({
   warranty: z.string(),
   price: z.number().optional()
 });
-;

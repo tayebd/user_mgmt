@@ -62,7 +62,8 @@ const ActionCard = React.forwardRef<HTMLDivElement, ActionCardProps>(
     padding = "default",
     className,
     href,
-    onClick
+    onClick,
+    ...props
   }, ref) => {
     const cardContent = (
       <BaseCard
@@ -75,6 +76,7 @@ const ActionCard = React.forwardRef<HTMLDivElement, ActionCardProps>(
           className
         )}
         onClick={onClick}
+        {...props}
       >
         <BaseCardHeader>
           <div className="flex items-start justify-between">

@@ -1,7 +1,7 @@
-import PVPanelList from './PVPanelList';
+import PVPanelListEnhanced from './PVPanelListEnhanced';
 
 const PVPanelPage = () => {
-  return <PVPanelList />;
+  return <PVPanelListEnhanced />;
 };
 
 export default PVPanelPage;

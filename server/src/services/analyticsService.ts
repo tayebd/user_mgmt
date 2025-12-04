@@ -45,21 +45,21 @@ interface DashboardMetrics {
     nextReviewDate: Date | null;
   };
   sectorComparison: {
-    companyMaturity: number | null;
+    organizationMaturity: number | null;
     sectorAvgMaturity: number | null;
     sectorName: string;
   };
 }
 
 export class AnalyticsService {
-  private validateCompanyExists = async (companyId: number): Promise<void> => {
-    const company = await prisma.company.findUnique({
-      where: { id: companyId },
+  private validateOrganizationExists = async (organizationId: number): Promise<void> => {
+    const organization = await prisma.organization.findUnique({
+      where: { id: organizationId },
       select: { id: true }
     });
 
-    if (!company) {
-      throw new AnalyticsError('Company not found', { companyId });
+    if (!organization) {
+      throw new AnalyticsError('Organization not found', { organizationId });
     }
   };
 
@@ -70,20 +70,20 @@ export class AnalyticsService {
     return Number(value);
   };
 
-  async getDashboardMetrics(companyId: number): Promise<DashboardMetrics> {
+  async getDashboardMetrics(organizationId: number): Promise<DashboardMetrics> {
     try {
-      await this.validateCompanyExists(companyId);
+      await this.validateOrganizationExists(organizationId);
       const today = new Date();
       const sixMonthsAgo = subMonths(today, 6);
 
-      // Get company's industry information
-      const company = await prisma.company.findUnique({
-        where: { id: companyId },
+      // Get organization's industry information
+      const organization = await prisma.organization.findUnique({
+        where: { id: organizationId },
         include: { industry: true }
       });
 
-      if (!company) {
-        throw new Error('Company not found');
+      if (!organization) {
+        throw new Error('Organization not found');
       }
 
       const [
@@ -98,7 +98,7 @@ export class AnalyticsService {
       ] = await Promise.all([
         // Current technology implementation metrics
         prisma.technologyImplementation.aggregate({
-          where: { companyId },
+          where: { organizationId },
           _count: true,
           _avg: {
             maturityLevel: true
@@ -108,7 +108,7 @@ export class AnalyticsService {
         // Technology implementation trend
         prisma.technologyImplementationFact.findMany({
           where: {
-            companyId,
+            organizationId,
             date: {
               gte: sixMonthsAgo
             }
@@ -123,7 +123,7 @@ export class AnalyticsService {
 
         // Current process digitization metrics
         prisma.digitalProcess.aggregate({
-          where: { companyId },
+          where: { organizationId },
           _avg: {
             digitizationLevel: true,
             automationLevel: true
@@ -133,7 +133,7 @@ export class AnalyticsService {
         // Process digitization trend
         prisma.processDigitizationFact.findMany({
           where: {
-            companyId,
+            organizationId,
             date: {
               gte: sixMonthsAgo
             }
@@ -148,7 +148,7 @@ export class AnalyticsService {
 
         // Personnel skills metrics
         prisma.personnelSkill.aggregate({
-          where: { companyId },
+          where: { organizationId },
           _sum: {
             numberOfPersonnel: true
           },
@@ -159,7 +159,7 @@ export class AnalyticsService {
 
         // Skill distribution
         prisma.personnelSkill.groupBy({
-          where: { companyId },
+          where: { organizationId },
           by: ['skillId'],
           _sum: {
             numberOfPersonnel: true
@@ -174,14 +174,14 @@ export class AnalyticsService {
 
         // Latest strategy assessment
         prisma.strategyAssessment.findFirst({
-          where: { companyId },
+          where: { organizationId },
           orderBy: { assessmentDate: 'desc' }
         }),
 
         // Sector comparison
         prisma.technologyImplementationFact.aggregate({
           where: {
-            sectorId: company.industryId,
+            sectorId: organization.industryId,
             date: {
               gte: startOfMonth(subMonths(today, 1))
             }
@@ -238,9 +238,9 @@ export class AnalyticsService {
           nextReviewDate: strategyStatus?.nextReviewDate ?? null
         },
         sectorComparison: {
-          companyMaturity: this.sanitizeNumber(Number(techImplementation._avg.maturityLevel), 0),
+          organizationMaturity: this.sanitizeNumber(Number(techImplementation._avg.maturityLevel), 0),
           sectorAvgMaturity: this.sanitizeNumber(Number(sectorMaturity._avg.avgMaturityLevel), 0),
-          sectorName: company.industry.name
+          sectorName: organization.industry.name
         }
       };
     } catch (error) {

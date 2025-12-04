@@ -7,12 +7,14 @@ import dotenv from "dotenv";
 
 /* ROUTE IMPORTS */
 import searchRoutes from "./routes/searchRoutes";
-import companyRoutes from "./routes/companyRoutes";
+import organizationRoutes from "./routes/organizationRoutes";
 import pvPanelRoutes from './routes/pvPanelRoutes';
 import inverterRoutes from './routes/inverterRoutes';
 import dashboardRoutes from './routes/dashboardRoutes';
 import surveyRoutes from './routes/surveyRoutes';
 import userRoutes from './routes/userRoutes';
+import aiRoutes from './routes/aiRoutes';
+import enhancedEquipmentRoutes from './routes/enhancedEquipmentRoutes';
 
 /* CONFIGURATIONS */
 dotenv.config();
@@ -62,9 +64,13 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/surveys', surveyRoutes);
 app.use('/api/users', userRoutes);
 app.use("/api/search", searchRoutes);
-app.use("/api/companies", companyRoutes);
+app.use("/api/organizations", organizationRoutes);
 app.use('/api/pv-panels', pvPanelRoutes);
 app.use('/api/inverters', inverterRoutes);
+
+// AI Routes
+app.use('/api/ai', aiRoutes);
+app.use('/api/enhanced', enhancedEquipmentRoutes);
 
 // Log all routes for debugging
 console.log('Registered routes:');

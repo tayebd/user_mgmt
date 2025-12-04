@@ -1,0 +1,33 @@
+{
+  "description": "Solar PV Panel Datasheet Processing Configuration",
+  "version": "1.0",
+  "database": {
+    "connection_string": "postgresql://user:password@localhost:5432/database_name",
+    "table_name": "p_v_panel"
+  },
+  "processing": {
+    "manufacturer_override": null,
+    "confidence_threshold": 0.7,
+    "skip_validation": false,
+    "export_format": "both",
+    "output_dir": "./processing-logs"
+  },
+  "pdf_files": [
+    {
+      "file_path": "PDFs/Q_CELLS_Q.PEAK_DUO_L-G5.2_395.pdf",
+      "manufacturer": "Q CELLS",
+      "model_hint": "Q.PEAK DUO L-G5.2 395",
+      "priority": "high",
+      "notes": "Sample datasheet for testing"
+    }
+  ],
+  "manufacturer_patterns": {
+    "enabled_patterns": [
+      "Q CELLS",
+      "JinkoSolar",
+      "CanadianSolar",
+      "JASolar"
+    ],
+    "custom_patterns": {}
+  }
+}

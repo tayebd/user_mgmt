@@ -7,6 +7,7 @@ import {
   deleteSurvey,
   createSurveyResponse,
   getSurveyResponses,
+  getSurveyResponse,
   updateSurveyResponse,
   deleteSurveyResponse,
 } from '../controllers/surveyController';
@@ -26,6 +27,7 @@ router.delete('/:surveyId', authenticateToken, deleteSurvey);
 // Survey response routes - all require authentication
 router.post('/:surveyId/surveyResponses', authenticateToken, createSurveyResponse);
 router.get('/:surveyId/surveyResponses', authenticateToken, getSurveyResponses);
+router.get('/surveyResponses/:surveyResponseId', authenticateToken, getSurveyResponse);
 router.put('/surveyResponses/:surveyResponseId', authenticateToken, updateSurveyResponse);
 router.delete('/surveyResponses/:surveyResponseId', authenticateToken, deleteSurveyResponse);
 

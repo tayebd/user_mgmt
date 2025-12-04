@@ -1,6 +1,15 @@
 import { Suspense } from 'react';
 import SurveyEvaluate from './SurveyEvaluate';
 
+// For static export, generate some static params
+export async function generateStaticParams() {
+  return [
+    { id: '1' },
+    { id: '2' },
+    { id: '3' },
+  ];
+}
+
 type PageProps = {
   params: { id: string }
 }

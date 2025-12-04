@@ -90,7 +90,7 @@ describe('RespondPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
-    jest.spyOn(apiStore, 'useApiStore').mockImplementation(() => mockApiStore);
+    (apiStore.useApiStore as jest.Mock).mockReturnValue(mockApiStore);
   });
 
   it('loads and displays the survey correctly', async () => {

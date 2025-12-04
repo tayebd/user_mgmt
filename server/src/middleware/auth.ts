@@ -38,7 +38,19 @@ export const authenticateToken = async (
 
     const token = authHeader.split(' ')[1];
     console.log('Token found, attempting to verify...');
-    
+
+    // Handle mock tokens in development
+    if (process.env.NODE_ENV !== 'production' && token === 'mock-access-token') {
+      console.log('Using mock authentication for development');
+      req.user = {
+        id: 15,
+        uid: 'mock-user-id',
+        email: 'test@example.com',
+        role: 'USER'
+      };
+      return next();
+    }
+
     try {
       const supabase = createClient({ req, res });
       const { data: { user: supabaseUser }, error } = await supabase.auth.getUser(token);

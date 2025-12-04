@@ -189,8 +189,8 @@ class SPVSIM:
                                  'ArrayPower':frst_array['p_mp']},
                                   index = self.times.index)
             for ar in range(1, len(self.array_list)):
-                sarf  =  self.array_list[ar].is_defined()
-                if sarf:
+                # sarf  =  self.array_list[ar].is_defined()
+                # if sarf:
                    sec_array = self.array_list[ar].define_array_performance(self.times.index,
                                                     self.site, self.inv)
                    for rw in range(len(rslt)):
@@ -235,7 +235,7 @@ class SPVSIM:
         outln = '{0:06}\t{1:6.2f}\t{2:6.2f}\t{3:6.2f}\t{4:6.2f}\t'
         outln += '{5:6.2f}\t{6:6.2f}\t{7:6.2f}\t{8:6.2f}\t{9:6.2f}\t'
         outln += '{10:6.2f}\t{11:6.2f}\t{12:6.2f}\t{13:6.2f}\t{14}\n'
-        bflg = self.bnk.is_defined()
+        # bflg = self.bnk.is_defined()
         self.out_rec = hdr
         for tindx in range(len(self.array_out)):
             wkDict = dict()

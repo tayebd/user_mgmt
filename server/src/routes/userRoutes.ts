@@ -4,9 +4,9 @@ import {
   getUsers,
   getUser,
   getUserByUid,
-  createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  createDatabaseUser
 } from '../controllers/userController';
 
 const router = express.Router();
@@ -14,7 +14,7 @@ const router = express.Router();
 router.get('/', authenticateToken, getUsers);
 router.get('/uid/:uid', authenticateToken, getUserByUid);
 router.get('/:userId', authenticateToken, getUser);
-router.post('/', authenticateToken, createUser);
+router.post('/', authenticateToken, createDatabaseUser);
 router.put('/:userId', authenticateToken, updateUser);
 router.delete('/:userId', authenticateToken, deleteUser);
 

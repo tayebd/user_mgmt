@@ -2,6 +2,15 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import SurveyResultsComponent from './SurveyResultsComponent';
 
+// For static export, generate some static params
+export async function generateStaticParams() {
+  return [
+    { id: '1' },
+    { id: '2' },
+    { id: '3' },
+  ];
+}
+
 /**
  * Validates survey ID from params
  */

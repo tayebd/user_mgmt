@@ -1,0 +1,732 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  createdAt         DateTime         @default(now())
+  email             String           @unique
+  name              String
+  role              UserRole         @default(USER)
+  updatedAt         DateTime         @updatedAt
+  profilePictureUrl String?
+  phone             String?
+  creatorId         Int?
+  id                Int              @id @default(autoincrement())
+  uid               String           @unique @default(uuid())
+  Review            Review[]
+  Task              Task[]           @relation("TaskAssignee")
+  SurveyResponse    SurveyResponse[] @relation("SurveyResponseUser")
+  Survey            Survey[]         @relation("SurveyCreator")
+}
+
+model Country {
+  name      String
+  iso2      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+}
+
+model Organization {
+  name                      String                     @unique
+  website                   String?
+  createdAt                 DateTime                   @default(now())
+  updatedAt                 DateTime                   @updatedAt
+  iconUrl                   String?
+  address                   String?
+  city                      String?
+  country                   String?
+  email                     String?
+  foundedYear               Int?
+  latitude                  Float?
+  longitude                 Float?
+  phone                     String?
+  serviceAreas              String[]
+  state                     String?
+  capabilities              String?
+  commercial                Boolean?
+  fb_handle                 String?
+  residential               Boolean?
+  web_validity              Boolean?
+  distributor               Boolean?
+  id                        Int                        @id @default(autoincrement())
+  fax                       String?
+  industryId                Int                        @default(72)
+  postalCode                String?
+  certifications            Certification[]
+  industry                  Industry                   @relation(fields: [industryId], references: [id])
+  projects                  OrganizationProject[]
+  descriptions              Description[]
+  digitalProcesses          DigitalProcess[]
+  partnerships              Partnership[]
+  personnelSkills           PersonnelSkill[]
+  productInnovations        ProductInnovation[]
+  reviews                   Review[]
+  services                  Service[]
+  strategyAssessments       StrategyAssessment[]
+  technologyImplementations TechnologyImplementation[]
+  surveyResponses           SurveyResponse[]
+}
+
+model Industry {
+  name        String
+  description String
+  id          Int       @id @default(autoincrement())
+  organizations   Organization[]
+}
+
+model Survey {
+  title           String
+  description     String
+  surveyJson      String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  expiresAt       DateTime?
+  status          SurveyStatus     @default(DRAFT)
+  targetResponses Int              @default(0)
+  id              Int              @id @default(autoincrement())
+  userId          Int
+  industryId      Int              @default(72)
+  responses       SurveyResponse[]
+  user            User             @relation("SurveyCreator", fields: [userId], references: [id])
+
+  @@index([userId, status])
+  @@map("surveys")
+}
+
+model SurveyResponse {
+  createdAt         DateTime  @default(now())
+  responseJson      Json
+  updatedAt         DateTime  @updatedAt
+  id                Int       @id @default(autoincrement())
+  surveyId          Int
+  userId            Int
+  processedMetrics  Json
+  organizationId         Int       @default(1)
+  lastMetricsUpdate DateTime?
+  metricsVersion    String?
+  organization           Organization   @relation(fields: [organizationId], references: [id])
+  survey            Survey    @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  user              User      @relation("SurveyResponseUser", fields: [userId], references: [id])
+
+  @@index([surveyId, userId])
+  @@index([organizationId])
+  @@map("responses")
+}
+
+model TechnologyType {
+  id              Int                        @id @default(autoincrement())
+  name            String                     @unique
+  category        String
+  description     String
+  createdAt       DateTime                   @default(now())
+  implementations TechnologyImplementation[]
+}
+
+model TechnologyImplementation {
+  id                 Int            @id @default(autoincrement())
+  organizationId          Int
+  technologyTypeId   Int
+  implementationDate DateTime
+  maturityLevel      Int
+  status             String
+  investmentAmount   Decimal
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  organization            Organization        @relation(fields: [organizationId], references: [id])
+  technologyType     TechnologyType @relation(fields: [technologyTypeId], references: [id])
+}
+
+model ProcessType {
+  id          Int              @id @default(autoincrement())
+  name        String
+  category    String
+  description String
+  createdAt   DateTime         @default(now())
+  processes   DigitalProcess[]
+}
+
+model DigitalProcess {
+  id                 Int         @id @default(autoincrement())
+  organizationId          Int
+  processTypeId      Int
+  digitizationLevel  Int
+  automationLevel    Int
+  implementationDate DateTime
+  lastAssessmentDate DateTime
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  organization            Organization     @relation(fields: [organizationId], references: [id])
+  processType        ProcessType @relation(fields: [processTypeId], references: [id])
+}
+
+model Skill {
+  id              Int              @id @default(autoincrement())
+  name            String
+  category        String
+  i40Relevance    Boolean
+  description     String
+  createdAt       DateTime         @default(now())
+  personnelSkills PersonnelSkill[]
+}
+
+model PersonnelSkill {
+  id                Int      @id @default(autoincrement())
+  organizationId         Int
+  skillId           Int
+  numberOfPersonnel Int
+  proficiencyLevel  Int
+  assessmentDate    DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  organization           Organization  @relation(fields: [organizationId], references: [id])
+  skill             Skill    @relation(fields: [skillId], references: [id])
+}
+
+model StrategyAssessment {
+  id                     Int      @id @default(autoincrement())
+  organizationId              Int
+  assessmentDate         DateTime
+  hasI40Strategy         Boolean
+  strategyMaturity       Int
+  implementationProgress Int
+  nextReviewDate         DateTime
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  organization                Organization  @relation(fields: [organizationId], references: [id])
+}
+
+model ProductInnovation {
+  id                 Int      @id @default(autoincrement())
+  organizationId          Int
+  smartFeaturesCount Int
+  customizationLevel Int
+  innovationDate     DateTime
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  organization            Organization  @relation(fields: [organizationId], references: [id])
+}
+
+model TechnologyImplementationFact {
+  id                         Int      @id @default(autoincrement())
+  date                       DateTime
+  organizationId                  Int
+  sectorId                   Int
+  technologyCount            Int
+  avgMaturityLevel           Decimal
+  totalInvestment            Decimal
+  implementationStatusCounts Json
+  createdAt                  DateTime @default(now())
+}
+
+model ProcessDigitizationFact {
+  id                   Int      @id @default(autoincrement())
+  date                 DateTime
+  organizationId            Int
+  sectorId             Int
+  processId            Int
+  avgDigitizationLevel Decimal
+  avgAutomationLevel   Decimal
+  processCount         Int
+  createdAt            DateTime @default(now())
+}
+
+model PersonnelSkillsFact {
+  id                    Int      @id @default(autoincrement())
+  date                  DateTime
+  organizationId             Int
+  sectorId              Int
+  skillCategory         String
+  totalSkilledPersonnel Int
+  avgProficiencyLevel   Decimal
+  createdAt             DateTime @default(now())
+}
+
+model StrategyImplementationFact {
+  id                        Int      @id @default(autoincrement())
+  date                      DateTime
+  organizationId                 Int
+  sectorId                  Int
+  organizationsWithStrategy     Int
+  avgStrategyMaturity       Decimal
+  avgImplementationProgress Decimal
+  createdAt                 DateTime @default(now())
+}
+
+model OrganizationProject {
+  name        String
+  description String?
+  latitude    Float?
+  longitude   Float?
+  capacityKw  Float?
+  completedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  id          Int            @id @default(autoincrement())
+  organizationId   Int
+  address     String?
+  organization     Organization        @relation(fields: [organizationId], references: [id])
+  photos      ProjectPhoto[]
+}
+
+model ProjectPhoto {
+  url       String
+  caption   String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  id        Int            @id @default(autoincrement())
+  projectId Int
+  project   OrganizationProject @relation(fields: [projectId], references: [id])
+}
+
+model Certification {
+  name       String
+  issuedBy   String?
+  issuedYear Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  organizationId  Int
+  organization    Organization  @relation(fields: [organizationId], references: [id])
+}
+
+model Partnership {
+  name      String
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  organizationId Int
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+}
+
+model Service {
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  organizationId Int
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+}
+
+model Description {
+  language  String
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  organizationId Int
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+}
+
+model Review {
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  organizationId Int
+  organization   Organization  @relation(fields: [organizationId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Project {
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime      @default(now())
+  status      ProjectStatus @default(NOT_STARTED)
+  updatedAt   DateTime      @updatedAt
+  id          Int           @id @default(autoincrement())
+  memberIds   Int[]
+  tasks       Task[]
+}
+
+model Task {
+  title        String
+  description  String?
+  dueDate      DateTime
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  status       TaskStatus   @default(NOT_STARTED)
+  priority     TaskPriority @default(MEDIUM)
+  id           Int          @id @default(autoincrement())
+  projectId    Int
+  assignedToId Int
+  assignedTo   User         @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  project      Project      @relation(fields: [projectId], references: [id])
+}
+
+
+
+model PVPanel {
+  description         String?
+  tempCoeffPmax       Float?
+  tempCoeffIsc        Float?
+  tempCoeffVoc        Float?
+  tempCoeffIpmax      Float?
+  tempCoeffVpmax      Float?
+  moduleType          String?
+  shortSide           Float?
+  longSide            Float?
+  weight              Float?
+  performanceWarranty String?
+  productWarranty     String?
+  efficiency          Float?
+  openCircuitVoltage  Float?
+  shortCircuitCurrent Float?
+  maxPower            Float?
+  id                  Int                @id @default(autoincrement())
+  certification       String?
+  currentAtPmax       Float?
+  voltageAtPmax       Float?
+  maker               String
+  maxSeriesFuseRating Float?
+  model               String             @unique
+  projectEquipment    ProjectEquipment[] @relation("ProjectPVPanel")
+
+  @@index([maker, model])
+}
+
+model Inverter {
+  description             String?
+  phaseType               String?
+  outputVoltage           Float?
+  id                      Int                @id @default(autoincrement())
+  acGridConnectionType    String?
+  certifications          String?
+  communicationInterfaces String?
+  coolingMethod           String?
+  dimensions              String?
+  displayType             String?
+  europeanEfficiency      Float?
+  ipRating                String?
+  maxApparentPower        Float?
+  maxDcVoltage            Float?
+  maxEfficiency           Float?
+  maxInputCurrentPerMppt  Float?
+  maxOutputCurrent        Float?
+  maxOutputPower          Float?
+  maxRecommendedPvPower   Float?
+  maxShortCircuitCurrent  Float?
+  mpptEfficiency          Float?
+  mpptVoltageRangeMax     Float?
+  mpptVoltageRangeMin     Float?
+  noiseLevel              Float?
+  nominalDcVoltage        Float?
+  nominalFrequency        Float?
+  nominalOutputPower      Float?
+  numberOfMpptTrackers    Int?
+  operatingTempRange      String?
+  powerFactor             Float?
+  protectionFeatures      String?
+  startVoltage            Float?
+  stringsPerMppt          Int?
+  totalHarmonicDistortion Float?
+  warrantyYears           Int?
+  weight                  Float?
+  maker                   String?
+  model                   String             @unique
+  projectEquipment        ProjectEquipment[] @relation("ProjectInverter")
+
+  @@index([maker, model])
+}
+
+model BatteryBank {
+  id                     Int                @id @default(autoincrement())
+  maker                  String
+  description            String?
+  batteryType            String
+  nominalVoltage         Float
+  ratedCapacity          Float
+  hourBasisForRating     Int
+  internalResistance     Float
+  ratedTemperature       Float
+  temperatureCoefficient Float
+  maxDischargeCycles     Int
+  maxDepthOfDischarge    Float
+  daysOfAutonomy         Int
+  depthOfDischarge       Float
+  unitsInSeries          Int
+  stringsInParallel      Int
+  totalBankBatteries     Int
+  model                  String
+  projectEquipment       ProjectEquipment[] @relation("ProjectBatteryBank")
+
+  @@unique([maker, model])
+  @@index([maker, model])
+}
+
+model ChargeController {
+  id                          Int                @id @default(autoincrement())
+  maker                       String
+  description                 String?
+  controllerType              String
+  maxPVVoltage                Float
+  maxPVCurrent                Float
+  batteryVoltage              Float
+  maxChargeVoltage            Float
+  maxChargeCurrent            Float
+  maxDischargeCurrent         Float
+  tempCompensationCoefficient Float
+  temperatureRating           Float
+  selfConsumption             Float
+  efficiency                  Float
+  model                       String
+  projectEquipment            ProjectEquipment[] @relation("ProjectChargeController")
+
+  @@unique([maker, model])
+  @@index([maker, model])
+}
+
+model Load {
+  id            Int       @id @default(autoincrement())
+  loadType      String
+  quantity      Int
+  usageFactor   Float
+  hoursPerDay   Float
+  startHour     Int
+  wattage       Float
+  operationMode String
+  projectId     Int
+  project       PVProject @relation(fields: [projectId], references: [id])
+
+  @@index([projectId])
+}
+
+model MountingHardware {
+  id               Int                @id @default(autoincrement())
+  maker            String
+  model            String             @unique
+  description      String?
+  type             String
+  material         String
+  maxLoad          Float
+  maxWindSpeed     Float
+  maxSnowLoad      Float
+  warranty         String
+  price            Float?
+  projectEquipment ProjectEquipment[] @relation("ProjectMountingHardware")
+
+  @@index([maker, model])
+}
+
+// Central model for all protection devices (DC and AC)
+model ProtectionDevice {
+  id                     Int    @id @default(autoincrement())
+  maker                  String
+  deviceType             DeviceType
+  side                   SystemSide
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  
+  // Common device properties
+  model                  String?
+  reference              String?
+  
+  // Rating properties (applicable to most devices)
+  ratedVoltage           Float?
+  ratedCurrent           Float?
+  
+  // Fuse specific properties
+  minRequiredVoltage     Float?   // For requirements tracking
+  minRequiredCurrent     Float?
+  maxRequiredCurrent     Float?
+  
+  // Switch specific properties
+  breakingCapacity       Float?
+  
+  // Circuit breaker specific properties
+  differentialSensitivity Float?
+  
+  // Surge protector specific properties
+  type                   String?   // "Type 1" or "Type 2"
+  continuousOperatingVoltage Float?
+  protectionLevel        Float?
+  nominalDischargeCurrentKA Float?
+  maxDischargeCurrentKA   Float?
+  minRequiredDischargeKA  Float?
+  
+  // Compliance
+  isCompliant            Boolean  @default(false)
+  complianceIssue        String?
+  recommendation         String?
+  
+  projectEquipment    ProjectEquipment[] @relation("ProjectProtectionDevice")
+
+}
+
+// Cables for both DC and AC
+model Wire {
+  id               Int                @id @default(autoincrement())
+  maker            String
+  Iz               Float             // currentCapacity
+  model            String             @unique
+  section          Float
+  side               SystemSide
+  maxVoltageDropPercent Float?
+  lengthInMeters     Float?
+  isCompliant        Boolean    @default(true)
+  complianceIssue    String?
+  projectEquipment ProjectEquipment[] @relation("ProjectWire")
+
+  @@index([maker, model])
+}
+
+// Grounding system details
+model GroundingSystem {
+  id               Int                @id @default(autoincrement())
+  metalPartsGrounded Boolean  @default(true)
+  cableSection       Float?
+  resistance         Float?
+  isCompliant        Boolean  @default(true)
+  complianceIssue    String?
+  
+  // Relationships
+  projectEquipment ProjectEquipment[] @relation("ProjectGrounding")
+  
+  @@map("grounding_systems")
+}
+
+model ProjectEquipment {
+  type               EquipmentType
+  quantity           Int               @default(1)
+  position           Json?
+  specifications     Json?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  id                 Int               @id @default(autoincrement())
+  projectId          Int
+  equipmentId        Int
+  pvPanelId          Int?
+  inverterId         Int?
+  mountingHardwareId Int?
+  wireId             Int?
+  groundId           Int?
+  protectionDeviceId Int?
+  batteryBankId      Int?
+  chargeControllerId Int?
+  batteryBank        BatteryBank?      @relation("ProjectBatteryBank", fields: [batteryBankId], references: [id])
+  chargeController   ChargeController? @relation("ProjectChargeController", fields: [chargeControllerId], references: [id])
+  inverter           Inverter?         @relation("ProjectInverter", fields: [inverterId], references: [id])
+  mountingHardware   MountingHardware? @relation("ProjectMountingHardware", fields: [mountingHardwareId], references: [id])
+  project            PVProject         @relation(fields: [projectId], references: [id])
+  protectionDevice   ProtectionDevice? @relation("ProjectProtectionDevice", fields: [protectionDeviceId], references: [id])
+  pvPanel            PVPanel?          @relation("ProjectPVPanel", fields: [pvPanelId], references: [id])
+  wire               Wire?             @relation("ProjectWire", fields: [wireId], references: [id])
+  grounding          GroundingSystem?  @relation("ProjectGrounding", fields: [groundId], references: [id])
+
+  @@unique([projectId, equipmentId, type])
+  @@index([projectId])
+  @@index([equipmentId])
+}
+
+model PVProject {
+  id               Int                @id @default(autoincrement())
+  name             String
+  customer         String
+  address          String
+  country          String
+  description      String?
+  city             String?
+  designer         String?
+  latitude         Float
+  longitude        Float
+  elevation        Float
+  timezone         Int
+  powerkW          Float
+  numberPanels     Int
+  numberOfStrings  Int
+  reference        String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  loads            Load[]
+  arrays           PVArray[]
+  gridVoltage      Int
+  gridFrequency    Int
+  projectEquipment ProjectEquipment[]
+}
+
+model PVArray {
+  id                     Int       @id @default(autoincrement())
+  tilt                   Float
+  azimuth                Float
+  mountingConfiguration  String?
+  spaceUnderPanel        Float
+  mountingHeight         Float
+  groundSurfaceCondition String?
+  albedo                 Float
+  unitsInSeries          Int
+  stringsInParallel      Int
+  arrayVmp               Float
+  arrayImp               Float
+  totalPanels            Int
+  projectId              Int
+  project                PVProject @relation(fields: [projectId], references: [id])
+}
+
+
+// Enums for categorizing devices
+enum DeviceType {
+  FUSE
+  DISCONNECT_SWITCH
+  CIRCUIT_BREAKER
+  SURGE_PROTECTOR
+}
+
+enum SystemSide {
+  DC
+  AC
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum SurveyStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+}
+
+enum ProjectStatus {
+  NOT_STARTED
+  PLANNING
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+}
+
+enum TaskStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  ON_HOLD
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum EquipmentType {
+  PV_PANEL
+  INVERTER
+  MOUNTING_HARDWARE
+  MISC_EQUIPMENT
+  WIRE
+  GROUNDING
+  PROTECTION
+}

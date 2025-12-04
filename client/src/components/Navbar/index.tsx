@@ -37,13 +37,13 @@ const Navbar = () => {
 
         <div className="flex items-center gap-6">
           <Link
-            href="/test"
+            href="/wizard"
             className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-              pathname === "/test" ? "text-orange-600 dark:text-orange-400" : "text-gray-700 dark:text-gray-300 hover:text-orange-500"
+              pathname === "/wizard" || pathname === "/ai-wizard" || pathname === "/test" ? "text-orange-600 dark:text-orange-400" : "text-gray-700 dark:text-gray-300 hover:text-orange-500"
             }`}
           >
             <Calculator className="h-4 w-4" />
-            Project Wizard
+            Solar Wizard
           </Link>
           <Link
             href="/pvpanels"

@@ -5,11 +5,31 @@ import SurveysPage from '../page';
 import { useRouter } from 'next/navigation';
 import { useApiStore } from '@/state/api';
 import { SurveyStatus } from '@/types';
+import { AuthProvider } from '@/contexts/AuthContext';
+
+// Mock the AuthContext
+jest.mock('@/contexts/AuthContext', () => ({
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  useAuth: () => ({
+    user: { id: 'test-user', email: 'test@example.com' },
+    signOut: jest.fn(),
+    isLoading: false,
+  }),
+}));
+
+// Mock the userAuth hook
+jest.mock('@/app/surveys/utils/userAuth', () => ({
+  useUserAuth: () => ({
+    currentUserId: 'test-user',
+    isLoading: false,
+  }),
+}));
 // Using Jest globals from the environment instead of importing from @jest/globals
 
 // Mock the next/navigation module
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
+  usePathname: jest.fn(() => '/surveys'),
 }));
 
 // Mock the state/api module
@@ -54,15 +74,23 @@ describe('SurveysPage Component', () => {
   });
 
   test('renders the surveys page with correct title', () => {
-    render(<SurveysPage />);
-    
-    expect(screen.getByText('Survey Builder')).toBeInTheDocument();
+    render(
+      <AuthProvider>
+        <SurveysPage />
+      </AuthProvider>
+    );
+
+    expect(screen.getByRole('heading', { name: 'Surveys' })).toBeInTheDocument();
     expect(screen.getByText('Create and manage your surveys')).toBeInTheDocument();
   });
 
   test('renders the surveys table with correct headers', () => {
-    render(<SurveysPage />);
-    
+    render(
+      <AuthProvider>
+        <SurveysPage />
+      </AuthProvider>
+    );
+
     expect(screen.getByText('All Surveys')).toBeInTheDocument();
     expect(screen.getByText('Title')).toBeInTheDocument();
     expect(screen.getByText('Created')).toBeInTheDocument();

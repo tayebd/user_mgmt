@@ -7,7 +7,7 @@ import morgan from "morgan";
 /* ROUTE IMPORTS */
 import searchRoutes from "./routes/searchRoutes";
 import userRoutes from "./routes/userRoutes";
-import companyRoutes from "./routes/companyRoutes";
+import organizationRoutes from "./routes/organizationRoutes";
 import pvPanelRoutes from './routes/pvPanelRoutes';
 import surveyRoutes from "./routes/surveyRoutes";
 import inverterRoutes from './routes/inverterRoutes';
@@ -50,7 +50,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/search", searchRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/companies", companyRoutes);
+app.use("/api/organizations", organizationRoutes);
 app.use('/api/pv-panels', pvPanelRoutes);
 app.use('/api/surveys', surveyRoutes);
 app.use('/api/inverters', inverterRoutes);

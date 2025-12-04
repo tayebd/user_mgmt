@@ -2,11 +2,11 @@ import { describe, beforeAll, afterAll, expect, it } from '@jest/globals';
 import { prisma } from '../src/config/db';
 import { MetricSyncService } from '../src/services/metricSyncService';
 import { ProcessedMetrics } from '../src/types/metrics';
-import { Prisma, Survey, User, Company } from '@prisma/client';
+import { Prisma, Survey, User, Organization } from '@prisma/client';
 
 describe('Metric Sync Service', () => {
   let testUserId: number;
-  let testCompanyId: number;
+  let testOrganizationId: number;
   let testSurveyId: number;
   let testSurveyResponseId: number;
 
@@ -78,24 +78,24 @@ describe('Metric Sync Service', () => {
     }
     testUserId = user.id;
 
-    // Check if test company exists first
-    let company = await prisma.company.findFirst({
+    // Check if test organization exists first
+    let organization = await prisma.organization.findFirst({
       where: {
-        name: 'Metric Sync Test Company'
+        name: 'Metric Sync Test Organization'
       }
     });
     
-    if (!company) {
-      // Create test company if it doesn't exist
-      company = await prisma.company.create({
+    if (!organization) {
+      // Create test organization if it doesn't exist
+      organization = await prisma.organization.create({
         data: {
-          name: 'Metric Sync Test Company',
+          name: 'Metric Sync Test Organization',
           address: '123 Metric St',
           phone: '555-METRIC'
         }
       });
     }
-    testCompanyId = company.id;
+    testOrganizationId = organization.id;
 
     // Check if test survey exists first
     let survey = await prisma.survey.findFirst({
@@ -123,7 +123,7 @@ describe('Metric Sync Service', () => {
       where: {
         surveyId: testSurveyId,
         userId: testUserId,
-        companyId: testCompanyId
+        organizationId: testOrganizationId
       }
     });
     
@@ -133,7 +133,7 @@ describe('Metric Sync Service', () => {
         data: {
           surveyId: testSurveyId,
           userId: testUserId,
-          companyId: testCompanyId,
+          organizationId: testOrganizationId,
           responseJson: {},
           metricsVersion: '1.0.0',
           processedMetrics: {} // Required field
@@ -153,21 +153,21 @@ describe('Metric Sync Service', () => {
       });
       
       // Delete technology implementations
-      await prisma.$executeRaw`DELETE FROM "TechnologyImplementation" WHERE "companyId" = ${testCompanyId}`;
+      await prisma.$executeRaw`DELETE FROM "TechnologyImplementation" WHERE "organizationId" = ${testOrganizationId}`;
       
       // Delete digital processes
       await prisma.digitalProcess.deleteMany({
-        where: { companyId: testCompanyId }
+        where: { organizationId: testOrganizationId }
       });
       
       // Delete personnel skills
       await prisma.personnelSkill.deleteMany({
-        where: { companyId: testCompanyId }
+        where: { organizationId: testOrganizationId }
       });
       
       // Delete strategy assessments
       await prisma.strategyAssessment.deleteMany({
-        where: { companyId: testCompanyId }
+        where: { organizationId: testOrganizationId }
       });
       
       // Delete surveys
@@ -175,13 +175,13 @@ describe('Metric Sync Service', () => {
         where: { id: testSurveyId }
       });
       
-      // Delete company
-      await prisma.company.deleteMany({
-        where: { id: testCompanyId }
+      // Delete organization
+      await prisma.organization.deleteMany({
+        where: { id: testOrganizationId }
       });
       
       // First delete ALL technology implementations to avoid foreign key constraint violations
-      // This is more thorough than just deleting by companyId
+      // This is more thorough than just deleting by organizationId
       await prisma.technologyImplementation.deleteMany({});
       
       // Now it's safe to delete technology types
@@ -215,7 +215,7 @@ describe('Metric Sync Service', () => {
       await MetricSyncService.syncMetricsWithDashboard(
         testSurveyResponseId,
         mockProcessedMetrics,
-        testCompanyId
+        testOrganizationId
       );
 
       // Verify survey response was updated
@@ -229,28 +229,28 @@ describe('Metric Sync Service', () => {
       
       // Verify technology implementations were created
       const techImplementations = await prisma.technologyImplementation.findMany({
-        where: { companyId: testCompanyId }
+        where: { organizationId: testOrganizationId }
       });
       
       expect(techImplementations.length).toBeGreaterThanOrEqual(1);
       
       // Verify digital processes were created
       const digitalProcesses = await prisma.digitalProcess.findMany({
-        where: { companyId: testCompanyId }
+        where: { organizationId: testOrganizationId }
       });
       
       expect(digitalProcesses.length).toBeGreaterThanOrEqual(1);
       
       // Verify personnel skills were created
       const personnelSkills = await prisma.personnelSkill.findMany({
-        where: { companyId: testCompanyId }
+        where: { organizationId: testOrganizationId }
       });
       
       expect(personnelSkills.length).toBeGreaterThanOrEqual(1);
       
       // Verify strategy assessment was created
       const strategyAssessments = await prisma.strategyAssessment.findMany({
-        where: { companyId: testCompanyId }
+        where: { organizationId: testOrganizationId }
       });
       
       expect(strategyAssessments.length).toBeGreaterThanOrEqual(1);
@@ -262,7 +262,7 @@ describe('Metric Sync Service', () => {
         data: {
           surveyId: testSurveyId,
           userId: testUserId,
-          companyId: testCompanyId,
+          organizationId: testOrganizationId,
           responseJson: {},
           metricsVersion: '1.0.0',
           processedMetrics: {} // Adding required field
@@ -293,7 +293,7 @@ describe('Metric Sync Service', () => {
         MetricSyncService.syncMetricsWithDashboard(
           newSurveyResponse.id,
           invalidMetrics,
-          testCompanyId
+          testOrganizationId
         )
       ).resolves.not.toThrow();
 

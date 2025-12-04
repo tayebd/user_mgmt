@@ -21,6 +21,7 @@ interface ArrayFormData {
 export function ArrayStep({ form, pvProject, setPVProject }: StepProps) {
   const [panels, setPanels] = useState<PVPanel[]>([]);
   const [loading, setLoading] = useState(true);
+  const { setValue } = form;
 
   const [array, setArray] = useState<ArrayFormData>({
     panelId: pvProject?.arrays[0]?.panelId || 0,
@@ -31,6 +32,14 @@ export function ArrayStep({ form, pvProject, setPVProject }: StepProps) {
     racking: pvProject?.arrays[0]?.racking || 'roof-top',
     bifacial: pvProject?.arrays[0]?.bifacial || true
   });
+
+  // Sync form with pvProject when it changes
+  useEffect(() => {
+    if (pvProject.arrays && pvProject.arrays.length > 0) {
+      console.log('ArrayStep - Syncing form with pvProject arrays:', pvProject.arrays[0]);
+      setValue('arrays', pvProject.arrays, { shouldValidate: true });
+    }
+  }, [pvProject.arrays, setValue]);
 
   const handleInputChange = (field: keyof ArrayFormData, value: string | number | boolean) => {
     setArray(prev => ({

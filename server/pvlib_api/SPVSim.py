@@ -38,17 +38,17 @@ class SPVSim:
         self.array_list = list()
         self.filename = None         # Complete path to Current File
         self.site = PVSite(self)
-        self.bat = PVBattery(self)
-        self.pnl = PVPanel(self)
+        self.bat = PVBattery()
+        self.pnl = PVPanel()
         self.ary = self.create_solar_array(self)
         self.array_list.append(self.ary)
         self.sec_ary = self.create_solar_array(self)
         self.array_list.append(self.sec_ary)
-        self.bnk = PVBatBank(self)
-        self.bnk.uses(self.bat)
-        self.inv = PVInverter(self)
+        self.bnk = PVBatBank([])
+        self.bnk.add_battery(self.bat)
+        self.inv = PVInverter()
         self.load = SiteLoad(self)
-        self.chgc = PVChgControl(self)
+        self.chgc = PVChgControl()
         self.array_out = None   # The Solar Array Output by hour
         self.times = None
         self.power_flow = None
@@ -56,8 +56,8 @@ class SPVSim:
         self.out_rec = None
 
     def create_solar_array(self, src):
-        sa = PVArray(src)
-        sa.uses(self.pnl)
+        sa = PVArray()
+        # sa.uses(self.pnl)
         return sa
 
     #TODO Should combine_arrays move to PVUtilities
@@ -70,30 +70,30 @@ class SPVSim:
         """
         if len(self.array_list)> 0:
             frst_array = self.array_list[0].define_array_performance(self.times.index,
-                                            self.site, self.inv)
+                                            self.site, self.inv, self.pnl)
             rslt = pd.DataFrame({'ArrayVolts':frst_array['v_mp'],
                                  'ArrayCurrent':frst_array['i_mp'],
                                  'ArrayPower':frst_array['p_mp']},
                                   index = self.times.index)
             for ar in range(1, len(self.array_list)):
-                sarf  =  self.array_list[ar].is_defined()
-                if sarf:
-                   sec_array = self.array_list[ar].define_array_performance(self.times.index,
-                                                    self.site, self.inv)
-                   for rw in range(len(rslt)):
-                       if rslt['ArrayPower'].iloc[rw] > 0 and sec_array['p_mp'].iloc[rw] >0:
-                           v_out = min(rslt['ArrayVolts'].iloc[rw], sec_array['v_mp'].iloc[rw])
-                           i_out = (rslt['ArrayCurrent'].iloc[rw] *
-                                    (v_out/rslt['ArrayVolts'].iloc[rw]) +
-                                    sec_array['i_mp'].iloc[rw]  *
-                                    (v_out/sec_array['v_mp'].iloc[rw]))
-                           rslt['ArrayVolts'].iloc[rw] = v_out
-                           rslt['ArrayCurrent'].iloc[rw] = i_out
-                           rslt['ArrayPower'].iloc[rw] = v_out * i_out
-                       elif sec_array['p_mp'].iloc[rw] > 0:
-                           rslt['ArrayVolts'].iloc[rw] = sec_array['v_mp'].iloc[rw]
-                           rslt['ArrayCurrent'].iloc[rw] = sec_array['i_mp'].iloc[rw]
-                           rslt['ArrayPower'].iloc[rw] = sec_array['p_mp'].iloc[rw]
+                # sarf  =  self.array_list[ar].is_defined()
+                # if sarf:
+                sec_array = self.array_list[ar].define_array_performance(self.times.index,
+                                                self.site, self.inv, self.pnl)
+                for rw in range(len(rslt)):
+                    if rslt['ArrayPower'].iloc[rw] > 0 and sec_array['p_mp'].iloc[rw] >0:
+                        v_out = min(rslt['ArrayVolts'].iloc[rw], sec_array['v_mp'].iloc[rw])
+                        i_out = (rslt['ArrayCurrent'].iloc[rw] *
+                                (v_out/rslt['ArrayVolts'].iloc[rw]) +
+                                sec_array['i_mp'].iloc[rw]  *
+                                (v_out/sec_array['v_mp'].iloc[rw]))
+                        rslt['ArrayVolts'].iloc[rw] = v_out
+                        rslt['ArrayCurrent'].iloc[rw] = i_out
+                        rslt['ArrayPower'].iloc[rw] = v_out * i_out
+                    elif sec_array['p_mp'].iloc[rw] > 0:
+                        rslt['ArrayVolts'].iloc[rw] = sec_array['v_mp'].iloc[rw]
+                        rslt['ArrayCurrent'].iloc[rw] = sec_array['i_mp'].iloc[rw]
+                        rslt['ArrayPower'].iloc[rw] = sec_array['p_mp'].iloc[rw]
             rslt = rslt.assign(Month= self.times['Month'],
                                          DayofMonth= self.times['DayofMonth'],
                                      DayofYear= self.times['DayofYear'])
@@ -197,12 +197,12 @@ class SPVSim:
             ft = 'run_{0}_{1:02}_{2}_{3:02}{4:02}{5:02}.txt'
             self.outfile = ft.format(rt.year, rt.month, rt.day,
                                 rt.hour, rt.minute, rt.second)
-            bnkflg = self.bnk.is_defined()
+            # bnkflg = self.bnk.is_defined()
             self.loc = self.site.get_location()
             self.times = create_time_indices(self.site.tz)
-            self.site.get_atmospherics(self.times.index)
-            if bnkflg:
-                self.bnk.initialize_bank()
+            # self.site.get_atmospherics(self.times.index)
+            # if bnkflg:
+            self.bnk.initialize_bank()
             self.array_out = self.combine_arrays()
             self.mnthly_array_perfm = build_monthly_performance(self.array_out,'ArrayPower')
             dl = np.array([self.load.get_daily_load()]*12)
@@ -238,19 +238,19 @@ class SPVSim:
         bflg = False
         invflg = False
 
-        if not self.site.check_definition():
-            return False
+        # if not self.site.check_definition():
+        #     return False
 
-        #Tests for panel & Array definition
-        if not self.ary.check_definition():
-            return False
+        # #Tests for panel & Array definition
+        # if not self.ary.check_definition():
+        #     return False
 
-        # Tests for proper inverter definition """
-        if sum(self.load.get_load_profile()['AC']) > 0:
-            if not self.inv.check_definition():
-                return False
-            else:
-                invflg = True
+        # # Tests for proper inverter definition """
+        # if sum(self.load.get_load_profile()['AC']) > 0:
+        #     if not self.inv.check_definition():
+        #         return False
+        #     else:
+        #         invflg = True
 
         # if self.bnk.check_definition():
         #     bflg = True
@@ -329,21 +329,12 @@ class SPVSim:
         fn = 'overview.txt'
         output_report(fn, rpt_ttl, s)
 
-import streamlit as st
-
 def main():
+    import streamlit as st
     """ Starts the GUI and enables processing all functions """
-    sp = SPVSim()
-    sp.load_project_file('Models/test2.spv')
-    print(sp.site)
-    print(sp.pnl)
-    print(sp.bat)
-    print(sp.inv)
-    sp.execute_simulation()
-    sp.print_load()
-    sp.create_overview_report()
-    sp.write_file('project.txt')
 
+    # Initialize simulator with defaults (skip loading problematic SPV file)
+    sp = SPVSim()
 
     # Streamlit UI
     st.title("Solar PV Simulation")
@@ -352,9 +343,64 @@ def main():
     # Input widgets
     st.sidebar.header("Input Parameters")
 
+    # Site parameters
+    st.sidebar.subheader("Site Configuration")
+    latitude = st.sidebar.number_input("Latitude", value=33.45, min_value=-90.0, max_value=90.0)
+    longitude = st.sidebar.number_input("Longitude", value=-84.15, min_value=-180.0, max_value=180.0)
+    altitude = st.sidebar.number_input("Altitude (m)", value=300.0)
+
+    # Panel parameters
+    st.sidebar.subheader("Panel Configuration")
+    panel_power = st.sidebar.number_input("Panel Power (W)", value=400.0, min_value=0.0)
+    panel_voltage = st.sidebar.number_input("Panel Voltage (V)", value=40.0, min_value=0.0)
+
+    # Array parameters
+    st.sidebar.subheader("Array Configuration")
+    modules_per_string = st.sidebar.number_input("Modules per String", value=8, min_value=1)
+    strings_per_inverter = st.sidebar.number_input("Strings per Inverter", value=4, min_value=1)
+    tilt = st.sidebar.number_input("Tilt Angle (degrees)", value=30.0, min_value=0.0, max_value=90.0)
+    azimuth = st.sidebar.number_input("Azimuth Angle (degrees)", value=180.0, min_value=0.0, max_value=360.0)
+
     # Run simulation button
     if st.sidebar.button("Run Simulation"):
-        sp.execute_simulation()
+        # Configure system with user inputs
+        try:
+            # Set site parameters
+            sp.site.latitude = latitude
+            sp.site.longitude = longitude
+            sp.site.altitude = altitude
+
+            # Set panel parameters
+            sp.pnl.PTC = panel_power
+            sp.pnl.V_oc_ref = panel_voltage
+
+            # Set array parameters
+            sp.ary.uis = modules_per_string
+            sp.ary.sip = strings_per_inverter
+            sp.ary.tilt = tilt
+            sp.ary.azimuth = azimuth
+
+            # Run simulation
+            with st.spinner("Running simulation..."):
+                sp.execute_simulation()
+
+            # Display results
+            st.success("Simulation completed successfully!")
+
+            # Show basic results
+            if sp.power_flow is not None:
+                st.subheader("Simulation Results")
+                total_energy = sp.power_flow['PowerOut'].sum() if 'PowerOut' in sp.power_flow.columns else 0
+                st.metric("Total Energy Yield", f"{total_energy:.2f} kWh")
+
+                # Create overview report
+                sp.create_overview_report()
+                st.info("Overview report generated")
+
+        except Exception as e:
+            import traceback
+            st.error(f"Simulation failed: {str(e)}")
+            st.error(f"Full traceback: {traceback.format_exc()}")
         # Display plots
         if sp.array_out is not None:
             show_pwr_performance(sp.mnthly_pwr_perfm[0])

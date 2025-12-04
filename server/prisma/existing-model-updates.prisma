@@ -1,0 +1,82 @@
+// UPDATES TO EXISTING MODELS
+// Add these relations to your existing models - don't modify existing fields
+
+/*
+// ADD to your existing User model:
+model User {
+  // ... all your existing fields stay the same ...
+  createdAt         DateTime         @default(now())
+  email             String           @unique
+  name              String
+  role              UserRole         @default(USER)
+  updatedAt         DateTime         @updatedAt
+  profilePictureUrl String?
+  phone             String?
+  creatorId         Int?
+  id                Int              @id @default(autoincrement())
+  uid               String           @unique @default(uuid())
+
+  // EXISTING RELATIONS (keep these):
+  Review            Review[]
+  Task              Task[]           @relation("TaskAssignee")
+  SurveyResponse    SurveyResponse[] @relation("SurveyResponseUser")
+  Survey            Survey[]         @relation("SurveyCreator")
+
+  // NEW AI RELATIONS (add these):
+  aiDesigns         AiDesign[]
+  aiPreferences     UserAiPreferences?
+  aiAnalytics       AiDesignAnalytics[]
+
+  // ... keep existing @@map and indexes ...
+}
+*/
+
+/*
+// ADD to your existing PVProject model:
+model PVProject {
+  // ... all your existing fields stay the same ...
+  id               Int                @id @default(autoincrement())
+  name             String
+  customer         String
+  address          String
+  country          String
+  description      String?
+  city             String?
+  designer         String?
+  latitude         Float
+  longitude        Float
+  elevation        Float
+  timezone         Int
+  powerkW          Float
+  numberPanels     Int
+  numberOfStrings  Int
+  reference        String
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  gridVoltage      Int
+  gridFrequency    Int
+
+  // EXISTING RELATIONS (keep these):
+  loads            Load[]
+  arrays           PVArray[]
+  projectEquipment ProjectEquipment[]
+
+  // NEW AI RELATIONS (add these):
+  aiDesigns        AiDesign[]
+
+  // ... keep existing @@map and indexes ...
+}
+*/
+
+/*
+// NO CHANGES NEEDED for these models:
+// - PVPanel (stays exactly the same)
+// - Inverter (stays exactly the same)
+// - BatteryBank (stays exactly the same)
+// - ChargeController (stays exactly the same)
+// - MountingHardware (stays exactly the same)
+// - ProtectionDevice (stays exactly the same)
+// - Wire (stays exactly the same)
+//
+// All master equipment data remains clean and untouched!
+*/

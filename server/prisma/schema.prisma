@@ -5,7 +5,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -23,6 +22,11 @@ model User {
   Task              Task[]           @relation("TaskAssignee")
   SurveyResponse    SurveyResponse[] @relation("SurveyResponseUser")
   Survey            Survey[]         @relation("SurveyCreator")
+
+  // AI Relations
+  aiDesigns         AiDesign[]            @relation("AiDesigns")
+  aiPreferences     UserAiPreferences?   @relation("UserAiPreferences")
+  aiAnalytics       AiDesignAnalytics[]  @relation("AiDesignAnalytics")
 }
 
 model Country {
@@ -33,7 +37,7 @@ model Country {
   id        Int      @id @default(autoincrement())
 }
 
-model Company {
+model Organization {
   name                      String                     @unique
   website                   String?
   createdAt                 DateTime                   @default(now())
@@ -61,7 +65,7 @@ model Company {
   postalCode                String?
   certifications            Certification[]
   industry                  Industry                   @relation(fields: [industryId], references: [id])
-  projects                  CompanyProject[]
+  projects                  OrganizationProject[]
   descriptions              Description[]
   digitalProcesses          DigitalProcess[]
   partnerships              Partnership[]
@@ -78,7 +82,7 @@ model Industry {
   name        String
   description String
   id          Int       @id @default(autoincrement())
-  companies   Company[]
+  organizations   Organization[]
 }
 
 model Survey {
@@ -108,15 +112,15 @@ model SurveyResponse {
   surveyId          Int
   userId            Int
   processedMetrics  Json
-  companyId         Int       @default(1)
+  organizationId         Int       @default(1)
   lastMetricsUpdate DateTime?
   metricsVersion    String?
-  company           Company   @relation(fields: [companyId], references: [id])
+  organization           Organization   @relation(fields: [organizationId], references: [id])
   survey            Survey    @relation(fields: [surveyId], references: [id], onDelete: Cascade)
   user              User      @relation("SurveyResponseUser", fields: [userId], references: [id])
 
   @@index([surveyId, userId])
-  @@index([companyId])
+  @@index([organizationId])
   @@map("responses")
 }
 
@@ -131,7 +135,7 @@ model TechnologyType {
 
 model TechnologyImplementation {
   id                 Int            @id @default(autoincrement())
-  companyId          Int
+  organizationId          Int
   technologyTypeId   Int
   implementationDate DateTime
   maturityLevel      Int
@@ -139,7 +143,7 @@ model TechnologyImplementation {
   investmentAmount   Decimal
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
-  company            Company        @relation(fields: [companyId], references: [id])
+  organization            Organization        @relation(fields: [organizationId], references: [id])
   technologyType     TechnologyType @relation(fields: [technologyTypeId], references: [id])
 }
 
@@ -154,7 +158,7 @@ model ProcessType {
 
 model DigitalProcess {
   id                 Int         @id @default(autoincrement())
-  companyId          Int
+  organizationId          Int
   processTypeId      Int
   digitizationLevel  Int
   automationLevel    Int
@@ -162,7 +166,7 @@ model DigitalProcess {
   lastAssessmentDate DateTime
   createdAt          DateTime    @default(now())
   updatedAt          DateTime    @updatedAt
-  company            Company     @relation(fields: [companyId], references: [id])
+  organization            Organization     @relation(fields: [organizationId], references: [id])
   processType        ProcessType @relation(fields: [processTypeId], references: [id])
 }
 
@@ -178,20 +182,20 @@ model Skill {
 
 model PersonnelSkill {
   id                Int      @id @default(autoincrement())
-  companyId         Int
+  organizationId         Int
   skillId           Int
   numberOfPersonnel Int
   proficiencyLevel  Int
   assessmentDate    DateTime
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  company           Company  @relation(fields: [companyId], references: [id])
+  organization           Organization  @relation(fields: [organizationId], references: [id])
   skill             Skill    @relation(fields: [skillId], references: [id])
 }
 
 model StrategyAssessment {
   id                     Int      @id @default(autoincrement())
-  companyId              Int
+  organizationId              Int
   assessmentDate         DateTime
   hasI40Strategy         Boolean
   strategyMaturity       Int
@@ -199,24 +203,24 @@ model StrategyAssessment {
   nextReviewDate         DateTime
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
-  company                Company  @relation(fields: [companyId], references: [id])
+  organization                Organization  @relation(fields: [organizationId], references: [id])
 }
 
 model ProductInnovation {
   id                 Int      @id @default(autoincrement())
-  companyId          Int
+  organizationId          Int
   smartFeaturesCount Int
   customizationLevel Int
   innovationDate     DateTime
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
-  company            Company  @relation(fields: [companyId], references: [id])
+  organization            Organization  @relation(fields: [organizationId], references: [id])
 }
 
 model TechnologyImplementationFact {
   id                         Int      @id @default(autoincrement())
   date                       DateTime
-  companyId                  Int
+  organizationId                  Int
   sectorId                   Int
   technologyCount            Int
   avgMaturityLevel           Decimal
@@ -228,7 +232,7 @@ model TechnologyImplementationFact {
 model ProcessDigitizationFact {
   id                   Int      @id @default(autoincrement())
   date                 DateTime
-  companyId            Int
+  organizationId            Int
   sectorId             Int
   processId            Int
   avgDigitizationLevel Decimal
@@ -240,7 +244,7 @@ model ProcessDigitizationFact {
 model PersonnelSkillsFact {
   id                    Int      @id @default(autoincrement())
   date                  DateTime
-  companyId             Int
+  organizationId             Int
   sectorId              Int
   skillCategory         String
   totalSkilledPersonnel Int
@@ -251,15 +255,15 @@ model PersonnelSkillsFact {
 model StrategyImplementationFact {
   id                        Int      @id @default(autoincrement())
   date                      DateTime
-  companyId                 Int
+  organizationId                 Int
   sectorId                  Int
-  companiesWithStrategy     Int
+  organizationsWithStrategy     Int
   avgStrategyMaturity       Decimal
   avgImplementationProgress Decimal
   createdAt                 DateTime @default(now())
 }
 
-model CompanyProject {
+model OrganizationProject {
   name        String
   description String?
   latitude    Float?
@@ -269,9 +273,9 @@ model CompanyProject {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
   id          Int            @id @default(autoincrement())
-  companyId   Int
+  organizationId   Int
   address     String?
-  company     Company        @relation(fields: [companyId], references: [id])
+  organization     Organization        @relation(fields: [organizationId], references: [id])
   photos      ProjectPhoto[]
 }
 
@@ -282,7 +286,7 @@ model ProjectPhoto {
   updatedAt DateTime       @updatedAt
   id        Int            @id @default(autoincrement())
   projectId Int
-  project   CompanyProject @relation(fields: [projectId], references: [id])
+  project   OrganizationProject @relation(fields: [projectId], references: [id])
 }
 
 model Certification {
@@ -292,8 +296,8 @@ model Certification {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   id         Int      @id @default(autoincrement())
-  companyId  Int
-  company    Company  @relation(fields: [companyId], references: [id])
+  organizationId  Int
+  organization    Organization  @relation(fields: [organizationId], references: [id])
 }
 
 model Partnership {
@@ -302,8 +306,8 @@ model Partnership {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   id        Int      @id @default(autoincrement())
-  companyId Int
-  company   Company  @relation(fields: [companyId], references: [id])
+  organizationId Int
+  organization   Organization  @relation(fields: [organizationId], references: [id])
 }
 
 model Service {
@@ -311,8 +315,8 @@ model Service {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   id        Int      @id @default(autoincrement())
-  companyId Int
-  company   Company  @relation(fields: [companyId], references: [id])
+  organizationId Int
+  organization   Organization  @relation(fields: [organizationId], references: [id])
 }
 
 model Description {
@@ -321,8 +325,8 @@ model Description {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   id        Int      @id @default(autoincrement())
-  companyId Int
-  company   Company  @relation(fields: [companyId], references: [id])
+  organizationId Int
+  organization   Organization  @relation(fields: [organizationId], references: [id])
 }
 
 model Review {
@@ -332,8 +336,8 @@ model Review {
   updatedAt DateTime @updatedAt
   id        Int      @id @default(autoincrement())
   userId    Int
-  companyId Int
-  company   Company  @relation(fields: [companyId], references: [id])
+  organizationId Int
+  organization   Organization  @relation(fields: [organizationId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
 }
 
@@ -653,6 +657,9 @@ model PVProject {
   gridVoltage      Int
   gridFrequency    Int
   projectEquipment ProjectEquipment[]
+
+  // AI Relations
+  aiDesigns        AiDesign[]          @relation("AiDesigns")
 }
 
 model PVArray {
@@ -729,4 +736,282 @@ enum EquipmentType {
   WIRE
   GROUNDING
   PROTECTION
+}
+
+// ============================================================================
+// AI SOLAR PV DESIGN ADDITIONS
+// ============================================================================
+
+// New Enums for AI functionality
+enum AIPerformanceClass {
+  PREMIUM
+  STANDARD
+  BUDGET
+}
+
+enum AIDesignStatus {
+  PROCESSING
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+// AI Intelligence for Panels - SEPARATE from master panel data
+model AiPanelIntelligence {
+  id                    String   @id @default(uuid()) @map("id")
+  panelId               Int      @unique @map("panel_id")
+  performanceClass      AIPerformanceClass @map("performance_class")
+  efficiencyRating      Int      @map("efficiency_rating") // 0-100
+  reliabilityScore      Int      @map("reliability_score") // 0-100
+  valueRating           Int      @map("value_rating") // 0-100
+  compatibilityScore    Int      @map("compatibility_score") // 0-100
+
+  // AI-computed technical insights
+  temperaturePerformance Json?    @map("temperature_performance")
+  spaceEfficiency       Json?    @map("space_efficiency")
+  installationComplexity String?  @map("installation_complexity")
+
+  // Market and cost intelligence
+  marketIntelligence     Json?    @map("market_intelligence")
+  costAnalysis          Json?    @map("cost_analysis")
+
+  // Performance analytics
+  performanceAnalytics   Json?    @map("performance_analytics")
+  complianceData        Json?    @map("compliance_data")
+
+  // AI metadata
+  lastUpdated           DateTime @default(now()) @map("last_updated")
+  dataQualityScore      Int      @map("data_quality_score") // 0-100
+  aiModelVersion        String?  @map("ai_model_version")
+  sourceReliability     Int      @map("source_reliability") // 0-100
+
+  @@index([panelId], map: "idx_ai_panel_panel_id")
+  @@index([performanceClass], map: "idx_ai_panel_performance_class")
+  @@index([efficiencyRating], map: "idx_ai_panel_efficiency")
+  @@index([reliabilityScore], map: "idx_ai_panel_reliability")
+  @@map("ai_panel_intelligence")
+}
+
+// AI Intelligence for Inverters - SEPARATE from master inverter data
+model AiInverterIntelligence {
+  id                    String   @id @default(uuid()) @map("id")
+  inverterId            Int      @unique @map("inverter_id")
+  performanceClass      AIPerformanceClass @map("performance_class")
+  efficiencyRating      Int      @map("efficiency_rating") // 0-100
+  reliabilityScore      Int      @map("reliability_score") // 0-100
+  valueRating           Int      @map("value_rating") // 0-100
+  compatibilityScore    Int      @map("compatibility_score") // 0-100
+
+  // AI-computed technical insights
+  inverterTopology      String?  @map("inverter_topology")
+  advancedFeatures      Json?    @map("advanced_features")
+  integrationCapabilities Json?  @map("integration_capabilities")
+
+  // Market and cost intelligence
+  marketIntelligence     Json?    @map("market_intelligence")
+  costAnalysis          Json?    @map("cost_analysis")
+
+  // Performance analytics
+  performanceAnalytics   Json?    @map("performance_analytics")
+  complianceData        Json?    @map("compliance_data")
+
+  // AI metadata
+  lastUpdated           DateTime @default(now()) @map("last_updated")
+  dataQualityScore      Int      @map("data_quality_score") // 0-100
+  aiModelVersion        String?  @map("ai_model_version")
+  sourceReliability     Int      @map("source_reliability") // 0-100
+
+  @@index([inverterId], map: "idx_ai_inverter_inverter_id")
+  @@index([performanceClass], map: "idx_ai_inverter_performance_class")
+  @@index([efficiencyRating], map: "idx_ai_inverter_efficiency")
+  @@index([reliabilityScore], map: "idx_ai_inverter_reliability")
+  @@map("ai_inverter_intelligence")
+}
+
+// AI Compatibility Matrix - Links equipment together
+model AiCompatibilityMatrix {
+  id                    String   @id @default(uuid()) @map("id")
+  panelId               Int      @map("panel_id")
+  inverterId            Int      @map("inverter_id")
+
+  // Compatibility scoring
+  overallScore          Decimal  @map("overall_score") @db.Decimal(5, 2) // 0-100
+  voltageCompatibility   Decimal? @map("voltage_compatibility") @db.Decimal(5, 2)
+  currentCompatibility  Decimal? @map("current_compatibility") @db.Decimal(5, 2)
+  powerCompatibility    Decimal? @map("power_compatibility") @db.Decimal(5, 2)
+  temperatureCompatibility Decimal? @map("temperature_compatibility") @db.Decimal(5, 2)
+
+  // Detailed analysis
+  compatibilityFactors   Json?    @map("compatibility_factors")
+  limitations           Json?    @map("limitations")
+  recommendations       Json?    @map("recommendations")
+
+  // Configuration suggestions
+  stringConfiguration   Json?    @map("string_configuration")
+  optimalArraySize      Json?    @map("optimal_array_size")
+
+  // Metadata
+  lastValidated         DateTime @default(now()) @map("last_validated")
+  aiModelVersion        String?  @map("ai_model_version")
+
+  // Ensure unique combinations
+  @@unique([panelId, inverterId], map: "unique_panel_inverter_compatibility")
+  @@index([panelId], map: "idx_compatibility_panel_id")
+  @@index([inverterId], map: "idx_compatibility_inverter_id")
+  @@index([overallScore], map: "idx_compatibility_overall_score")
+  @@map("ai_compatibility_matrix")
+}
+
+// AI Design Results - Store AI-generated designs
+model AiDesign {
+  id                    String   @id @default(uuid()) @map("id")
+  userId                Int      @map("user_id")
+  projectId             Int?     @map("project_id")
+
+  // Input requirements
+  requirements          Json     @map("requirements")
+  locationContext       Json     @map("location_context")
+
+  // AI design results
+  designResult          Json     @map("design_result")
+  equipmentSelections   Json     @map("equipment_selections")
+  systemConfiguration   Json     @map("system_configuration")
+
+  // Analysis results
+  performanceEstimates  Json     @map("performance_estimates")
+  costAnalysis          Json     @map("cost_analysis")
+  complianceResults     Json     @map("compliance_results")
+
+  // Alternative designs
+  alternatives          Json?    @map("alternatives")
+
+  // AI metadata
+  status                AIDesignStatus @default(PROCESSING) @map("status")
+  confidenceScore       Decimal? @map("confidence_score") @db.Decimal(5, 2)
+  processingTimeMs      Int?     @map("processing_time_ms")
+  aiModelVersion        String?  @map("ai_model_version")
+
+  // Timestamps
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+  completedAt           DateTime? @map("completed_at")
+
+  // Relations
+  user                  User     @relation("AiDesigns", fields: [userId], references: [id])
+  project               PVProject? @relation("AiDesigns", fields: [projectId], references: [id])
+  analytics             AiDesignAnalytics[] @relation("AiDesignAnalytics")
+
+  @@index([userId], map: "idx_ai_designs_user_id")
+  @@index([projectId], map: "idx_ai_designs_project_id")
+  @@index([status], map: "idx_ai_designs_status")
+  @@index([createdAt], map: "idx_ai_designs_created_at")
+  @@map("ai_designs")
+}
+
+// User AI Preferences - Learn from user behavior
+model UserAiPreferences {
+  id                    String   @id @default(uuid()) @map("id")
+  userId                Int      @unique @map("user_id")
+
+  // User preferences
+  equipmentPreferences  Json?    @map("equipment_preferences")
+  budgetPreferences     Json?    @map("budget_preferences")
+  brandPreferences      Json?    @map("brand_preferences")
+  aestheticPreferences  Json?    @map("aesthetic_preferences")
+  performancePriorities Json?    @map("performance_priorities")
+
+  // Learning data
+  interactionHistory    Json?    @map("interaction_history")
+  feedbackData          Json?    @map("feedback_data")
+  learnedPreferences    Json?    @map("learned_preferences")
+
+  // Timestamps
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user                  User     @relation("UserAiPreferences", fields: [userId], references: [id])
+
+  @@index([userId], map: "idx_user_ai_preferences_user_id")
+  @@map("user_ai_preferences")
+}
+
+// AI Design Analytics - Track AI performance and user feedback
+model AiDesignAnalytics {
+  id                    String   @id @default(uuid()) @map("id")
+  designId              String   @map("design_id")
+  userId                Int      @map("user_id")
+
+  // Design interaction data
+  originalRequirements  Json     @map("original_requirements")
+  aiRecommendations     Json     @map("ai_recommendations")
+  userModifications     Json?    @map("user_modifications")
+  finalDesign           Json?    @map("final_design")
+
+  // User feedback
+  userSatisfactionScore Int?     @map("user_satisfaction_score") // 1-5
+  feedbackText          String?  @map("feedback_text")
+  feedbackCategories    Json?    @map("feedback_categories")
+
+  // Performance tracking
+  performanceAccuracy   Json?    @map("performance_accuracy")
+  costVsEstimate        Json?    @map("cost_vs_estimate")
+  timeToComplete        Int?     @map("time_to_complete") // milliseconds
+
+  // Learning data
+  userSkillLevel        String?  @map("user_skill_level")
+  designComplexity      String?  @map("design_complexity")
+  successFactors        Json?    @map("success_factors")
+  improvementAreas      Json?    @map("improvement_areas")
+
+  // Timestamps
+  createdAt             DateTime @default(now()) @map("created_at")
+
+  // Relations
+  design                AiDesign @relation("AiDesignAnalytics", fields: [designId], references: [id])
+  user                  User     @relation("AiDesignAnalytics", fields: [userId], references: [id])
+
+  @@index([designId], map: "idx_ai_analytics_design_id")
+  @@index([userId], map: "idx_ai_analytics_user_id")
+  @@index([createdAt], map: "idx_ai_analytics_created_at")
+  @@map("ai_design_analytics")
+}
+
+// Market Intelligence Data - External market data separate from equipment specs
+model MarketIntelligence {
+  id                    String   @id @default(uuid()) @map("id")
+  equipmentType         String   @map("equipment_type") // 'panel', 'inverter', 'battery'
+  equipmentId           Int      @map("equipment_id")
+  regionCode            String   @map("region_code") // 'US-CA', 'EU-DE', etc.
+
+  // Market data
+  currentPrice          Decimal  @map("current_price") @db.Decimal(10, 2)
+  priceHistory          Json     @map("price_history")
+  availabilityStatus    String   @map("availability_status")
+  leadTimeDays          Int?     @map("lead_time_days")
+
+  // Supplier data
+  primarySuppliers      Json     @map("primary_suppliers")
+  supplierRatings       Json     @map("supplier_ratings")
+  regionalAvailability  Json     @map("regional_availability")
+
+  // Market intelligence
+  marketShare           Decimal? @map("market_share") @db.Decimal(5, 2)
+  popularityScore       Int?     @map("popularity_score") // 0-100
+  competitivePosition   Json?    @map("competitive_position")
+
+  // Validity
+  validFrom             DateTime @default(now()) @map("valid_from")
+  validUntil            DateTime? @map("valid_until")
+
+  // Metadata
+  source                String   @map("source") // Data source
+  lastUpdated           DateTime @default(now()) @map("last_updated")
+  confidenceLevel       Int      @map("confidence_level") // 0-100
+
+  @@unique([equipmentType, equipmentId, regionCode], map: "unique_market_intelligence")
+  @@index([equipmentType, equipmentId], map: "idx_market_equipment")
+  @@index([regionCode], map: "idx_market_region")
+  @@index([availabilityStatus], map: "idx_market_availability")
+  @@map("market_intelligence")
 }

@@ -1,0 +1,14 @@
+{
+  "timestamp": "2025-11-03T09:44:43.363218",
+  "total_files": 1,
+  "successful_extractions": 1,
+  "failed_extractions": 0,
+  "success_rate": 100.0,
+  "average_processing_time_ms": 12.89,
+  "manufacturers_found": {
+    "Q CELLS": 1
+  },
+  "errors": [],
+  "results_count": 1,
+  "extraction_method": "camelot_table_extraction"
+}

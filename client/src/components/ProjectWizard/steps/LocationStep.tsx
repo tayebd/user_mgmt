@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -21,20 +21,72 @@ export function LocationStep({ form, pvProject, setPVProject }: StepProps) {
     address: pvProject?.address || '',
     latitude: pvProject?.latitude || 33.893201,
     longitude: pvProject?.longitude || -84.253871,
-    timezone: pvProject?.timezone || '',
+    timezone: pvProject?.timezone || 'UTC',
     elevation: pvProject?.elevation || 320,
   });
-  const [projectName, setProjectName] = useState(pvProject?.name || '');
+
+  // Sync site state with pvProject when pvProject changes
+  useEffect(() => {
+    if (pvProject) {
+      setSite(prev => ({
+        ...prev,
+        name: pvProject.name || prev.name,
+        address: pvProject.address || prev.address,
+        latitude: pvProject.latitude || prev.latitude,
+        longitude: pvProject.longitude || prev.longitude,
+        timezone: pvProject.timezone || prev.timezone,
+        elevation: pvProject.elevation || prev.elevation,
+      }));
+    }
+  }, [pvProject]);
 
   const handleInputChange = (field: keyof SiteFormData, value: string | number) => {
     setSite(prev => ({
       ...prev,
       [field]: value
     }));
-    setPVProject?.(prev => ({
+
+    // Update pvProject with the specific field that changed
+    if (setPVProject && pvProject) {
+      setPVProject(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          [field]: value
+        };
+      });
+    }
+  };
+
+  const handleAddressFieldChange = (value: string) => {
+    setSite(prev => ({
       ...prev,
-        [field]: value,
+      address: value
     }));
+
+    // Update pvProject address but preserve existing latitude/longitude
+    if (setPVProject && pvProject) {
+      setPVProject(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          address: value
+        };
+      });
+    }
+  };
+
+  const handleProjectNameChange = (value: string) => {
+    setSite(prev => ({ ...prev, name: value }));
+    if (setPVProject && pvProject) {
+      setPVProject(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          name: value
+        };
+      });
+    }
   };
 
   const handleAddressSearch = async () => {
@@ -56,22 +108,11 @@ export function LocationStep({ form, pvProject, setPVProject }: StepProps) {
 
       if (data.results?.[0]?.geometry?.location) {
         const { lat, lng } = data.results[0].geometry.location;
-        handleInputChange('latitude', lat)
-        handleInputChange('longitude', lng)
-        // setValue('address', data.results[0].formatted_address, { shouldValidate: true });
+        handleInputChange('latitude', lat);
+        handleInputChange('longitude', lng);
+        handleInputChange('address', data.results[0].formatted_address || site.address);
         console.log('Geocoding data:', lat, lng);
-
-        // Update PVProject with new latitude and longitude
-        if (setPVProject) {
-          setPVProject(prev => ({
-            ...prev,
-              latitude: lat,
-              longitude: lng,
-              address: site.address.trim()
-
-          }));
-        }
-    }
+      }
     } catch (error) {
       console.error('Geocoding error:', error);
     } finally {
@@ -86,8 +127,8 @@ export function LocationStep({ form, pvProject, setPVProject }: StepProps) {
             <Label htmlFor="projectName">Project Name</Label>
             <Input
               id="projectName"
-              value={projectName}
-              onChange={(e) => setProjectName(e.target.value)}
+              value={site.name}
+              onChange={(e) => handleProjectNameChange(e.target.value)}
               placeholder="Enter project name"
               required
             />
@@ -110,7 +151,7 @@ export function LocationStep({ form, pvProject, setPVProject }: StepProps) {
             id="address"
             placeholder="Enter project address"
             value={site.address || ''}
-            onChange={(e) => handleInputChange('address', e.target.value) }
+            onChange={(e) => handleAddressFieldChange(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !isSearching && handleAddressSearch()}
             // className={`flex-1 ${errors?.site?.address ? 'border-red-500' : ''}`}
             disabled={isSearching}

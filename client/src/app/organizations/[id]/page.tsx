@@ -5,6 +5,17 @@ import { useApiStore } from '@/state/api';
 import { useParams } from 'next/navigation';
 import { Organization } from '@/types';
 
+// For static export, generate some static params
+export async function generateStaticParams() {
+  // Return some common organization IDs or empty array
+  // In production, you might want to generate this based on actual data
+  return [
+    { id: '1' },
+    { id: '2' },
+    { id: '3' },
+  ];
+}
+
 const OrganizationDetailPage = () => {
   const params = useParams();
   const id = Number(params?.id);

@@ -11,18 +11,18 @@ The root directory (`/home/tayebd/apps/user_mgmt`) contains:
   - `.clinerules`: Project-specific rules and learned patterns (e.g., authentication paths, tool usage).
   - `README.md`: High-level setup guide.
   - `.gitignore`, `.github/`: Standard Git and workflow configs.
-  - `cline_docs/`: Likely additional documentation or Cline-specific notes.
+  - `memory-bank/`: Primary documentation directory for project context, progress, and patterns (as per Cline's memory system).
 
 Key subdirectories in `client/`:
 - **src/app/**: Next.js app router pages (e.g., `/dashboard`, `/inverters`, `/pvpanel`, `/project-wizard` routes).
 - **src/components/**: Reusable UI components (e.g., `ProjectWizard/`, `Auth/`, `ui/` for ShadCN primitives like buttons, dialogs).
 - **src/lib/**: Utilities (e.g., Supabase client, types).
 - **src/state/**: State management (e.g., `api.ts` for data fetching, `auth.ts`).
-- **public/**: Static assets (company images, data files like `dashboard_data.js`, survey JSONs).
+- **public/**: Static assets (organization images, data files like `dashboard_data.js`, survey JSONs).
 - **tests/**: Test data (various survey JSONs for Industry 4.0/digital maturity assessments – suggests integration with survey tools).
 
 In `server/`:
-- Core backend files (inferred from memory bank: `companyRoutes.ts`, `pvPanelController.ts`, etc., though not all listed).
+- Core backend files (inferred from memory bank: `organizationRoutes.ts`, `pvPanelController.ts`, etc., though not all listed).
 - `tech_study/`: Python-based tools for technical studies (e.g., `api.py`, `calculate.py`, templates for reports in English/French, YAML configs for components and calculations). This seems like a specialized module for solar system simulations (array config, cable sizing, grounding).
 
 ## Technology Stack
@@ -47,7 +47,7 @@ Dependencies highlight a focus on interactive, data-heavy UIs: surveys, maps, ch
 
 ### Backend (server/)
 - **Framework**: Node.js with Express.js (inferred from memory bank; routes/controllers for CRUD operations).
-- **Database/ORM**: Prisma with PostgreSQL (models like `Company`, `PVPanel`, `Inverter`, `Project`).
+- **Database/ORM**: Prisma with PostgreSQL (models like `Organization`, `PVPanel`, `Inverter`, `Project`).
 - **Data Import**: XLSX library for seeding from Excel files (e.g., `excelSeederPV.ts` for PV panels/inverters).
 - **Auth**: Supabase integration (JWT, RBAC).
 - **Python Tools (tech_study/)**: Separate for calculations/reports:
@@ -59,8 +59,8 @@ Dependencies highlight a focus on interactive, data-heavy UIs: surveys, maps, ch
 
 ### Database
 - PostgreSQL (managed via PgAdmin).
-- Prisma schema defines entities: Users, Companies (with projects/services), PVPanels, Inverters, Projects (wizard data), Locations, etc.
-- Seeding: Scripts populate master data (e.g., company logos/images in `public/`).
+- Prisma schema defines entities: Users, Organizations (with projects/services), PVPanels, Inverters, Projects (wizard data), Locations, etc.
+- Seeding: Scripts populate master data (e.g., organization logos/images in `public/`).
 - Constraints: Relies on Excel structure for imports; supports pagination (default: page 1, limit 50).
 
 ## Key Features & Architecture
@@ -71,7 +71,7 @@ From memory bank and code patterns:
    - Components: `Login.tsx`, `UserManagement.tsx`, `AuthContext.tsx`.
 
 2. **Data Management**:
-   - CRUD for Companies, PV Panels, Inverters (paginated tables).
+   - CRUD for Organizations, PV Panels, Inverters (paginated tables).
    - Excel import/seeding for bulk data.
    - Master data focus: Technical specs (e.g., panel power, inverter phases/voltage).
 
@@ -105,13 +105,13 @@ From memory bank and code patterns:
 - CI/CD: GitHub Actions implied.
 
 ## Current Status & Progress (from memory-bank/progress.md & activeContext.md)
-- **What Works**: Company data CRUD/display, intuitive UI, Excel imports, basic pagination for PV Panels.
+- **What Works**: Organization data CRUD/display, intuitive UI, Excel imports, basic pagination for PV Panels.
 - **In Progress**: 
   - PV Panel pagination (controllers/API updated).
   - Inverter implementation (routes/controllers seeded).
   - Wizard integration for projects/inverters.
 - **What's Left**: Master data prep (validation, more seeding), tests, docs.
-- **Challenges**: Company logos management, ensuring Excel structure consistency, integrating Python calcs with JS frontend.
+- **Challenges**: Organization logos management, ensuring Excel structure consistency, integrating Python calcs with JS frontend.
 - **Todo List** (current, from reminders):
   1. Review/finalize PVPanel pagination.
   2. Implement Inverter data management.
@@ -128,4 +128,4 @@ From memory bank and code patterns:
   - Integrate Python tools more seamlessly (e.g., via subprocess or API).
   - Expand tests (current Jest setup is basic).
   - Handle internationalization (EN/FR templates suggest multi-lang support).
-- The codebase is ~500+ files, focused on renewable energy (company directory + design tools). Total size: Medium-scale app, suitable for team development.
+- The codebase is ~500+ files, focused on renewable energy (organization directory + design tools). Total size: Medium-scale app, suitable for team development.

@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from pandas.plotting import register_matplotlib_converters
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 # from typing import Dict, List, Optional, Any, Union
 import uvicorn
 from APIModels import *
@@ -28,9 +29,18 @@ from PVUtilities import (read_resource, hourly_load, create_time_indices,
 
 
 # Create FastAPI app
-app = FastAPI(title="PV Simulation API", 
+app = FastAPI(title="PV Simulation API",
               description="API for running solar PV simulations",
               version="1.0.0")
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # Next.js dev server
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
+)
 
 class SPVSim:
     def __init__(self):

@@ -17,6 +17,14 @@ export function InverterStep({ form, pvProject, setPVProject }: StepProps) {
   const selectedInverterModel = formValues.inverters?.[0]?.model;
   const numberInverters = formValues.numberInverters || 1;
 
+  // Sync form with pvProject when it changes
+  useEffect(() => {
+    if (pvProject.inverters && pvProject.inverters.length > 0) {
+      console.log('InverterStep - Syncing form with pvProject inverters:', pvProject.inverters[0]);
+      setValue('inverters', pvProject.inverters, { shouldValidate: true });
+    }
+  }, [pvProject.inverters, setValue]);
+
 
   useEffect(() => {
     const loadInverters = async () => {

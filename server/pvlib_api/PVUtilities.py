@@ -297,6 +297,14 @@ def computOutputResults(attrb_dict,  ArP, ArV, ArI, acLd, dcLd, wkDict):
                         wkDict['Error'] = (msg.format(sysLd, ArP), 'Warning')
                     else:
                         iout = -1 * ((ArP-sysLd)/vout)
+            # Initialize battery-related values for grid-tied systems
+            if 'BD' not in wkDict:
+                wkDict['BD'] = 0.0
+            if 'BS' not in wkDict:
+                wkDict['BS'] = 0.0
+            if 'BP' not in wkDict:
+                wkDict['BP'] = 0.0
+
             #update Bank State
             attrb_dict['Bnk'].update_soc(iout, wkDict)
             if ArP - wkDict['BD'] -pload >= 0.0:

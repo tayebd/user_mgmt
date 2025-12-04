@@ -90,19 +90,19 @@ async function main() {
       })
     ]);
 
-    // Get existing companies
-    const companies = await prisma.company.findMany({
+    // Get existing organizations
+    const organizations = await prisma.organization.findMany({
       include: { industry: true }
     });
 
-    // Seed data for each company
-    for (const company of companies) {
+    // Seed data for each organization
+    for (const organization of organizations) {
       // Technology Implementations
       for (const tech of technologyTypes) {
         if (Math.random() > 0.3) { // 70% chance of implementation
           await prisma.technologyImplementation.create({
             data: {
-              companyId: company.id,
+              organizationId: organization.id,
               technologyTypeId: tech.id,
               implementationDate: faker.date.past(),
               maturityLevel: faker.number.int({ min: 1, max: 4 }),
@@ -118,7 +118,7 @@ async function main() {
         if (Math.random() > 0.4) { // 60% chance of implementation
           await prisma.digitalProcess.create({
             data: {
-              companyId: company.id,
+              organizationId: organization.id,
               processTypeId: process.id,
               digitizationLevel: faker.number.int({ min: 1, max: 5 }),
               automationLevel: faker.number.int({ min: 1, max: 5 }),
@@ -134,7 +134,7 @@ async function main() {
         if (Math.random() > 0.3) { // 70% chance of having skilled personnel
           await prisma.personnelSkill.create({
             data: {
-              companyId: company.id,
+              organizationId: organization.id,
               skillId: skill.id,
               numberOfPersonnel: faker.number.int({ min: 5, max: 50 }),
               proficiencyLevel: faker.number.int({ min: 1, max: 5 }),
@@ -147,7 +147,7 @@ async function main() {
       // Strategy Assessment
       await prisma.strategyAssessment.create({
         data: {
-          companyId: company.id,
+          organizationId: organization.id,
           assessmentDate: faker.date.recent(),
           hasI40Strategy: Math.random() > 0.4,
           strategyMaturity: faker.number.int({ min: 1, max: 5 }),
@@ -159,7 +159,7 @@ async function main() {
       // Product Innovation
       await prisma.productInnovation.create({
         data: {
-          companyId: company.id,
+          organizationId: organization.id,
           smartFeaturesCount: faker.number.int({ min: 0, max: 10 }),
           customizationLevel: faker.number.int({ min: 1, max: 5 }),
           innovationDate: faker.date.past()
@@ -167,7 +167,7 @@ async function main() {
       });
 
       // Generate initial fact tables
-      await generateFactTables(company.id, company.industryId);
+      await generateFactTables(organization.id, organization.industryId);
     }
 
     console.log('Analytics seed data created successfully');
@@ -177,7 +177,7 @@ async function main() {
   }
 }
 
-async function generateFactTables(companyId: number, sectorId: number) {
+async function generateFactTables(organizationId: number, sectorId: number) {
   const date = new Date();
   
   // Generate facts for the last 12 months
@@ -188,7 +188,7 @@ async function generateFactTables(companyId: number, sectorId: number) {
       prisma.technologyImplementationFact.create({
         data: {
           date: new Date(date),
-          companyId,
+          organizationId,
           sectorId,
           technologyCount: faker.number.int({ min: 1, max: 10 }),
           avgMaturityLevel: faker.number.float({ min: 1, max: 4, fractionDigits: 1 }),
@@ -203,7 +203,7 @@ async function generateFactTables(companyId: number, sectorId: number) {
       prisma.processDigitizationFact.create({
         data: {
           date: new Date(date),
-          companyId,
+          organizationId,
           sectorId,
           processId: faker.number.int({ min: 1, max: 3 }),
           avgDigitizationLevel: faker.number.float({ min: 1, max: 5, fractionDigits: 1 }),
@@ -214,7 +214,7 @@ async function generateFactTables(companyId: number, sectorId: number) {
       prisma.personnelSkillsFact.create({
         data: {
           date: new Date(date),
-          companyId,
+          organizationId,
           sectorId,
           skillCategory: faker.helpers.arrayElement(['Technical', 'Management', 'Operation']),
           totalSkilledPersonnel: faker.number.int({ min: 10, max: 100 }),
@@ -224,9 +224,9 @@ async function generateFactTables(companyId: number, sectorId: number) {
       prisma.strategyImplementationFact.create({
         data: {
           date: new Date(date),
-          companyId,
+          organizationId,
           sectorId,
-          companiesWithStrategy: faker.number.int({ min: 0, max: 1 }),
+          organizationsWithStrategy: faker.number.int({ min: 0, max: 1 }),
           avgStrategyMaturity: faker.number.float({ min: 1, max: 5, fractionDigits: 1 }),
           avgImplementationProgress: faker.number.float({ min: 0, max: 100, fractionDigits: 1 })
         }

@@ -78,6 +78,11 @@ class PVBatBank():
     
     def set_volts(self):
         """ set Bank Voltage """
+        # Skip voltage calculation if no battery parts are defined
+        if not self.parts or not hasattr(self.parts[0], 'b_typ') or not self.parts[0].b_typ:
+            self.bnk_vo = 0
+            return
+
         bnk_vnom = self.bnk_vo
         eff = battery_types[self.parts[0].b_typ][1]
         if self.soc == 1:
@@ -143,14 +148,18 @@ class PVBatBank():
             i_chg = i_chg * (i_in/abs(i_in))
             bd = self.bnk_vo * i_chg        
             self.cur_cap += i_in
-            if self.cur_cap > self.bnk_cap:
+            if self.bnk_cap > 0 and self.cur_cap > self.bnk_cap:
                self.cur_cap = self.bnk_cap
             if self.cur_cap <= 0:
                 self.cur_cap = 0                
-            new_soc = min(self.cur_cap/self.bnk_cap, 1)
-            assert new_soc >= 0, ermsg.format(i_in,self.cur_cap)
-            self.soc = new_soc 
-            self.set_volts()
+        # Skip SOC calculations for grid-tied systems without battery capacity
+        if self.bnk_cap <= 0:
+            return
+
+        new_soc = min(self.cur_cap/self.bnk_cap, 1)
+        assert new_soc >= 0, ermsg.format(i_in,self.cur_cap)
+        self.soc = new_soc
+        self.set_volts()
         wkDict['BD'] = bd
         wkDict['BS'] = self.soc
         wkDict['BP'] = self.current_power()

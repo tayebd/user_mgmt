@@ -7,9 +7,9 @@
   - Supabase
   - Server: `auth.ts` (middleware)
 
-- **Company Data Retrieval:**
-  - Client: `CompanyManagement.tsx`, `api.ts`
-  - Server: `companyRoutes.ts`, `companyController.ts`
+- **Organization Data Retrieval:**
+  - Client: `OrganizationManagement.tsx`, `api.ts`
+  - Server: `organizationRoutes.ts`, `organizationController.ts`
   - Prisma
   - Database
 
@@ -27,18 +27,18 @@
 
 ## Known Challenges
 
-- Need to determine how to best manage and associate company logos.
+- Need to determine how to best manage and associate organization logos.
 
 ## Project Scope
-- The application is a company directory.
-- Company data is loaded from Excel files.
+- The application is a organization directory.
+- Organization data is loaded from Excel files.
 
 ## Evolution of Project Decisions
 
 - Initial database setup with migrations.
 - Added Supabase authentication.
-- Implemented basic company CRUD.
-- Added company descriptions and icon URLs.
+- Implemented basic organization CRUD.
+- Added organization descriptions and icon URLs.
 
 ## Tool Usage Patterns
 

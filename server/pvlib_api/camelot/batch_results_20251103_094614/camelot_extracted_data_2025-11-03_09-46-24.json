@@ -1,0 +1,38 @@
+[
+  {
+    "panel_data": {
+      "maker": "Hyperion",
+      "model": "HY-DH108P8B-395/415",
+      "description": "Hyperion HY-DH108P8B-395/415 Solar Panel",
+      "maxPower": 313.9,
+      "openCircuitVoltage": 35.51,
+      "shortCircuitCurrent": 11.31,
+      "voltageAtPmax": 29.98,
+      "currentAtPmax": 10.47,
+      "maxSeriesFuseRating": null,
+      "tempCoeffPmax": null,
+      "tempCoeffIsc": null,
+      "tempCoeffVoc": null,
+      "tempCoeffIpmax": null,
+      "tempCoeffVpmax": null,
+      "moduleType": "Monocrystalline",
+      "shortSide": null,
+      "longSide": null,
+      "weight": 24.2,
+      "efficiency": 21.3,
+      "performanceWarranty": null,
+      "productWarranty": null,
+      "certification": null
+    },
+    "confidence_scores": {
+      "maxPower": 0.95,
+      "efficiency": 0.9,
+      "openCircuitVoltage": 0.9,
+      "shortCircuitCurrent": 0.9
+    },
+    "warnings": [],
+    "errors": [],
+    "processing_time_ms": 8.565187454223633,
+    "source_file": "../../datasheet-input/Hyperion 395-415W NEW.pdf"
+  }
+]

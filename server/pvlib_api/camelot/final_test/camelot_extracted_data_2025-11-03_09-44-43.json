@@ -1,0 +1,38 @@
+[
+  {
+    "panel_data": {
+      "maker": "Q CELLS",
+      "model": "Q.PEAK DUO L-G5.2\n380-405\nENDURING HIGH\nPERFORMANCE MOD2",
+      "description": "Q CELLS Q.PEAK DUO L-G5.2\n380-405\nENDURING HIGH\nPERFORMANCE MOD2 Solar Panel",
+      "maxPower": 405.0,
+      "openCircuitVoltage": 46.45,
+      "shortCircuitCurrent": 8.28,
+      "voltageAtPmax": 39.33,
+      "currentAtPmax": 7.71,
+      "maxSeriesFuseRating": null,
+      "tempCoeffPmax": null,
+      "tempCoeffIsc": null,
+      "tempCoeffVoc": null,
+      "tempCoeffIpmax": null,
+      "tempCoeffVpmax": null,
+      "moduleType": "Monocrystalline",
+      "shortSide": 1.19,
+      "longSide": 1.15,
+      "weight": 23.5,
+      "efficiency": 20.1,
+      "performanceWarranty": null,
+      "productWarranty": null,
+      "certification": "IEC 60904"
+    },
+    "confidence_scores": {
+      "maxPower": 0.95,
+      "efficiency": 0.9,
+      "openCircuitVoltage": 0.9,
+      "shortCircuitCurrent": 0.9
+    },
+    "warnings": [],
+    "errors": [],
+    "processing_time_ms": 12.894868850708008,
+    "source_file": "../../datasheet-input/Q_CELLS_Data_sheet_Q.PEAK_DUO_L-G5.2_395.pdf"
+  }
+]

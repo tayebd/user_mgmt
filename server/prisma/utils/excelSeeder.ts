@@ -9,11 +9,11 @@ import * as path from 'path';
 // correctly despite these errors.
 const prisma = new PrismaClient();
 
-type ModelName = 'company';
+type ModelName = 'organization';
 
 type ModelInputType = {
 
-  company: Prisma.CompanyCreateManyInput;
+  organization: Prisma.OrganizationCreateManyInput;
 };
 
 interface ExcelMapping {
@@ -25,12 +25,12 @@ interface ExcelMapping {
 
 // Configuration for each file type
 const fileConfig: Record<ModelName, { skipRows: number }> = {
-  company: { skipRows: 0 }, // Assuming no header rows to skip
+  organization: { skipRows: 0 }, // Assuming no header rows to skip
 };
 
 // Define field mappings for each model
 const fieldMappings: Record<ModelName, ExcelMapping[]> = {
-  company: [
+  organization: [
     { excelField: 'name', modelField: 'name', required: true },
     { excelField: 'address', modelField: 'location', required: false },
     { excelField: 'website', modelField: 'website' },
@@ -101,7 +101,7 @@ function transformExcelData<T extends ModelName>(
       });
 
       // Type guard based on model
-      if (modelName === 'company' && (!transformedRow.name || !transformedRow.location)) {
+      if (modelName === 'organization' && (!transformedRow.name || !transformedRow.location)) {
         return null;
       }
 
@@ -158,9 +158,9 @@ async function importExcelToDatabase(filePath: string, modelName: ModelName) {
     // Bulk insert based on model type
     let result;
     switch (modelName) {
-      case 'company':
-        result = await prisma.company.createMany({
-          data: transformedData as Prisma.CompanyCreateManyInput[],
+      case 'organization':
+        result = await prisma.organization.createMany({
+          data: transformedData as Prisma.OrganizationCreateManyInput[],
           skipDuplicates: true
         });
         break;
@@ -183,17 +183,17 @@ export async function seedFromExcel() {
     // Clear existing data
       console.log('Clearing existing data...');
     await prisma.projectPhoto.deleteMany();
-    await prisma.companyProject.deleteMany();
+    await prisma.organizationProject.deleteMany();
     await prisma.review.deleteMany();
     await prisma.service.deleteMany();
     await prisma.partnership.deleteMany();
     await prisma.certification.deleteMany();
     await prisma.description.deleteMany();
-    await prisma.company.deleteMany();
+    await prisma.organization.deleteMany();
 
     await importExcelToDatabase(
-      path.join(seedDataDir, 'Company.xlsx'),
-      'company'
+      path.join(seedDataDir, 'Organization.xlsx'),
+      'organization'
     );
 
     console.log('Excel seeding completed successfully');

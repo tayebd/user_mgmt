@@ -1,5 +1,12 @@
 # System Patterns
 
+## Overall Architecture
+
+The application follows a client-server architecture, with distinct `client` and `server` directories.
+
+*   **Client:**  Handles the frontend, user interface, and user interactions. This is a Next.js application.
+*   **Server:**  Provides the backend API and database interactions. Uses Prisma and Express.js.
+
 ## Architecture Patterns
 
 1. **Microservices Architecture:**
@@ -13,6 +20,27 @@
 
 3. **Data Access Object (DAO):**
    - The backend uses Prisma as the DAO to interact with the PostgreSQL database, abstracting the database operations and providing a consistent API for data access.
+
+## Data Flow
+
+1.  User interacts with the client-side application.
+2.  Client makes requests to the server's API endpoints.
+3.  Server processes requests, interacts with the database (via Prisma), and returns data.
+4.  Client receives data and updates the UI.
+
+## Key Components
+
+*   **Frontend Components (Client):** React components for displaying and managing organization data.
+*   **API Routes (Server):**  Endpoints for CRUD operations on organization data.
+*   **Database Models (Server):** Prisma schema defining the structure of the data.
+*   **Data Seeding (Server):**  Utility (`excelSeeder.ts`) to populate the database from an Excel file.
+
+## Technologies
+
+* React
+* Prisma
+* Excel (xlsx library)
+* TypeScript
 
 ## Design Patterns
 
@@ -47,7 +75,7 @@
 
 1. **Frontend Components:**
    - The frontend is composed of reusable React components, each responsible for a specific part of the user interface.
-   - Components are organized into folders based on their functionality, such as `Company` and `Project`.
+   - Components are organized into folders based on their functionality, such as `Organization` and `Project`.
 
 2. **Wizard Components:**
    - `client/src/components/ProjectWizard/ProjectWizard.tsx`: Main wizard container component
@@ -62,7 +90,7 @@
 
 3. **Backend Controllers:**
    - The backend controllers handle the application logic and interact with the models and DAO to perform database operations.
-   - Controllers are organized into folders based on their functionality, such as `CompanyController` and `ProjectController`.
+   - Controllers are organized into folders based on their functionality, such as `OrganizationController` and `ProjectController`.
 
 4. **Database Models:**
    - The database models represent the data entities and their relationships.

@@ -17,18 +17,11 @@ export default function HomePage() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/ai-wizard"
-            className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold px-8 py-4 rounded-lg transition-colors shadow-lg"
+            href="/wizard"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-orange-500 hover:from-purple-700 hover:to-orange-600 text-white font-semibold px-8 py-4 rounded-lg transition-colors shadow-lg transform hover:scale-105"
           >
             <Brain className="h-5 w-5" />
-            AI Project Wizard
-          </Link>
-          <Link
-            href="/test"
-            className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-8 py-4 rounded-lg transition-colors shadow-lg"
-          >
-            <Calculator className="h-5 w-5" />
-            Manual Wizard
+            Start Solar Design
           </Link>
           <Link
             href="/pvpanels"
@@ -88,10 +81,10 @@ export default function HomePage() {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link
-            href="/test"
-            className="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-colors"
+            href="/wizard"
+            className="flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors"
           >
-            <Calculator className="h-5 w-5 text-orange-600" />
+            <Brain className="h-5 w-5 text-purple-600" />
             <span className="font-medium">New Project</span>
           </Link>
           <Link

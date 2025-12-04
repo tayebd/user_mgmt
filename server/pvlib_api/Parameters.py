@@ -75,11 +75,12 @@ panel_racking = ['open_rack_cell_glassback',
 
 
 # Transforms PVLIB panel_racking configuration to Sandia temperature model nomenclature
-temp_model_xlate = { 'open_rack_cell_glassback':['sapm', 'open_rack_glass_glass'], 
+temp_model_xlate = { 'open_rack_cell_glassback':['sapm', 'open_rack_glass_glass'],
                                  'roof_mount_cell_glassback':['sapm', 'close_mount_glass_glass'],
                                  'open_rack_cell_polymerback':['sapm', 'open_rack_glass_polymer'],
                                  'insulated_back_polymerback':['sapm', 'insulated_back_glass_polymer'],
-                                 'open_rack_polymer_thinfilm_steel':['sapm', 'open_rack_glass_glass']
+                                 'open_rack_polymer_thinfilm_steel':['sapm', 'open_rack_glass_glass'],
+                                 'Fixed':['sapm', 'close_mount_glass_glass']
                                  }
 
 

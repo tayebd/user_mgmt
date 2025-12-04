@@ -1,0 +1,18 @@
+{
+  "description": "Batch processing configuration for PV panel datasheets",
+  "datasheets": [
+    {
+      "file_path": "../../datasheet-input/Q_CELLS_Data_sheet_Q.PEAK_DUO_L-G5.2_395.pdf",
+      "manufacturer": "Q CELLS"
+    },
+    {
+      "file_path": "../../datasheet-input/Hyperion 395-415W NEW.pdf",
+      "manufacturer": "Hyperion"
+    }
+  ],
+  "output_directory": "./batch_results",
+  "extraction_options": {
+    "skip_validation": false,
+    "output_formats": ["json", "csv", "summary"]
+  }
+}

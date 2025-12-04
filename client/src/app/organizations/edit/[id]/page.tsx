@@ -2,6 +2,15 @@ import { Suspense } from 'react';
 import EditOrganizationForm from './EditOrganizationForm';
 import { notFound } from 'next/navigation';
 
+// For static export, generate some static params
+export async function generateStaticParams() {
+  return [
+    { id: '1' },
+    { id: '2' },
+    { id: '3' },
+  ];
+}
+
 // Define strict types for page parameters
 type Props = {
   params: { id: string }

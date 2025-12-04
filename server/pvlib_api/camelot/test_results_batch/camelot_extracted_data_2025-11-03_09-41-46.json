@@ -1,0 +1,37 @@
+[
+  {
+    "panel_data": {
+      "maker": "Hyperion",
+      "model": "108",
+      "description": "Hyperion 108 Solar Panel",
+      "maxPower": 313.9,
+      "openCircuitVoltage": null,
+      "shortCircuitCurrent": 11.31,
+      "voltageAtPmax": null,
+      "currentAtPmax": null,
+      "maxSeriesFuseRating": null,
+      "tempCoeffPmax": null,
+      "tempCoeffIsc": null,
+      "tempCoeffVoc": null,
+      "tempCoeffIpmax": null,
+      "tempCoeffVpmax": null,
+      "moduleType": "Monocrystalline",
+      "shortSide": null,
+      "longSide": null,
+      "weight": 24.2,
+      "efficiency": 21.3,
+      "performanceWarranty": null,
+      "productWarranty": null,
+      "certification": null
+    },
+    "confidence_scores": {
+      "maxPower": 0.95,
+      "efficiency": 0.9,
+      "shortCircuitCurrent": 0.9
+    },
+    "warnings": [],
+    "errors": [],
+    "processing_time_ms": 4.669427871704102,
+    "source_file": "../../datasheet-input/Hyperion 395-415W NEW.pdf"
+  }
+]

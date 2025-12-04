@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { createClient } from '../config/supabase';
 import { prisma } from '../config/db';
+import { UserRole } from '@prisma/client';
 
 export const getUsers = async (req: Request, res: Response) => {
   const supabase = createClient({ req, res });
@@ -107,5 +108,62 @@ export const deleteUser = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error deleting user:', error);
     res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// Create a database user record (for development/mock users)
+export const createDatabaseUser = async (req: Request, res: Response) => {
+  const { email, name, uid, role, photoURL } = req.body;
+
+  console.log(`[API] Creating user with UID: ${uid}`);
+
+  try {
+    // Check if user already exists
+    const existingUser = await prisma.user.findFirst({
+      where: { uid },
+    });
+
+    if (existingUser) {
+      console.log(`[API] User with UID ${uid} already exists`);
+      return res.status(200).json(existingUser);
+    }
+
+    // For development, allow creating users without Supabase validation
+    // This handles mock users from the frontend
+    const newUser = await prisma.user.create({
+      data: {
+        uid,
+        email: email || '',
+        name: name || email?.split('@')[0] || 'Anonymous',
+        role: (role === 'ADMIN' ? UserRole.ADMIN : UserRole.USER),
+        profilePictureUrl: photoURL || null,
+      },
+    });
+
+    console.log(`[API] Successfully created user with ID: ${newUser.id}`);
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error('[API] Error creating database user:', error);
+
+    // Handle unique constraint violations
+    if (error instanceof Error && error.message.includes('Unique constraint')) {
+      // Try to find existing user and return it
+      try {
+        const existingUser = await prisma.user.findFirst({
+          where: { uid },
+        });
+        if (existingUser) {
+          console.log(`[API] Found existing user after constraint error: ${existingUser.id}`);
+          return res.status(200).json(existingUser);
+        }
+      } catch (findError) {
+        console.error('[API] Error finding existing user:', findError);
+      }
+    }
+
+    res.status(500).json({
+      message: 'Failed to create user',
+      error: error instanceof Error ? error.message : 'Unknown error'
+    });
   }
 };

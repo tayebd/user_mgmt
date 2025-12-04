@@ -5,6 +5,14 @@ interface SimulationResults {
   success: boolean;
   message?: string;
   service_percentage?: number;
+  timestamp?: string;
+  annual_energy?: number;
+  capacity_factor?: number;
+  peak_power?: number;
+  performance_ratio?: number;
+  monthly_energy?: Record<string, number>;
+  daily_energy?: Record<string, number>;
+  error_message?: string | null;
   overview?: {
     text: string;
   };
@@ -16,6 +24,7 @@ interface SimulationResults {
   power_flow?: {
     data: Array<Record<string, unknown>>;
   };
+  powerOutput?: number[];
 }
 
 export interface StepProps {

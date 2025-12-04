@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -180,7 +180,9 @@ export function AIProjectWizard() {
     return true;
   };
 
-  const startAIDesign = async () => {
+  const startAIDesign = async (retryCount = 0) => {
+    const maxRetries = 3;
+
     setIsProcessing(true);
     setCurrentDesignId(null);
     setDesignResult(null);
@@ -206,35 +208,105 @@ export function AIProjectWizard() {
       }
     };
 
-    try {
-      const result = await createAIDesign(designData);
-      if (result && result.id) {
-        setCurrentDesignId(result.id);
-        toast.success('AI design started! This typically takes 2-5 seconds.');
+    const attemptDesign = async (): Promise<boolean> => {
+      try {
+        // Add timeout to the request
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Request timeout after 30 seconds')), 30000);
+        });
 
-        // Start polling for results
-        startPolling(result.id);
+        const result = await Promise.race([
+          createAIDesign(designData),
+          timeoutPromise
+        ]);
+
+        if (result && (result as any).id) {
+          const designId = (result as any).id;
+          setCurrentDesignId(designId);
+          toast.success('AI design started! This typically takes 2-5 seconds.');
+          startPolling(designId);
+          return true;
+        } else {
+          throw new Error('Invalid response from AI design service');
+        }
+      } catch (error) {
+        console.error(`AI design attempt ${retryCount + 1} failed:`, error);
+
+        // Check if we should retry
+        const shouldRetry = retryCount < maxRetries && (
+          error instanceof Error && (
+            error.message.includes('fetch') ||
+            error.message.includes('network') ||
+            error.message.includes('timeout') ||
+            error.message.includes('503') ||
+            error.message.includes('502') ||
+            error.message.includes('500')
+          )
+        );
+
+        if (shouldRetry) {
+          const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
+          toast.info(`Retrying in ${delay / 1000} seconds... (${retryCount + 1}/${maxRetries})`);
+
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return attemptDesign();
+        } else {
+          // Handle different error types with specific messages
+          let errorMessage = 'Failed to start AI design. Please try again.';
+
+          if (error instanceof Error) {
+            if (error.message.includes('timeout')) {
+              errorMessage = 'Request timed out. The AI service is taking longer than expected. Please try again.';
+            } else if (error.message.includes('network') || error.message.includes('fetch')) {
+              errorMessage = 'Network connection error. Please check your internet connection and try again.';
+            } else if (error.message.includes('401') || error.message.includes('403')) {
+              errorMessage = 'Authentication error. Please refresh the page and try again.';
+            } else if (error.message.includes('429')) {
+              errorMessage = 'Too many requests. Please wait a moment and try again.';
+            } else if (error.message.includes('500') || error.message.includes('502') || error.message.includes('503')) {
+              errorMessage = 'AI service is temporarily unavailable. Please try again in a few minutes.';
+            }
+          }
+
+          toast.error(errorMessage);
+          setIsProcessing(false);
+          return false;
+        }
       }
-    } catch (error) {
-      console.error('Error starting AI design:', error);
-      toast.error('Failed to start AI design. Please try again.');
-      setIsProcessing(false);
-    }
+    };
+
+    await attemptDesign();
   };
 
   const startPolling = (designId: string) => {
+    let pollCount = 0;
+    const maxPolls = 30; // Maximum 60 seconds of polling (30 * 2 seconds)
+    let consecutiveErrors = 0;
+    const maxConsecutiveErrors = 3;
+
     const interval = setInterval(async () => {
+      pollCount++;
+      consecutiveErrors++;
+
       try {
         // Get auth token using the same method as the API store
         const token = await getAuthToken();
+
+        // Add timeout to the polling request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
         // Fetch the latest design status
         const response = await fetch(`${API_BASE_URL}/ai/designs/${designId}`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-          }
+          },
+          signal: controller.signal
         });
+
+        clearTimeout(timeoutId);
+        consecutiveErrors = 0; // Reset error count on successful request
 
         if (response.ok) {
           const result: AIDesignResult = await response.json();
@@ -246,6 +318,7 @@ export function AIProjectWizard() {
             setDesignResult(result);
             setCurrentStep(3); // Move to results step
             toast.success('AI design completed successfully!');
+            return;
           } else if (result.status === 'FAILED') {
             clearInterval(interval);
             setPollingInterval(null);
@@ -256,23 +329,68 @@ export function AIProjectWizard() {
             });
             setCurrentStep(3);
             toast.error('AI design failed. Please try different requirements.');
+            return;
+          }
+          // If status is PROCESSING, continue polling
+        } else if (response.status === 404) {
+          // Design not found - might still be processing or was deleted
+          if (pollCount > 5) { // After 10 seconds, treat as error
+            clearInterval(interval);
+            setPollingInterval(null);
+            setIsProcessing(false);
+            toast.error('Design not found. Please try starting a new design.');
+          }
+        } else if (response.status >= 500) {
+          // Server error - continue polling but with backoff
+          if (consecutiveErrors >= maxConsecutiveErrors) {
+            clearInterval(interval);
+            setPollingInterval(null);
+            setIsProcessing(false);
+            toast.error('Server error. Please try again later.');
           }
         } else {
-          // HTTP error occurred - could be 404, 500, etc.
-          // Continue polling as the server might be processing
-        }
-      } catch (error) {
-        // Network error occurred
-        // If there's an authentication error, stop polling
-        if (error instanceof Error && error.message.includes('No active session found')) {
+          // Other HTTP errors (auth, forbidden, etc.)
           clearInterval(interval);
           setPollingInterval(null);
           setIsProcessing(false);
-          toast.error('Authentication error. Please refresh the page and try again.');
+          toast.error('Request failed. Please refresh the page and try again.');
         }
-        // For other network errors, continue polling
+      } catch (error) {
+        if (error instanceof Error) {
+          if (error.name === 'AbortError') {
+            // Request timed out
+            if (consecutiveErrors >= maxConsecutiveErrors) {
+              clearInterval(interval);
+              setPollingInterval(null);
+              setIsProcessing(false);
+              toast.error('Request timeout. Please check your connection and try again.');
+            }
+          } else if (error.message.includes('No active session found')) {
+            // Authentication error
+            clearInterval(interval);
+            setPollingInterval(null);
+            setIsProcessing(false);
+            toast.error('Authentication error. Please refresh the page and try again.');
+          } else if (error.message.includes('fetch')) {
+            // Network error
+            if (consecutiveErrors >= maxConsecutiveErrors) {
+              clearInterval(interval);
+              setPollingInterval(null);
+              setIsProcessing(false);
+              toast.error('Network error. Please check your connection and try again.');
+            }
+          }
+        }
       }
-    }, 2000); // Poll every 2 seconds instead of 1 second
+
+      // Check if we've exceeded maximum polling time
+      if (pollCount >= maxPolls) {
+        clearInterval(interval);
+        setPollingInterval(null);
+        setIsProcessing(false);
+        toast.error('Design is taking longer than expected. Please try again or contact support.');
+      }
+    }, 2000); // Poll every 2 seconds
 
     setPollingInterval(interval);
   };
@@ -445,150 +563,271 @@ function RequirementsStep({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>System Requirements</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <Zap className="h-5 w-5 text-purple-600" />
+          System Requirements
+        </CardTitle>
         <CardDescription>
           Tell us about your energy needs and preferences. Our AI will optimize the design based on these requirements.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Power Target */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Power Target (Watts)</label>
-            <select
-              value={requirements.powerTarget}
-              onChange={(e) => setRequirements(prev => ({ ...prev, powerTarget: Number(e.target.value) }))}
-              className="w-full p-2 border rounded-md"
-            >
-              <option value={3000}>3 kW - Small Residential</option>
-              <option value={5000}>5 kW - Medium Residential</option>
-              <option value={6000}>6 kW - Large Residential</option>
-              <option value={10000}>10 kW - Commercial</option>
-              <option value={15000}>15 kW - Large Commercial</option>
-            </select>
-            <p className="text-xs text-gray-500">
-              Average daily consumption: {Math.round(requirements.powerTarget * 4.5 / 365)} kWh
-            </p>
-          </div>
-
-          {/* Budget */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Budget (Euros)</label>
-            <select
-              value={requirements.budget}
-              onChange={(e) => setRequirements(prev => ({ ...prev, budget: Number(e.target.value) }))}
-              className="w-full p-2 border rounded-md"
-            >
-              <option value={3000}>€3,000 - Budget</option>
-              <option value={5000}>€5,000 - Standard</option>
-              <option value={8000}>€8,000 - Quality</option>
-              <option value={12000}>€12,000 - Premium</option>
-              <option value={20000}>€20,000 - High-End</option>
-            </select>
-            <p className="text-xs text-gray-500">
-              Cost per watt: €{(requirements.budget / requirements.powerTarget).toFixed(2)}/W
-            </p>
-          </div>
-
-          {/* Roof Type */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Roof Type</label>
-            <select
-              value={requirements.roofType}
-              onChange={(e) => setRequirements(prev => ({ ...prev, roofType: e.target.value as AIRequirements['roofType'] }))}
-              className="w-full p-2 border rounded-md"
-            >
-              <option value="tilted">Tiled Roof</option>
-              <option value="flat">Flat Roof</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          {/* Priority */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Design Priority</label>
-            <select
-              value={requirements.priority}
-              onChange={(e) => setRequirements(prev => ({ ...prev, priority: e.target.value as AIRequirements['priority'] }))}
-              className="w-full p-2 border rounded-md"
-            >
-              <option value="efficiency">Maximum Efficiency</option>
-              <option value="cost">Lowest Cost</option>
-              <option value="space">Space Optimization</option>
-              <option value="reliability">Highest Reliability</option>
-            </select>
-            <p className="text-xs text-gray-500">
-              {requirements.priority === 'efficiency' && 'Maximum energy production per area'}
-              {requirements.priority === 'cost' && 'Best value for money'}
-              {requirements.priority === 'space' && 'Optimal for limited roof space'}
-              {requirements.priority === 'reliability' && 'Most durable components'}
-            </p>
-          </div>
-
-          {/* Orientation */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Roof Orientation</label>
-            <select
-              value={requirements.orientation}
-              onChange={(e) => setRequirements(prev => ({ ...prev, orientation: e.target.value as AIRequirements['orientation'] }))}
-              className="w-full p-2 border rounded-md"
-            >
-              <option value="south">South</option>
-              <option value="south-east">South-East</option>
-              <option value="south-west">South-West</option>
-              <option value="east">East</option>
-              <option value="west">West</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          {/* Tilt Angle */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Tilt Angle (degrees)</label>
-            <input
-              type="range"
-              min="5"
-              max="45"
-              value={requirements.tilt}
-              onChange={(e) => setRequirements(prev => ({ ...prev, tilt: Number(e.target.value) }))}
-              className="w-full"
-            />
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>5° (Flat)</span>
-              <span>{requirements.tilt}°</span>
-              <span>45° (Steep)</span>
+      <CardContent className="space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Power Target - Enhanced */}
+          <div className="space-y-3">
+            <label className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <div className="w-2 h-2 bg-purple-600 rounded-full"></div>
+              Power Target
+            </label>
+            <div className="space-y-3">
+              <div className="relative">
+                <select
+                  value={requirements.powerTarget}
+                  onChange={(e) => setRequirements(prev => ({ ...prev, powerTarget: Number(e.target.value) }))}
+                  className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 dark:focus:ring-purple-800 transition-all bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-medium"
+                >
+                  <option value={3000}>3 kW - Small Residential</option>
+                  <option value={5000}>5 kW - Medium Residential</option>
+                  <option value={6000}>6 kW - Large Residential</option>
+                  <option value={10000}>10 kW - Commercial</option>
+                  <option value={15000}>15 kW - Large Commercial</option>
+                </select>
+              </div>
+              <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-purple-700 dark:text-purple-300">Daily Production:</span>
+                  <span className="font-semibold text-purple-900 dark:text-purple-100">
+                    {Math.round(requirements.powerTarget * 4.5 / 365)} kWh
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm mt-1">
+                  <span className="text-purple-700 dark:text-purple-300">Monthly Production:</span>
+                  <span className="font-semibold text-purple-900 dark:text-purple-100">
+                    {Math.round(requirements.powerTarget * 4.5 / 12)} kWh
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Constraints */}
-          <div className="space-y-2 md:col-span-2">
-            <label className="text-sm font-medium">Special Constraints</label>
-            <div className="grid grid-cols-2 gap-2">
-              {['shading', 'space_limitation', 'building_restrictions', 'historic_property'].map(constraint => (
-                <label key={constraint} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={requirements.constraints.includes(constraint)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setRequirements(prev => ({
-                          ...prev,
-                          constraints: [...prev.constraints, constraint]
-                        }));
-                      } else {
-                        setRequirements(prev => ({
-                          ...prev,
-                          constraints: prev.constraints.filter(c => c !== constraint)
-                        }));
-                      }
-                    }}
-                    />
-                  <span className="text-sm">{constraint.replace('_', ' ').split(' ').map(word =>
-                    word.charAt(0).toUpperCase() + word.slice(1)
-                  ).join(' ')}</span>
-                </label>
+          {/* Budget - Enhanced */}
+          <div className="space-y-3">
+            <label className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+              Budget Range
+            </label>
+            <div className="space-y-3">
+              <div className="relative">
+                <select
+                  value={requirements.budget}
+                  onChange={(e) => setRequirements(prev => ({ ...prev, budget: Number(e.target.value) }))}
+                  className="w-full p-3 border-2 border-gray-200 dark:border-gray-700 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 dark:focus:ring-green-800 transition-all bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-medium"
+                >
+                  <option value={3000}>€3,000 - Budget</option>
+                  <option value={5000}>€5,000 - Standard</option>
+                  <option value={8000}>€8,000 - Quality</option>
+                  <option value={12000}>€12,000 - Premium</option>
+                  <option value={20000}>€20,000 - High-End</option>
+                </select>
+              </div>
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-green-700 dark:text-green-300">Cost per Watt:</span>
+                  <span className="font-semibold text-green-900 dark:text-green-100">
+                    €{(requirements.budget / requirements.powerTarget).toFixed(2)}/W
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <div className="w-full bg-green-200 dark:bg-green-800 rounded-full h-2">
+                    <div
+                      className="bg-green-600 h-2 rounded-full transition-all"
+                      style={{ width: `${Math.min((requirements.budget / requirements.powerTarget) * 10, 100)}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-green-600 dark:text-green-400 mt-1">
+                    {requirements.budget / requirements.powerTarget < 1 ? 'Excellent Value' :
+                     requirements.budget / requirements.powerTarget < 1.5 ? 'Good Value' :
+                     requirements.budget / requirements.powerTarget < 2 ? 'Standard Pricing' : 'Premium Range'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Roof Type - Enhanced */}
+          <div className="space-y-3">
+            <label className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+              Roof Type
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { value: 'tilted', label: 'Tiled', icon: '🏠' },
+                { value: 'flat', label: 'Flat', icon: '🏢' },
+                { value: 'other', label: 'Other', icon: '⚙️' }
+              ].map((type) => (
+                <button
+                  key={type.value}
+                  type="button"
+                  onClick={() => setRequirements(prev => ({ ...prev, roofType: type.value as AIRequirements['roofType'] }))}
+                  className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                    requirements.roofType === type.value
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  <div className="text-lg mb-1">{type.icon}</div>
+                  <div>{type.label}</div>
+                </button>
               ))}
             </div>
+          </div>
+
+          {/* Priority - Enhanced */}
+          <div className="space-y-3">
+            <label className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
+              Design Priority
+            </label>
+            <div className="space-y-2">
+              {[
+                { value: 'efficiency', label: 'Maximum Efficiency', desc: 'Most energy per area', color: 'red' },
+                { value: 'cost', label: 'Lowest Cost', desc: 'Best value for money', color: 'green' },
+                { value: 'space', label: 'Space Optimization', desc: 'Compact design', color: 'blue' },
+                { value: 'reliability', label: 'Highest Reliability', desc: 'Premium durability', color: 'purple' }
+              ].map((priority) => (
+                <button
+                  key={priority.value}
+                  type="button"
+                  onClick={() => setRequirements(prev => ({ ...prev, priority: priority.value as AIRequirements['priority'] }))}
+                  className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
+                    requirements.priority === priority.value
+                      ? `border-${priority.color}-500 bg-${priority.color}-50 dark:bg-${priority.color}-900/20`
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                  }`}
+                >
+                  <div className="font-medium text-gray-900 dark:text-white">{priority.label}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">{priority.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Orientation - Enhanced */}
+          <div className="space-y-3">
+            <label className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <div className="w-2 h-2 bg-indigo-600 rounded-full"></div>
+              Roof Orientation
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { value: 'south', label: 'South', angle: '↙' },
+                { value: 'south-east', label: 'SE', angle: '↓' },
+                { value: 'south-west', label: 'SW', angle: '↘' },
+                { value: 'east', label: 'East', angle: '←' },
+                { value: 'west', label: 'West', angle: '→' },
+                { value: 'other', label: 'Other', angle: '?' }
+              ].map((orientation) => (
+                <button
+                  key={orientation.value}
+                  type="button"
+                  onClick={() => setRequirements(prev => ({ ...prev, orientation: orientation.value as AIRequirements['orientation'] }))}
+                  className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                    requirements.orientation === orientation.value
+                      ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-700 dark:text-gray-300'
+                  }`}
+                >
+                  <div className="text-lg mb-1">{orientation.angle}</div>
+                  <div>{orientation.label}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tilt Angle - Enhanced */}
+          <div className="space-y-3">
+            <label className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <div className="w-2 h-2 bg-teal-600 rounded-full"></div>
+              Tilt Angle
+            </label>
+            <div className="space-y-3">
+              <div className="relative">
+                <input
+                  type="range"
+                  min="5"
+                  max="45"
+                  value={requirements.tilt}
+                  onChange={(e) => setRequirements(prev => ({ ...prev, tilt: Number(e.target.value) }))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                  style={{
+                    background: `linear-gradient(to right, #14b8a6 0%, #14b8a6 ${((requirements.tilt - 5) / 40) * 100}%, #e5e7eb ${((requirements.tilt - 5) / 40) * 100}%, #e5e7eb 100%)`
+                  }}
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>5°</span>
+                  <span>25°</span>
+                  <span>45°</span>
+                </div>
+              </div>
+              <div className="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-3 text-center">
+                <div className="text-2xl font-bold text-teal-700 dark:text-teal-300">{requirements.tilt}°</div>
+                <div className="text-sm text-teal-600 dark:text-teal-400">
+                  {requirements.tilt < 15 ? 'Flat Installation' :
+                   requirements.tilt < 25 ? 'Low Tilt' :
+                   requirements.tilt < 35 ? 'Optimal Tilt' : 'Steep Installation'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Constraints - Enhanced */}
+          <div className="space-y-3 lg:col-span-2">
+            <label className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <div className="w-2 h-2 bg-gray-600 rounded-full"></div>
+              Special Constraints
+            </label>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {[
+                { value: 'shading', label: 'Shading Issues', icon: '🌳' },
+                { value: 'space_limitation', label: 'Limited Space', icon: '📐' },
+                { value: 'building_restrictions', label: 'Building Rules', icon: '🏛️' },
+                { value: 'historic_property', label: 'Historic Site', icon: '🏛️' }
+              ].map((constraint) => (
+                <button
+                  key={constraint.value}
+                  type="button"
+                  onClick={() => {
+                    if (requirements.constraints.includes(constraint.value)) {
+                      setRequirements(prev => ({
+                        ...prev,
+                        constraints: prev.constraints.filter(c => c !== constraint.value)
+                      }));
+                    } else {
+                      setRequirements(prev => ({
+                        ...prev,
+                        constraints: [...prev.constraints, constraint.value]
+                      }));
+                    }
+                  }}
+                  className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
+                    requirements.constraints.includes(constraint.value)
+                      ? 'border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 text-gray-600 dark:text-gray-400'
+                  }`}
+                >
+                  <div className="text-lg mb-1">{constraint.icon}</div>
+                  <div>{constraint.label}</div>
+                </button>
+              ))}
+            </div>
+            {requirements.constraints.length > 0 && (
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-3">
+                <p className="text-sm text-yellow-800 dark:text-yellow-200">
+                  ⚠️ Selected constraints may affect system performance and cost. Our AI will optimize accordingly.
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
@@ -598,45 +837,147 @@ function RequirementsStep({
 
 // Processing Step Component
 function ProcessingStep() {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [dots, setDots] = useState('');
+
+  const steps = [
+    { icon: Clock, text: 'Analyzing requirements...', color: 'blue' },
+    { icon: Zap, text: 'Selecting optimal equipment...', color: 'yellow' },
+    { icon: Calculator, text: 'Calculating configuration...', color: 'green' },
+    { icon: Shield, text: 'Validating compliance...', color: 'purple' },
+    { icon: TrendingUp, text: 'Optimizing performance...', color: 'orange' }
+  ];
+
+  useEffect(() => {
+    const stepInterval = setInterval(() => {
+      setCurrentStep((prev) => (prev + 1) % steps.length);
+    }, 800);
+
+    const dotsInterval = setInterval(() => {
+      setDots((prev) => {
+        if (prev.length >= 3) return '';
+        return prev + '.';
+      });
+    }, 500);
+
+    return () => {
+      clearInterval(stepInterval);
+      clearInterval(dotsInterval);
+    };
+  }, []);
+
   return (
     <Card>
       <CardContent className="py-12">
-        <div className="text-center space-y-6">
-          <div className="flex justify-center">
-            <Brain className="h-16 w-16 text-purple-600 animate-pulse" />
+        <div className="text-center space-y-8">
+          {/* Animated Brain Icon */}
+          <div className="flex justify-center relative">
+            <div className="absolute inset-0 bg-purple-600 rounded-full blur-xl opacity-30 animate-pulse"></div>
+            <Brain className="h-20 w-20 text-purple-600 relative z-10 animate-bounce" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-24 h-24 border-4 border-purple-300 border-t-transparent rounded-full animate-spin"></div>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+          {/* Main Title */}
+          <div className="space-y-3">
+            <h3 className="text-3xl font-bold text-gray-900 dark:text-white">
               AI is Designing Your Solar System
+              <span className="text-purple-600">{dots}</span>
             </h3>
-            <p className="text-gray-600 dark:text-gray-300">
-              Our intelligent algorithms are analyzing your requirements and selecting the optimal equipment
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Our intelligent algorithms are analyzing thousands of equipment combinations to find the perfect design for your specific requirements
             </p>
           </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-              <Clock className="h-4 w-4 animate-spin" />
-              <span>Analyzing requirements...</span>
+          {/* Progress Steps */}
+          <div className="max-w-2xl mx-auto space-y-4">
+            <div className="flex justify-center items-center space-x-2">
+              {steps.map((step, index) => {
+                const Icon = step.icon;
+                const isActive = index === currentStep;
+                const isCompleted = index < currentStep;
+
+                return (
+                  <div key={index} className="flex items-center">
+                    <div className={`relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${
+                      isActive
+                        ? 'bg-purple-600 text-white scale-110 shadow-lg'
+                        : isCompleted
+                        ? 'bg-green-500 text-white scale-95'
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-400 scale-90'
+                    }`}>
+                      <Icon className="h-5 w-5" />
+                      {isActive && (
+                        <div className="absolute inset-0 rounded-full bg-purple-600 animate-ping opacity-30"></div>
+                      )}
+                    </div>
+                    {index < steps.length - 1 && (
+                      <div className={`w-8 h-1 mx-2 transition-all duration-300 ${
+                        isCompleted ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
+                      }`}></div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-            <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-              <Zap className="h-4 w-4 animate-pulse" />
-              <span>Selecting optimal equipment...</span>
-            </div>
-            <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-              <Calculator className="h-4 w-4 animate-pulse" />
-              <span>Calculating configuration...</span>
-            </div>
-            <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-              <Shield className="h-4 w-4 animate-pulse" />
-              <span>Validating compliance...</span>
+
+            {/* Current Step Text */}
+            <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
+              <div className="flex items-center justify-center space-x-3">
+                {(() => {
+                  const CurrentIcon = steps[currentStep].icon;
+                  return (
+                    <>
+                      <CurrentIcon className={`h-6 w-6 text-${steps[currentStep].color}-600 animate-pulse`} />
+                      <span className="text-lg font-medium text-gray-900 dark:text-white">
+                        {steps[currentStep].text}
+                      </span>
+                    </>
+                  );
+                })()}
+              </div>
             </div>
           </div>
 
-          <div className="max-w-md mx-auto bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
-            <p className="text-sm text-purple-700 dark:text-purple-300">
-              This typically takes 2-5 seconds. Our AI is working to find the perfect balance of performance, cost, and reliability for your project.
+          {/* Additional Processing Info */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+              <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">1000+</div>
+              <div className="text-sm text-blue-800 dark:text-blue-200">Equipment Options Analyzed</div>
+            </div>
+            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4">
+              <div className="text-2xl font-bold text-green-600 dark:text-green-400">25+</div>
+              <div className="text-sm text-green-800 dark:text-green-200">Performance Metrics</div>
+            </div>
+            <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4">
+              <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">8760</div>
+              <div className="text-sm text-purple-800 dark:text-purple-200">Hourly Simulations</div>
+            </div>
+          </div>
+
+          {/* Loading Animation */}
+          <div className="flex justify-center space-x-2">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="w-3 h-3 bg-purple-600 rounded-full animate-bounce"
+                style={{ animationDelay: `${i * 0.1}s` }}
+              ></div>
+            ))}
+          </div>
+
+          {/* Estimated Time */}
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 max-w-md mx-auto">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Estimated Time</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">2-5 seconds</span>
+            </div>
+            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+              <div className="bg-gradient-to-r from-purple-500 to-orange-500 h-2 rounded-full animate-pulse" style={{ width: '65%' }}></div>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+              Our AI is optimizing for the perfect balance of performance, cost, and reliability for your specific requirements.
             </p>
           </div>
         </div>

@@ -170,6 +170,10 @@ class PVArray():
         }
         
         # Temperature model based on mounting configuration
+        # Handle empty or missing rack configuration
+        if not mdl_rack_config or mdl_rack_config not in temp_model_xlate:
+            mdl_rack_config = 'Fixed'  # Default to fixed mounting
+
         temp_model = temp_model_xlate[mdl_rack_config][0]
         temp_type = temp_model_xlate[mdl_rack_config][1]
         temp_parms = TEMPERATURE_MODEL_PARAMETERS[temp_model][temp_type]

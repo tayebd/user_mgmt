@@ -3,6 +3,15 @@
 import React, { useState } from 'react';
 import { Model } from 'survey-core';
 import SurveyDisplay from '@/components/surveys/SurveyDisplay';
+
+// For static export, generate some static params
+export async function generateStaticParams() {
+  return [
+    { id: '1' },
+    { id: '2' },
+    { id: '3' },
+  ];
+}
 import { useUserAuth } from '../../utils/userAuth';
 
 // Import new components

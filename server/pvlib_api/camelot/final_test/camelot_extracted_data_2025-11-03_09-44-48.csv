@@ -1,0 +1,2 @@
+maker,model,description,maxPower,openCircuitVoltage,shortCircuitCurrent,voltageAtPmax,currentAtPmax,maxSeriesFuseRating,tempCoeffPmax,tempCoeffIsc,tempCoeffVoc,tempCoeffIpmax,tempCoeffVpmax,moduleType,shortSide,longSide,weight,efficiency,performanceWarranty,productWarranty,certification
+Hyperion,HY-DH108P8B-395/415,Hyperion HY-DH108P8B-395/415 Solar Panel,313.9,35.51,11.31,29.98,10.47,,,,,,,Monocrystalline,,,24.2,21.3,,,

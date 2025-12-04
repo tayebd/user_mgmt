@@ -39,7 +39,9 @@
     ".next/types/**/*.ts",
     "src/app/surveys/[id]/edit/SurveyEvaluate.jsx",
     "src/types/**/*.d.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "out/types/**/*.ts",
+    "out/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

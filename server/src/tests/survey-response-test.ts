@@ -23,7 +23,7 @@ const prisma = new PrismaClient();
 const mockSurveyResponse = {
   surveyId: 9,
   userId: 1,
-  companyId: 263,
+  organizationId: 263,
   responseJson: {
     systemCoverage: [
       { name: 'erp', value: 'full' },
@@ -116,13 +116,13 @@ async function createTestSurveyResponse() {
       throw new Error(`Survey with ID ${mockSurveyResponse.surveyId} not found`);
     }
     
-    // Check if company exists
-    const company = await prisma.company.findUnique({
-      where: { id: mockSurveyResponse.companyId }
+    // Check if organization exists
+    const organization = await prisma.organization.findUnique({
+      where: { id: mockSurveyResponse.organizationId }
     });
     
-    if (!company) {
-      throw new Error(`Company with ID ${mockSurveyResponse.companyId} not found`);
+    if (!organization) {
+      throw new Error(`Organization with ID ${mockSurveyResponse.organizationId} not found`);
     }
     
     // Create survey response
@@ -130,7 +130,7 @@ async function createTestSurveyResponse() {
       data: {
         surveyId: mockSurveyResponse.surveyId,
         userId: mockSurveyResponse.userId,
-        companyId: mockSurveyResponse.companyId,
+        organizationId: mockSurveyResponse.organizationId,
         responseJson: mockSurveyResponse.responseJson,
         processedMetrics: mockSurveyResponse.processedMetrics as unknown as Prisma.InputJsonValue,
         metricsVersion: CURRENT_METRICS_VERSION,
@@ -139,7 +139,7 @@ async function createTestSurveyResponse() {
       include: {
         survey: true,
         user: true,
-        company: true
+        organization: true
       }
     });
     
@@ -147,14 +147,14 @@ async function createTestSurveyResponse() {
       id: surveyResponse.id,
       surveyId: surveyResponse.surveyId,
       userId: surveyResponse.userId,
-      companyId: surveyResponse.companyId,
+      organizationId: surveyResponse.organizationId,
       createdAt: surveyResponse.createdAt
     });
     
     // Create technology implementations for the metrics
     if (isProcessedMetrics(mockSurveyResponse.processedMetrics)) {
       await createTechnologyImplementations(
-        surveyResponse.companyId,
+        surveyResponse.organizationId,
         mockSurveyResponse.processedMetrics
       );
     } else {
@@ -174,7 +174,7 @@ async function createTestSurveyResponse() {
  * Function to create technology implementations for the metrics
  */
 async function createTechnologyImplementations(
-  companyId: number,
+  organizationId: number,
   processedMetrics: ProcessedMetrics
 ) {
   try {
@@ -212,7 +212,7 @@ async function createTechnologyImplementations(
         // Check if implementation exists
         const existingImpl = await prisma.technologyImplementation.findFirst({
           where: {
-            companyId: companyId,
+            organizationId: organizationId,
             technologyTypeId: techTypeId
           }
         });
@@ -234,7 +234,7 @@ async function createTechnologyImplementations(
           // Create new implementation
           await prisma.technologyImplementation.create({
             data: {
-              companyId,
+              organizationId,
               technologyTypeId: techTypeId,
               implementationDate: new Date(),
               maturityLevel: Math.floor(Math.random() * 5) + 1, // Random maturity level between 1-5

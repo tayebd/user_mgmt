@@ -16,7 +16,7 @@ export const getSurveys = async (req: Request, res: Response) => {
             responseJson: true;
             processedMetrics: true;
             createdAt: true;
-            companyId: true;
+            organizationId: true;
             metricsVersion: true;
             lastMetricsUpdate: true;
           };
@@ -32,7 +32,7 @@ export const getSurveys = async (req: Request, res: Response) => {
             responseJson: true,
             processedMetrics: true,
             createdAt: true,
-            companyId: true,
+            organizationId: true,
             metricsVersion: true,
             lastMetricsUpdate: true
           }
@@ -191,13 +191,13 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
   const { surveyId } = req.params;
   console.log('Request body received:', req.body);
 
-  const { responseJson, companyId, processedMetrics, userId } = req.body;
+  const { responseJson, organizationId, processedMetrics, userId } = req.body;
   
   console.log('Extracted values:', { 
     surveyId, 
     responseJson: !!responseJson, 
     userId,
-    companyId,
+    organizationId,
     hasMetrics: !!processedMetrics
   });
   
@@ -208,12 +208,8 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
     });
   }
 
-  if (!companyId) {
-    return res.status(400).json({ 
-      message: 'companyId is required for dashboard integration',
-      receivedBody: req.body
-    });
-  }
+  // organizationId is optional with default value 1 in database schema
+  // Allow survey responses without explicit organizationId for development/mock scenarios
 
   try {
     // Validate and parse response JSON
@@ -253,7 +249,7 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
         surveyId: Number(surveyId),
         responseJson: parsedResponse as Prisma.InputJsonValue,
         userId: userId, // Use authenticated user ID
-        companyId: Number(companyId),
+        organizationId: organizationId ? Number(organizationId) : 263, // Default to 263 (first organization) if not provided
         metricsVersion: validatedMetrics ? CURRENT_METRICS_VERSION : null,
         lastMetricsUpdate: validatedMetrics ? new Date() : null,
         processedMetrics: validatedMetrics ? (validatedMetrics as unknown as Prisma.InputJsonValue) : Prisma.JsonNull
@@ -261,7 +257,7 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
       include: {
         survey: true,
         user: true,
-        company: true
+        organization: true
       }
     });
 
@@ -271,7 +267,7 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
         await MetricSyncService.syncMetricsWithDashboard(
           surveyResponse.id,
           validatedMetrics,
-          Number(companyId)
+          organizationId ? Number(organizationId) : 263
         );
       } catch (syncError) {
         console.error('Error syncing metrics with dashboard:', syncError);
@@ -307,7 +303,7 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
           id: true,
           surveyId: true,
           userId: true,
-          companyId: true,
+          organizationId: true,
           responseJson: true,
           processedMetrics: true,
           createdAt: true,
@@ -328,7 +324,42 @@ export const createSurveyResponse = async (req: Request, res: Response) => {
       res.status(500).json({ message: 'Internal server error' });
     }
   };
-  
+
+  export const getSurveyResponse = async (req: Request, res: Response) => {
+    const { surveyResponseId } = req.params;
+    try {
+      // Validate surveyResponseId
+      if (!surveyResponseId || isNaN(Number(surveyResponseId))) {
+        return res.status(400).json({ message: 'Invalid survey response ID' });
+      }
+
+      const surveyResponse = await prisma.surveyResponse.findUnique({
+        where: { id: Number(surveyResponseId) },
+        select: {
+          id: true,
+          surveyId: true,
+          userId: true,
+          organizationId: true,
+          responseJson: true,
+          processedMetrics: true,
+          createdAt: true,
+          metricsVersion: true,
+          lastMetricsUpdate: true
+        }
+      });
+
+      if (!surveyResponse) {
+        return res.status(404).json({ message: 'Survey response not found' });
+      }
+
+      console.log(`Found survey response ${surveyResponseId}`);
+      res.status(200).json(surveyResponse);
+    } catch (error) {
+      console.error('Error fetching survey response:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+
   export const updateSurveyResponse = async (req: Request, res: Response) => {
     const { responseId } = req.params;
     const { responseJson } = req.body;

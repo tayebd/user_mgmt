@@ -1,0 +1,8 @@
+maker,model,description,maxPower,openCircuitVoltage,shortCircuitCurrent,voltageAtPmax,currentAtPmax,maxSeriesFuseRating,tempCoeffPmax,tempCoeffIsc,tempCoeffVoc,tempCoeffIpmax,tempCoeffVpmax,moduleType,shortSide,longSide,weight,efficiency,performanceWarranty,productWarranty,certification
+Q CELLS,"Q.PEAK DUO L-G5.2
+380-405
+ENDURING HIGH
+PERFORMANCE MOD2","Q CELLS Q.PEAK DUO L-G5.2
+380-405
+ENDURING HIGH
+PERFORMANCE MOD2 Solar Panel",405.0,,,,,,,,,,,Monocrystalline,1.19,1.15,23.5,20.3,,,IEC 60904

@@ -558,6 +558,286 @@ ${interpolateTemplate(cableSizingTemplate, reportContext)}
     );
   };
 
+  // Helper function to process monthly energy data
+  const processMonthlyEnergyData = (monthlyEnergy: Record<string, number> | undefined) => {
+    if (!monthlyEnergy) return [];
+
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return Object.entries(monthlyEnergy).map(([month, energy], index) => ({
+      month: monthNames[parseInt(month) - 1] || month,
+      energy: parseFloat(energy.toFixed(1)),
+      monthNumber: parseInt(month)
+    }));
+  };
+
+  // Helper function to process daily energy data
+  const processDailyEnergyData = (dailyEnergy: Record<string, number> | undefined) => {
+    if (!dailyEnergy) return [];
+
+    return Object.entries(dailyEnergy).map(([day, energy]) => ({
+      day: parseInt(day),
+      date: `Day ${day}`,
+      energy: parseFloat(energy.toFixed(1))
+    }));
+  };
+
+  // Render comprehensive simulation results with new data structure
+  const renderEnhancedSimulationResults = () => {
+    const {
+      success,
+      timestamp,
+      annual_energy,
+      capacity_factor,
+      peak_power,
+      performance_ratio,
+      monthly_energy,
+      daily_energy,
+      error_message
+    } = simulationResults as any;
+
+    // Calculate additional metrics
+    const capacityFactorPercent = (capacity_factor || 0) * 100;
+    const totalDailyEnergy = daily_energy
+      ? (Object.values(daily_energy) as number[]).reduce((sum: number, val: number) => sum + val, 0)
+      : 0;
+
+    // Get best and worst performing months
+    const monthlyData = processMonthlyEnergyData(monthly_energy);
+    const bestMonth = monthlyData.reduce((best, month) =>
+      month.energy > (best?.energy || 0) ? month : best, monthlyData[0]
+    );
+    const worstMonth = monthlyData.reduce((worst, month) =>
+      month.energy < (worst?.energy || Infinity) ? month : worst, monthlyData[0]
+    );
+
+    return (
+      <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+        <h3 className="text-xl font-semibold text-green-800 mb-4">Solar Simulation Results</h3>
+
+        {/* Location Information */}
+        <div className="bg-white rounded-lg p-4 shadow mb-6 border-l-4 border-blue-500">
+          <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
+            <svg className="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
+            </svg>
+            Simulation Location
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <div className="text-sm text-gray-600 mb-1">Project Name</div>
+              <div className="font-semibold text-gray-900">{pvProject?.name || 'N/A'}</div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-600 mb-1">Address</div>
+              <div className="font-semibold text-gray-900">{pvProject?.address || 'N/A'}</div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-600 mb-1">Latitude</div>
+              <div className="font-medium text-gray-700">{pvProject?.latitude?.toFixed(4) || 'N/A'}°</div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-600 mb-1">Longitude</div>
+              <div className="font-medium text-gray-700">{pvProject?.longitude?.toFixed(4) || 'N/A'}°</div>
+            </div>
+            {pvProject?.elevation && (
+              <div>
+                <div className="text-sm text-gray-600 mb-1">Elevation</div>
+                <div className="font-medium text-gray-700">{pvProject.elevation}m</div>
+              </div>
+            )}
+            {pvProject?.timezone && (
+              <div>
+                <div className="text-sm text-gray-600 mb-1">Timezone</div>
+                <div className="font-medium text-gray-700">{pvProject.timezone}</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Key Performance Indicators */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-lg p-4 shadow border-l-4 border-green-500">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm text-gray-600">Annual Energy</div>
+              <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+              </svg>
+            </div>
+            <div className="text-2xl font-bold text-green-600">
+              {(annual_energy || 0).toFixed(1)} kWh
+            </div>
+            <div className="text-xs text-gray-500 mt-1">Total annual production</div>
+          </div>
+
+          <div className="bg-white rounded-lg p-4 shadow border-l-4 border-blue-500">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm text-gray-600">Capacity Factor</div>
+              <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+              </svg>
+            </div>
+            <div className="text-2xl font-bold text-blue-600">
+              {capacityFactorPercent.toFixed(2)}%
+            </div>
+            <div className="text-xs text-gray-500 mt-1">System utilization</div>
+          </div>
+
+          <div className="bg-white rounded-lg p-4 shadow border-l-4 border-orange-500">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm text-gray-600">Peak Power</div>
+              <svg className="w-5 h-5 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd"/>
+              </svg>
+            </div>
+            <div className="text-2xl font-bold text-orange-600">
+              {(peak_power || 0).toFixed(0)} W
+            </div>
+            <div className="text-xs text-gray-500 mt-1">Maximum output</div>
+          </div>
+
+          <div className="bg-white rounded-lg p-4 shadow border-l-4 border-purple-500">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm text-gray-600">Performance Ratio</div>
+              <svg className="w-5 h-5 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+              </svg>
+            </div>
+            <div className="text-2xl font-bold text-purple-600">
+              {(performance_ratio || 0).toFixed(1)}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">Efficiency ratio</div>
+          </div>
+        </div>
+
+        {/* Performance Summary */}
+        <div className="bg-white rounded-lg p-4 shadow mb-6">
+          <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
+            <svg className="w-5 h-5 mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd"/>
+            </svg>
+            Production Analysis
+          </h4>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="bg-gray-50 rounded p-3">
+              <div className="text-gray-600 mb-1">Best Month</div>
+              <div className="font-semibold text-green-600">{bestMonth?.month || 'N/A'}</div>
+              <div className="text-xs text-gray-500">{(bestMonth?.energy || 0).toFixed(1)} kWh</div>
+            </div>
+            <div className="bg-gray-50 rounded p-3">
+              <div className="text-gray-600 mb-1">Worst Month</div>
+              <div className="font-semibold text-orange-600">{worstMonth?.month || 'N/A'}</div>
+              <div className="text-xs text-gray-500">{(worstMonth?.energy || 0).toFixed(1)} kWh</div>
+            </div>
+            <div className="bg-gray-50 rounded p-3">
+              <div className="text-gray-600 mb-1">Daily Average</div>
+              <div className="font-semibold text-blue-600">
+                {daily_energy ? (totalDailyEnergy / Object.keys(daily_energy).length).toFixed(1) : '0'} kWh
+              </div>
+              <div className="text-xs text-gray-500">Per day average</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Production Charts */}
+        {monthly_energy && (
+          <div className="bg-white rounded-lg p-4 shadow">
+            <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
+              <svg className="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+              </svg>
+              Monthly Production
+            </h4>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={monthlyData}>
+                <defs>
+                  <linearGradient id="colorMonthly" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.3}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis
+                  dataKey="month"
+                  tick={{ fontSize: 11 }}
+                />
+                <YAxis
+                  label={{ value: 'Energy (kWh)', angle: -90, position: 'insideLeft' }}
+                  tick={{ fontSize: 12 }}
+                />
+                <Tooltip
+                  formatter={(value: unknown) => [`${value} kWh`, 'Monthly Energy']}
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '4px' }}
+                />
+                <Bar
+                  dataKey="energy"
+                  fill="#10b981"
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+            <div className="mt-2 text-sm text-gray-600 text-center">
+              Monthly energy production distribution
+            </div>
+          </div>
+        )}
+
+        {daily_energy && (
+          <div className="bg-white rounded-lg p-4 shadow mt-6">
+            <h4 className="font-semibold text-gray-800 mb-4 flex items-center">
+              <svg className="w-5 h-5 mr-2 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd"/>
+              </svg>
+              Daily Production (Year View)
+            </h4>
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={processDailyEnergyData(daily_energy)}>
+                <defs>
+                  <linearGradient id="colorDaily" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis
+                  dataKey="day"
+                  label={{ value: 'Day of Year', position: 'insideBottom', offset: -5 }}
+                  tick={{ fontSize: 10 }}
+                  interval={29} // Show every 30th day
+                />
+                <YAxis
+                  label={{ value: 'Energy (kWh)', angle: -90, position: 'insideLeft' }}
+                  tick={{ fontSize: 12 }}
+                />
+                <Tooltip
+                  formatter={(value: unknown) => [`${value} kWh`, 'Daily Energy']}
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '4px' }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="energy"
+                  stroke="#3b82f6"
+                  fillOpacity={1}
+                  fill="url(#colorDaily)"
+                  strokeWidth={1.5}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+            <div className="mt-2 text-sm text-gray-600 text-center">
+              Daily energy production throughout the year
+            </div>
+          </div>
+        )}
+
+        {/* Timestamp */}
+        {timestamp && (
+          <div className="mt-4 text-xs text-gray-500 text-center">
+            Simulation completed on {new Date(timestamp).toLocaleString()}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Simulation Results Section
   const renderSimulationResults = () => {
     console.log('renderSimulationResults called with:', {
@@ -586,7 +866,12 @@ ${interpolateTemplate(cableSizingTemplate, reportContext)}
       );
     }
 
-    // Handle basic power output data from API
+    // Handle new data structure with annual_energy, monthly_energy, daily_energy
+    if ((simulationResults as any).annual_energy !== undefined || (simulationResults as any).monthly_energy) {
+      return renderEnhancedSimulationResults();
+    }
+
+    // Handle basic power output data from API (legacy format)
     if ((simulationResults as any).powerOutput && Array.isArray((simulationResults as any).powerOutput)) {
       const powerData = (simulationResults as any).powerOutput;
       const totalHours = powerData.length;

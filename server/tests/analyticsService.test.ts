@@ -4,7 +4,7 @@ import { AnalyticsService, AnalyticsError } from '../src/services/analyticsServi
 
 describe('Analytics Service', () => {
   let analyticsService: AnalyticsService;
-  let testCompanyId: number;
+  let testOrganizationId: number;
   let testIndustryId: number;
 
   beforeAll(async () => {
@@ -19,16 +19,16 @@ describe('Analytics Service', () => {
     });
     testIndustryId = industry.id;
 
-    // Create test company
-    const company = await prisma.company.create({
+    // Create test organization
+    const organization = await prisma.organization.create({
       data: {
-        name: 'Test Analytics Company',
+        name: 'Test Analytics Organization',
         address: '123 Analytics St',
         phone: '555-0000',
         industryId: testIndustryId
       }
     });
-    testCompanyId = company.id;
+    testOrganizationId = organization.id;
 
     // Create test process types first
     const processType1 = await prisma.processType.create({
@@ -51,7 +51,7 @@ describe('Analytics Service', () => {
     await prisma.digitalProcess.createMany({
       data: [
         {
-          companyId: testCompanyId,
+          organizationId: testOrganizationId,
           processTypeId: processType1.id,
           digitizationLevel: 4,
           automationLevel: 3,
@@ -59,7 +59,7 @@ describe('Analytics Service', () => {
           lastAssessmentDate: new Date()
         },
         {
-          companyId: testCompanyId,
+          organizationId: testOrganizationId,
           processTypeId: processType2.id,
           digitizationLevel: 5,
           automationLevel: 4,
@@ -92,14 +92,14 @@ describe('Analytics Service', () => {
     await prisma.personnelSkill.createMany({
       data: [
         {
-          companyId: testCompanyId,
+          organizationId: testOrganizationId,
           skillId: skill1.id,
           numberOfPersonnel: 10,
           proficiencyLevel: 4,
           assessmentDate: new Date()
         },
         {
-          companyId: testCompanyId,
+          organizationId: testOrganizationId,
           skillId: skill2.id,
           numberOfPersonnel: 15,
           proficiencyLevel: 3,
@@ -111,7 +111,7 @@ describe('Analytics Service', () => {
     // Create test strategy assessment
     await prisma.strategyAssessment.create({
       data: {
-        companyId: testCompanyId,
+        organizationId: testOrganizationId,
         hasI40Strategy: true,
         strategyMaturity: 4,
         implementationProgress: 75,
@@ -130,7 +130,7 @@ describe('Analytics Service', () => {
     await Promise.all(dates.map(date => 
       prisma.technologyImplementationFact.create({
         data: {
-          companyId: testCompanyId,
+          organizationId: testOrganizationId,
           sectorId: testIndustryId,
           date,
           technologyCount: 0,
@@ -148,7 +148,7 @@ describe('Analytics Service', () => {
     await Promise.all(dates.map(date => 
       prisma.processDigitizationFact.create({
         data: {
-          companyId: testCompanyId,
+          organizationId: testOrganizationId,
           sectorId: testIndustryId,
           processId: processType1.id,
           date,
@@ -165,7 +165,7 @@ describe('Analytics Service', () => {
     await prisma.technologyImplementationFact.deleteMany({
       where: { 
         OR: [
-          { companyId: testCompanyId },
+          { organizationId: testOrganizationId },
           { sectorId: testIndustryId }
         ]
       }
@@ -173,19 +173,19 @@ describe('Analytics Service', () => {
     await prisma.processDigitizationFact.deleteMany({
       where: { 
         OR: [
-          { companyId: testCompanyId },
+          { organizationId: testOrganizationId },
           { sectorId: testIndustryId }
         ]
       }
     });
     await prisma.personnelSkill.deleteMany({
-      where: { companyId: testCompanyId }
+      where: { organizationId: testOrganizationId }
     });
     await prisma.digitalProcess.deleteMany({
-      where: { companyId: testCompanyId }
+      where: { organizationId: testOrganizationId }
     });
     await prisma.strategyAssessment.deleteMany({
-      where: { companyId: testCompanyId }
+      where: { organizationId: testOrganizationId }
     });
     // Delete skills after personnel skills
     await prisma.skill.deleteMany({
@@ -195,8 +195,8 @@ describe('Analytics Service', () => {
     await prisma.processType.deleteMany({
       where: { name: { startsWith: 'Test Process Type' } }
     });
-    // Delete all companies in the test industry
-    await prisma.company.deleteMany({
+    // Delete all organizations in the test industry
+    await prisma.organization.deleteMany({
       where: { industryId: testIndustryId }
     });
     // Now we can safely delete the industry
@@ -207,8 +207,8 @@ describe('Analytics Service', () => {
   });
 
   describe('getDashboardMetrics', () => {
-    it('should return complete dashboard metrics for a valid company', async () => {
-      const metrics = await analyticsService.getDashboardMetrics(testCompanyId);
+    it('should return complete dashboard metrics for a valid organization', async () => {
+      const metrics = await analyticsService.getDashboardMetrics(testOrganizationId);
 
       // Test technology metrics from fact table
       expect(metrics.technologyMetrics.implementationCount).toBe(0);
@@ -240,30 +240,30 @@ describe('Analytics Service', () => {
       expect(metrics.strategyMetrics.nextReviewDate).toBeInstanceOf(Date);
 
       // Test sector comparison
-      expect(metrics.sectorComparison.companyMaturity).toBe(0);
+      expect(metrics.sectorComparison.organizationMaturity).toBe(0);
       expect(metrics.sectorComparison.sectorAvgMaturity).toBe(0);
       expect(metrics.sectorComparison.sectorName).toBe('Test Industry');
     });
 
-    it('should throw AnalyticsError for non-existent company', async () => {
-      const nonExistentCompanyId = 999999;
-      await expect(analyticsService.getDashboardMetrics(nonExistentCompanyId))
+    it('should throw AnalyticsError for non-existent organization', async () => {
+      const nonExistentOrganizationId = 999999;
+      await expect(analyticsService.getDashboardMetrics(nonExistentOrganizationId))
         .rejects
         .toThrow(AnalyticsError);
     });
 
     it('should handle missing data gracefully', async () => {
-      // Create a new company without any associated data
-      const emptyCompany = await prisma.company.create({
+      // Create a new organization without any associated data
+      const emptyOrganization = await prisma.organization.create({
         data: {
-          name: `Empty Test Company ${Date.now()}`,
+          name: `Empty Test Organization ${Date.now()}`,
           address: '456 Empty St',
           phone: '555-9999',
           industryId: testIndustryId
         }
       });
 
-      const metrics = await analyticsService.getDashboardMetrics(emptyCompany.id);
+      const metrics = await analyticsService.getDashboardMetrics(emptyOrganization.id);
 
       // Verify default/null values are handled properly
       expect(metrics.technologyMetrics.implementationCount).toBe(0);
@@ -284,8 +284,8 @@ describe('Analytics Service', () => {
       expect(metrics.strategyMetrics.nextReviewDate).toBeNull();
 
       // Clean up
-      await prisma.company.delete({
-        where: { id: emptyCompany.id }
+      await prisma.organization.delete({
+        where: { id: emptyOrganization.id }
       });
     });
   });

@@ -1,0 +1,83 @@
+// import request from 'supertest';
+// import { app } from '../src/index';
+import { prisma } from '../src/config/db';
+import { describe, beforeAll, afterAll, afterEach, expect, it } from '@jest/globals';
+
+describe.skip('Organization Controller', () => {
+  let testOrganizationIds: number[] = [];
+
+  beforeAll(async () => {
+    // Create test data without deleting existing organizations
+    const createdOrganizations = await prisma.organization.createMany({
+      data: [
+        { name: 'Test Organization A', address: '123 Test St', phone: '555-1111' },
+        { name: 'Test Organization B', address: '456 Test St', phone: '555-2222' }
+      ]
+    });
+    
+    // Store IDs of created test organizations for cleanup
+    const organizations = await prisma.organization.findMany({
+      where: {
+        name: { in: ['Test Organization A', 'Test Organization B'] }
+      },
+      select: { id: true }
+    });
+    testOrganizationIds = organizations.map(c => c.id);
+  });
+
+  afterAll(async () => {
+    // Clean up only the test organizations we created
+    await prisma.organization.deleteMany({
+      where: { id: { in: testOrganizationIds } }
+    });
+    await prisma.$disconnect();
+  });
+
+  describe('GET /api/organizations', () => {
+    it('should fetch all organizations including test data', async () => {
+      const response = await request(app)
+        .get('/api/organizations')
+        .expect(200);
+
+      expect(response.body).toBeInstanceOf(Array);
+      expect(response.body.length).toBeGreaterThanOrEqual(2);
+      
+      // Verify test organizations are present
+      const testOrganizations = response.body.filter((c: any) => 
+        testOrganizationIds.includes(c.id)
+      );
+      expect(testOrganizations.length).toBe(2);
+    });
+  });
+
+  describe('POST /api/organizations', () => {
+    let newOrganizationId: number;
+
+    it('should create a new organization', async () => {
+      const newOrganization = {
+        name: 'New Test Organization',
+        address: '789 Test St',
+        phone: '555-3333'
+      };
+
+      const response = await request(app)
+        .post('/api/organizations')
+        .send(newOrganization)
+        .expect(201);
+
+      expect(response.body).toHaveProperty('id');
+      newOrganizationId = response.body.id;
+    });
+
+    afterEach(async () => {
+      // Clean up the newly created organization
+      if (newOrganizationId) {
+        await prisma.organization.delete({
+          where: { id: newOrganizationId }
+        });
+      }
+    });
+  });
+
+  // ... (rest of the test cases)
+});

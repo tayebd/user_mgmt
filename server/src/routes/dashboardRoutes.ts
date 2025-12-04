@@ -3,7 +3,7 @@ import { AnalyticsService, AnalyticsError } from '../services/analyticsService';
 import { validateRequest } from '../middleware/validateRequest';
 import { z } from 'zod';
 
-type DashboardRequest = Request<{}, {}, {}, { companyId: string }>;
+type DashboardRequest = Request<{}, {}, {}, { organizationId: string }>;
 
 interface DashboardResponse {
   success: boolean;
@@ -41,7 +41,7 @@ interface DashboardResponse {
       nextReviewDate: Date | null;
     };
     sectorComparison: {
-      companyMaturity: number;
+      organizationMaturity: number;
       sectorAvgMaturity: number;
       sectorName: string;
     };
@@ -53,10 +53,10 @@ const analyticsService = new AnalyticsService();
 
 // Validation schema for query parameters
 const dashboardQuerySchema = z.object({
-  companyId: z.string().transform((val: string) => {
+  organizationId: z.string().transform((val: string) => {
     const parsed = parseInt(val, 10);
     if (isNaN(parsed)) {
-      throw new Error('Invalid company ID');
+      throw new Error('Invalid organization ID');
     }
     return parsed;
   })
@@ -87,15 +87,15 @@ const asyncHandler = (fn: (req: DashboardRequest, res: Response, next: NextFunct
 router.get('/metrics',
   validateRequest({ query: dashboardQuerySchema }),
   asyncHandler(async (req: DashboardRequest, res: Response) => {
-    const companyId = parseInt(req.query.companyId, 10);
-    if (isNaN(companyId)) {
+    const organizationId = parseInt(req.query.organizationId, 10);
+    if (isNaN(organizationId)) {
       res.status(400).json({
-        error: 'Invalid company ID',
-        details: 'Company ID must be a valid number'
+        error: 'Invalid organization ID',
+        details: 'Organization ID must be a valid number'
       });
       return;
     }
-    const metrics = await analyticsService.getDashboardMetrics(companyId);
+    const metrics = await analyticsService.getDashboardMetrics(organizationId);
     res.json({
       success: true,
       data: metrics
@@ -107,15 +107,15 @@ router.get('/metrics',
 router.get('/metrics/export',
   validateRequest({ query: dashboardQuerySchema }),
   asyncHandler(async (req: DashboardRequest, res: Response) => {
-    const companyId = parseInt(req.query.companyId, 10);
-    if (isNaN(companyId)) {
+    const organizationId = parseInt(req.query.organizationId, 10);
+    if (isNaN(organizationId)) {
       res.status(400).json({
-        error: 'Invalid company ID',
-        details: 'Company ID must be a valid number'
+        error: 'Invalid organization ID',
+        details: 'Organization ID must be a valid number'
       });
       return;
     }
-    const metrics = await analyticsService.getDashboardMetrics(companyId);
+    const metrics = await analyticsService.getDashboardMetrics(organizationId);
     
     // Format data for CSV export
     const csvData = {
@@ -140,7 +140,7 @@ router.get('/metrics/export',
         maturityLevel: metrics.strategyMetrics.strategyMaturity
       },
       sector: {
-        companyMaturity: metrics.sectorComparison.companyMaturity,
+        organizationMaturity: metrics.sectorComparison.organizationMaturity,
         sectorAvgMaturity: metrics.sectorComparison.sectorAvgMaturity,
         sectorName: metrics.sectorComparison.sectorName
       }

@@ -12,12 +12,12 @@ export class MetricSyncService {
   static async syncMetricsWithDashboard(
     surveyResponseId: number,
     processedMetrics: ProcessedMetrics,
-    companyId: number
+    organizationId: number
   ): Promise<void> {
     try {
       // Validate input parameters
-      if (!surveyResponseId || !companyId) {
-        console.error('Missing required parameters: surveyResponseId or companyId');
+      if (!surveyResponseId || !organizationId) {
+        console.error('Missing required parameters: surveyResponseId or organizationId');
         return; // Return early instead of throwing
       }
       
@@ -88,7 +88,7 @@ export class MetricSyncService {
             })(),
             metricsVersion: CURRENT_METRICS_VERSION,
             lastMetricsUpdate: timestamp,
-            companyId
+            organizationId
           }
         });
 
@@ -96,22 +96,22 @@ export class MetricSyncService {
         if (processedMetrics?.metrics) {
           // 2. Sync technology implementations if they exist
           if (processedMetrics.metrics.technologyMetrics) {
-            await this.syncTechnologyImplementations(tx, companyId, processedMetrics.metrics.technologyMetrics);
+            await this.syncTechnologyImplementations(tx, organizationId, processedMetrics.metrics.technologyMetrics);
           }
 
           // 3. Sync digital processes if they exist
           if (processedMetrics.metrics.processMetrics) {
-            await this.syncDigitalProcesses(tx, companyId, processedMetrics.metrics.processMetrics);
+            await this.syncDigitalProcesses(tx, organizationId, processedMetrics.metrics.processMetrics);
           }
 
           // 4. Sync personnel skills if they exist
           if (processedMetrics.metrics.personnelMetrics) {
-            await this.syncPersonnelSkills(tx, companyId, processedMetrics.metrics.personnelMetrics);
+            await this.syncPersonnelSkills(tx, organizationId, processedMetrics.metrics.personnelMetrics);
           }
 
           // 5. Sync strategy assessment if they exist
           if (processedMetrics.metrics.strategyMetrics) {
-            await this.syncStrategyAssessment(tx, companyId, processedMetrics.metrics.strategyMetrics);
+            await this.syncStrategyAssessment(tx, organizationId, processedMetrics.metrics.strategyMetrics);
           }
         }
       });
@@ -131,10 +131,10 @@ export class MetricSyncService {
    */
   private static async syncTechnologyImplementations(
     tx: any,
-    companyId: number,
+    organizationId: number,
     techMetrics: DashboardMetrics['technologyMetrics']
   ): Promise<void> {
-    console.log('Starting syncTechnologyImplementations with companyId:', companyId);
+    console.log('Starting syncTechnologyImplementations with organizationId:', organizationId);
     console.log('Technology metrics received:', JSON.stringify(techMetrics, null, 2));
     
     try {
@@ -181,7 +181,7 @@ export class MetricSyncService {
         // First check if an implementation already exists
         const existingImplementation = await tx.technologyImplementation.findFirst({
           where: {
-            companyId,
+            organizationId,
             technologyTypeId: techType.id
           }
         });
@@ -204,7 +204,7 @@ export class MetricSyncService {
           console.log(`Creating new implementation for ${tech}`);
           const newImplementation = await tx.technologyImplementation.create({
             data: {
-              companyId,
+              organizationId,
               technologyTypeId: techType.id,
               implementationDate: new Date(),
               maturityLevel: Math.round((techMetrics.averageMaturity || 0) * 5), // Convert 0-1 to 0-5 scale with fallback
@@ -230,7 +230,7 @@ export class MetricSyncService {
    */
   private static async syncDigitalProcesses(
     tx: any,
-    companyId: number,
+    organizationId: number,
     processMetrics: DashboardMetrics['processMetrics']
   ): Promise<void> {
     // Return early if no valid process metrics
@@ -259,7 +259,7 @@ export class MetricSyncService {
       // First check if a digital process already exists
       const existingProcess = await tx.digitalProcess.findFirst({
         where: {
-          companyId,
+          organizationId,
           processTypeId: processType.id
         }
       });
@@ -278,7 +278,7 @@ export class MetricSyncService {
         // Create new process
         await tx.digitalProcess.create({
           data: {
-            companyId,
+            organizationId,
             processTypeId: processType.id,
             digitizationLevel: Math.round(processMetrics.digitizationLevel * 5),
             automationLevel: Math.round(processMetrics.automationLevel * 5),
@@ -298,7 +298,7 @@ export class MetricSyncService {
    */
   private static async syncPersonnelSkills(
     tx: any,
-    companyId: number,
+    organizationId: number,
     personnelMetrics: DashboardMetrics['personnelMetrics']
   ): Promise<void> {
     // Return early if no valid personnel metrics
@@ -327,7 +327,7 @@ export class MetricSyncService {
       // First check if a personnel skill record already exists
       const existingSkill = await tx.personnelSkill.findFirst({
         where: {
-          companyId,
+          organizationId,
           skillId: digitalSkill.id
         }
       });
@@ -346,7 +346,7 @@ export class MetricSyncService {
         // Create new skill record
         await tx.personnelSkill.create({
           data: {
-            companyId,
+            organizationId,
             skillId: digitalSkill.id,
             numberOfPersonnel: personnelMetrics.totalSkilled,
             proficiencyLevel: Math.round(personnelMetrics.avgProficiency * 5),
@@ -365,7 +365,7 @@ export class MetricSyncService {
    */
   private static async syncStrategyAssessment(
     tx: any,
-    companyId: number,
+    organizationId: number,
     strategyMetrics: DashboardMetrics['strategyMetrics']
   ): Promise<void> {
     // Return early if no valid strategy metrics
@@ -376,7 +376,7 @@ export class MetricSyncService {
     try {
       // First check if a strategy assessment already exists
       const existingAssessment = await tx.strategyAssessment.findFirst({
-        where: { companyId }
+        where: { organizationId }
       });
       
       if (existingAssessment) {
@@ -394,7 +394,7 @@ export class MetricSyncService {
         // Create new assessment
         await tx.strategyAssessment.create({
           data: {
-            companyId,
+            organizationId,
             assessmentDate: new Date(),
             hasI40Strategy: true,
             strategyMaturity: Math.round(strategyMetrics.strategyMaturity * 5),
